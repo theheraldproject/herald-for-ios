@@ -22,9 +22,11 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "ConcreteGPSSensor")
     private var delegates: [SensorDelegate] = []
     private let locationManager = CLLocationManager()
+    private let rangeForBeacon: UUID?
 
-    init(desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, distanceFilter: CLLocationDistance = CLLocationDistanceMax) {
-        logger.debug("init(desiredAccuracy=\(desiredAccuracy == kCLLocationAccuracyThreeKilometers ? "3km" : desiredAccuracy.description),distanceFilter=\(distanceFilter == CLLocationDistanceMax ? "max" : distanceFilter.description))")
+    init(desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, distanceFilter: CLLocationDistance = CLLocationDistanceMax, rangeForBeacon: UUID? = nil) {
+        logger.debug("init(desiredAccuracy=\(desiredAccuracy == kCLLocationAccuracyThreeKilometers ? "3km" : desiredAccuracy.description),distanceFilter=\(distanceFilter == CLLocationDistanceMax ? "max" : distanceFilter.description),rangeForBeacon=\(rangeForBeacon == nil ? "disabled" : rangeForBeacon!.description))")
+        self.rangeForBeacon = rangeForBeacon
         super.init()
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
@@ -47,11 +49,40 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
     func start() {
         logger.debug("start")
         locationManager.startUpdatingLocation()
+        logger.debug("startUpdatingLocation")
+
+        // Start beacon ranging
+        guard let beaconUUID = rangeForBeacon else {
+            return
+        }
+        if #available(iOS 13.0, *) {
+            locationManager.startRangingBeacons(satisfying: CLBeaconIdentityConstraint(uuid: beaconUUID))
+            logger.debug("startRangingBeacons(ios>=13.0,beaconUUID=\(beaconUUID.description))")
+        } else {
+            let beaconRegion = CLBeaconRegion(proximityUUID: beaconUUID, identifier: beaconUUID.uuidString)
+            locationManager.startRangingBeacons(in: beaconRegion)
+            logger.debug("startRangingBeacons(ios<13.0,beaconUUID=\(beaconUUID.uuidString)))")
+        }
+
+
     }
     
     func stop() {
         logger.debug("stop")
         locationManager.stopUpdatingLocation()
+        logger.debug("stopUpdatingLocation")
+        // Start beacon ranging
+        guard let beaconUUID = rangeForBeacon else {
+            return
+        }
+        if #available(iOS 13.0, *) {
+            locationManager.stopRangingBeacons(satisfying: CLBeaconIdentityConstraint(uuid: beaconUUID))
+            logger.debug("stopRangingBeacons(ios>=13.0,beaconUUID=\(beaconUUID.description))")
+        } else {
+            let beaconRegion = CLBeaconRegion(proximityUUID: beaconUUID, identifier: beaconUUID.uuidString)
+            locationManager.stopRangingBeacons(in: beaconRegion)
+            logger.debug("stopRangingBeacons(ios<13.0,beaconUUID=\(beaconUUID.description))")
+        }
     }
     
     // MARK:- CLLocationManagerDelegate
