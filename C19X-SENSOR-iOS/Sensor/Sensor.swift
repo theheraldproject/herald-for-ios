@@ -42,7 +42,7 @@ class SensorArray : NSObject, Sensor {
     
     override init() {
         logger.debug("init")
-        sensorArray.append(ConcreteGPSSensor(desiredAccuracy: 1, distanceFilter: 1))
+        sensorArray.append(ConcreteGPSSensor(desiredAccuracy: 1, distanceFilter: 1, rangeForBeacon: UUID(uuidString: "0022D481-83FE-1F13-0000-000000000000")))
     }
     
     func add(delegate: SensorDelegate) {
