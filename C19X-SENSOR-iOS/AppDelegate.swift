@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         logger.info(sensor.rawValue + ",didDetect=" + didDetect.description)
     }
     
-    func sensor(_ sensor: SensorType, didRead: TargetPayloadData, fromTarget: TargetIdentifier) {
+    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         logger.info(sensor.rawValue + ",didRead=" + didRead.base64EncodedString() + ",fromTarget=" + fromTarget.description)
     }
     

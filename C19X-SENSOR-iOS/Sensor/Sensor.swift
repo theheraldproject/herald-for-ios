@@ -26,7 +26,7 @@ protocol SensorDelegate {
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier)
     
     /// Read payload data from target, e.g. encrypted device identifier from BLE peripheral after successful connection.
-    func sensor(_ sensor: SensorType, didRead: TargetPayloadData, fromTarget: TargetIdentifier)
+    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier)
     
     /// Measure proximity to target, e.g. a sample of RSSI values from BLE peripheral.
     func sensor(_ sensor: SensorType, didMeasureProximity: ProximityData, fromTarget: TargetIdentifier)
@@ -42,7 +42,8 @@ class SensorArray : NSObject, Sensor {
     
     override init() {
         logger.debug("init")
-        sensorArray.append(ConcreteGPSSensor(desiredAccuracy: 1, distanceFilter: 1, rangeForBeacon: UUID(uuidString: "0022D481-83FE-1F13-0000-000000000000")))
+//        sensorArray.append(ConcreteGPSSensor(desiredAccuracy: 1, distanceFilter: 1, rangeForBeacon: UUID(uuidString: "0022D481-83FE-1F13-0000-000000000000")))
+        sensorArray.append(ConcreteBLESensor())
     }
     
     func add(delegate: SensorDelegate) {
@@ -78,7 +79,12 @@ enum SensorType : String {
 typealias TargetIdentifier = String
 
 /// Encrypted payload data received from target. This is likely to be an encrypted datagram of the target's actual permanent identifier.
-typealias TargetPayloadData = Data
+typealias PayloadData = Data
+extension PayloadData {
+    var description: String {
+        self.base64EncodedString()
+    }
+}
 
 /// Raw data for estimating proximity between sensor and target, e.g. sample of RSSI for BLE.
 struct ProximityData {
