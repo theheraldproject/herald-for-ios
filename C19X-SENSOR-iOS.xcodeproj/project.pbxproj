@@ -17,6 +17,10 @@
 		B692CAAE24CADE7300F45AEE /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAD24CADE7300F45AEE /* Logger.swift */; };
 		B692CAB524CB096300F45AEE /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB424CB096300F45AEE /* Sensor.swift */; };
 		B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */; };
+		B692CABE24CB319800F45AEE /* PayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CABD24CB319800F45AEE /* PayloadSupplier.swift */; };
+		B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */; };
+		B692CAC424CB41B800F45AEE /* UltrasoundSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC324CB41B800F45AEE /* UltrasoundSensor.swift */; };
+		B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC524CB6E2C00F45AEE /* BLESensor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +36,10 @@
 		B692CAAD24CADE7300F45AEE /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		B692CAB424CB096300F45AEE /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
+		B692CABD24CB319800F45AEE /* PayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadSupplier.swift; sourceTree = "<group>"; };
+		B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
+		B692CAC324CB41B800F45AEE /* UltrasoundSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltrasoundSensor.swift; sourceTree = "<group>"; };
+		B692CAC524CB6E2C00F45AEE /* BLESensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLESensor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,7 +97,9 @@
 		B692CAB324CB093A00F45AEE /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				B692CABF24CB3E7E00F45AEE /* Payload */,
 				B692CAB724CB1A0700F45AEE /* GPS */,
+				B692CAC224CB410200F45AEE /* ULTRASOUND */,
 				B692CAB624CB19D800F45AEE /* BLE */,
 				B692CAB424CB096300F45AEE /* Sensor.swift */,
 			);
@@ -99,6 +109,7 @@
 		B692CAB624CB19D800F45AEE /* BLE */ = {
 			isa = PBXGroup;
 			children = (
+				B692CAC524CB6E2C00F45AEE /* BLESensor.swift */,
 			);
 			path = BLE;
 			sourceTree = "<group>";
@@ -109,6 +120,23 @@
 				B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */,
 			);
 			path = GPS;
+			sourceTree = "<group>";
+		};
+		B692CABF24CB3E7E00F45AEE /* Payload */ = {
+			isa = PBXGroup;
+			children = (
+				B692CABD24CB319800F45AEE /* PayloadSupplier.swift */,
+				B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */,
+			);
+			path = Payload;
+			sourceTree = "<group>";
+		};
+		B692CAC224CB410200F45AEE /* ULTRASOUND */ = {
+			isa = PBXGroup;
+			children = (
+				B692CAC324CB41B800F45AEE /* UltrasoundSensor.swift */,
+			);
+			path = ULTRASOUND;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,7 +215,11 @@
 				B692CA9E24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld in Sources */,
 				B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */,
 				B692CAAC24CADE4400F45AEE /* Database.swift in Sources */,
+				B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */,
+				B692CAC424CB41B800F45AEE /* UltrasoundSensor.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
+				B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */,
+				B692CABE24CB319800F45AEE /* PayloadSupplier.swift in Sources */,
 				B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
