@@ -24,7 +24,6 @@ class MockDatabase: Database {
 
 @available(iOS 10.0, *)
 class ConcreteDatabase: Database {
-    static let shared = ConcreteDatabase()
     private let logger = ConcreteLogger(subsystem: "Data", category: "Database")
     private let dispatchQueue = DispatchQueue(label: "Database")
     private var persistentContainer: NSPersistentContainer
@@ -63,6 +62,7 @@ class ConcreteDatabase: Database {
         }
     }
     
+    /// Requires : Info.plist : Application supports iTunes file sharing = YES
     func exportEvents() {
         dispatchQueue.async {
             do {

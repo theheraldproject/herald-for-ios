@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import os
 
 protocol Logger {
@@ -29,23 +30,20 @@ class ConcreteLogger: NSObject, Logger {
     private let subsystem: String
     private let category: String
     private let log: OSLog?
-    private let database: Database?
-    
+
     required init(subsystem: String, category: String) {
         self.subsystem = subsystem
         self.category = category
         if #available(iOS 10.0, *) {
             log = OSLog(subsystem: subsystem, category: category)
-            database = ConcreteDatabase.shared
         } else {
             log = nil
-            database = nil
         }
     }
 
     func log(_ level: LogLevel, _ message: String) {
         // Write to unified os log if available, else print to console
-        guard let log = log else {
+        guard let log = log, let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             let entry = Date().description + "::" + level.rawValue + "::" + subsystem + "::" + category + " :: " + message
             debugPrint(entry)
             return
@@ -59,13 +57,10 @@ class ConcreteLogger: NSObject, Logger {
             case .fault:
                 os_log("%s", log: log, type: .fault, message)
             }
+            // Write to database for post event analysis
+            appDelegate.database?.insert(level.rawValue + "::" + subsystem + "::" + category + " :: " + message)
             return
         }
-        // Write to database for post event analysis
-        guard let database = database else {
-            return
-        }
-        database.insert(level.rawValue + "::" + subsystem + "::" + category + " :: " + message)
     }
     
     func debug(_ message: String) {
