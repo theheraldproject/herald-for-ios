@@ -17,7 +17,6 @@
 		B692CAAE24CADE7300F45AEE /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAD24CADE7300F45AEE /* Logger.swift */; };
 		B692CAB524CB096300F45AEE /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB424CB096300F45AEE /* Sensor.swift */; };
 		B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */; };
-		B692CABE24CB319800F45AEE /* PayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CABD24CB319800F45AEE /* PayloadSupplier.swift */; };
 		B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */; };
 		B692CAC424CB41B800F45AEE /* UltrasoundSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC324CB41B800F45AEE /* UltrasoundSensor.swift */; };
 		B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC524CB6E2C00F45AEE /* BLESensor.swift */; };
@@ -36,7 +35,6 @@
 		B692CAAD24CADE7300F45AEE /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		B692CAB424CB096300F45AEE /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
-		B692CABD24CB319800F45AEE /* PayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadSupplier.swift; sourceTree = "<group>"; };
 		B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
 		B692CAC324CB41B800F45AEE /* UltrasoundSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltrasoundSensor.swift; sourceTree = "<group>"; };
 		B692CAC524CB6E2C00F45AEE /* BLESensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLESensor.swift; sourceTree = "<group>"; };
@@ -125,7 +123,6 @@
 		B692CABF24CB3E7E00F45AEE /* Payload */ = {
 			isa = PBXGroup;
 			children = (
-				B692CABD24CB319800F45AEE /* PayloadSupplier.swift */,
 				B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */,
 			);
 			path = Payload;
@@ -219,7 +216,6 @@
 				B692CAC424CB41B800F45AEE /* UltrasoundSensor.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
 				B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */,
-				B692CABE24CB319800F45AEE /* PayloadSupplier.swift in Sources */,
 				B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

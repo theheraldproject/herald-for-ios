@@ -28,6 +28,9 @@ protocol SensorDelegate {
     /// Read payload data from target, e.g. encrypted device identifier from BLE peripheral after successful connection.
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier)
     
+    /// Read payload data of other targets recently acquired by a target, e.g. Android peripheral sharing payload data acquired from nearby iOS peripherals.
+    func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier)
+
     /// Measure proximity to target, e.g. a sample of RSSI values from BLE peripheral.
     func sensor(_ sensor: SensorType, didMeasureProximity: ProximityData, fromTarget: TargetIdentifier)
     
@@ -85,6 +88,15 @@ extension PayloadData {
         self.base64EncodedString()
     }
 }
+
+/// Payload data supplier, e.g. BeaconCodes in C19X and BroadcastPayloadSupplier in Sonar.
+protocol PayloadDataSupplier {
+    /// Get payload for given timestamp. Use this for integration with any payload generator, e.g. BeaconCodes or SonarBroadcastPayloadService
+    func payload(_ timestamp: PayloadTimestamp) -> PayloadData
+}
+
+/// Payload timestamp, should normally be Date, but it may change to UInt64 in the future to use server synchronised relative timestamp.
+typealias PayloadTimestamp = Date
 
 /// Raw data for estimating proximity between sensor and target, e.g. sample of RSSI for BLE.
 struct ProximityData {
