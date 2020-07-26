@@ -43,10 +43,10 @@ class SensorArray : NSObject, Sensor {
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "SensorArray")
     private var sensorArray: [Sensor] = []
     
-    override init() {
+    init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
 //        sensorArray.append(ConcreteGPSSensor(desiredAccuracy: 1, distanceFilter: 1, rangeForBeacon: UUID(uuidString: "0022D481-83FE-1F13-0000-000000000000")))
-        sensorArray.append(ConcreteBLESensor())
+        sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
     }
     
     func add(delegate: SensorDelegate) {

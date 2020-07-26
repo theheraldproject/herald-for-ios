@@ -28,7 +28,7 @@ class ConcreteDatabase: Database {
     private let dispatchQueue = DispatchQueue(label: "Database")
     private var persistentContainer: NSPersistentContainer
     private var events: [Event] = []
-
+    
     init() {
         persistentContainer = NSPersistentContainer(name: "_SENSOR_iOS")
         let storeDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
@@ -88,7 +88,7 @@ class ConcreteDatabase: Database {
             }
         }
     }
-
+    
     
     private func load() {
         let managedContext = persistentContainer.viewContext

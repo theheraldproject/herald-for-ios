@@ -13,6 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     private let logger = ConcreteLogger(subsystem: "App", category: "AppDelegate")
     var window: UIWindow?
     var database: Database?
+    var payloadDataSupplier: PayloadDataSupplier?
     var sensor: Sensor?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -23,7 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         } else {
             database = nil
         }
-        sensor = SensorArray()
+        payloadDataSupplier = MockSonarPayloadSupplier(identifier: 1)
+        sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
         sensor?.start()
         

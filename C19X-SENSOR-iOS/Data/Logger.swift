@@ -43,7 +43,7 @@ class ConcreteLogger: NSObject, Logger {
 
     func log(_ level: LogLevel, _ message: String) {
         // Write to unified os log if available, else print to console
-        guard let log = log, let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+        guard let log = log else {
             let entry = Date().description + "::" + level.rawValue + "::" + subsystem + "::" + category + " :: " + message
             debugPrint(entry)
             return
@@ -58,7 +58,7 @@ class ConcreteLogger: NSObject, Logger {
                 os_log("%s", log: log, type: .fault, message)
             }
             // Write to database for post event analysis
-            appDelegate.database?.insert(level.rawValue + "::" + subsystem + "::" + category + " :: " + message)
+//            ConcreteLogger.database.insert(level.rawValue + "::" + subsystem + "::" + category + " :: " + message)
             return
         }
     }
