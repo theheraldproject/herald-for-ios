@@ -32,11 +32,13 @@ protocol SensorDelegate {
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier)
 
     /// Measure proximity to target, e.g. a sample of RSSI values from BLE peripheral.
-    func sensor(_ sensor: SensorType, didMeasureProximity: ProximityData, fromTarget: TargetIdentifier)
+    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier)
     
     /// Detection of time spent at location, e.g. at specific restaurant between 02/06/2020 19:00 and 02/06/2020 21:00
-    func sensor(_ sensor: SensorType, didVisit: LocationData)
+    func sensor(_ sensor: SensorType, didVisit: Location)
 }
+
+// MARK:- SensorArray
 
 /// Sensor array for combining multiple detection and tracking methods.
 class SensorArray : NSObject, Sensor {
@@ -81,13 +83,7 @@ enum SensorType : String {
 /// Ephemeral identifier for detected target (e.g. smartphone, beacon, place). This is likely to be an UUID but using String for variable identifier length.
 typealias TargetIdentifier = String
 
-/// Encrypted payload data received from target. This is likely to be an encrypted datagram of the target's actual permanent identifier.
-typealias PayloadData = Data
-extension PayloadData {
-    var description: String {
-        self.base64EncodedString()
-    }
-}
+// MARK:- Payload data
 
 /// Payload data supplier, e.g. BeaconCodes in  and BroadcastPayloadSupplier in Sonar.
 protocol PayloadDataSupplier {
@@ -98,43 +94,79 @@ protocol PayloadDataSupplier {
 /// Payload timestamp, should normally be Date, but it may change to UInt64 in the future to use server synchronised relative timestamp.
 typealias PayloadTimestamp = Date
 
-/// Raw data for estimating proximity between sensor and target, e.g. sample of RSSI for BLE.
-struct ProximityData {
+/// Encrypted payload data received from target. This is likely to be an encrypted datagram of the target's actual permanent identifier.
+typealias PayloadData = Data
+extension PayloadData {
+    var description: String {
+        self.base64EncodedString()
+    }
+}
+
+// MARK:- Proximity data
+
+/// Raw data for estimating proximity between sensor and target, e.g. RSSI for BLE.
+struct Proximity {
     /// Unit of measurement, e.g. RSSI
-    let unit: MeasurementUnit
-    /// Measurement values, e.g. raw RSSI values.
-    let values: [Double]
+    let unit: ProximityMeasurementUnit
+    /// Measured value, e.g. raw RSSI value.
+    let value: Double
     /// Get plain text description of proximity data
     var description: String { get {
-        unit.rawValue + ":" + values.description
+        unit.rawValue + ":" + value.description
     }}
 }
 
 /// Measurement unit for interpreting the proximity data values.
-enum MeasurementUnit : String {
+enum ProximityMeasurementUnit : String {
     /// Received signal strength indicator, e.g. BLE signal strength as proximity estimator.
     case RSSI
     /// Roundtrip time, e.g. Audio signal echo time duration as proximity estimator.
     case RTT
-    /// GPS coordinates (latitude,longitude,altitude) in WGS84 decimal format and meters from sea level.
-    case WGS84_POINT
-    /// GPS coordinates and region radius, e.g. latitude and longitude in decimal format and radius in meters.
-    case WGS84_AREA
-    /// Free text place name.
-    case PLACENAME
 }
 
-/// Raw location data for estimating
-struct LocationData {
-    /// Unit of measurement, e.g. WGS84_DECIMAL
-    let unit: MeasurementUnit
+// MARK:- Location data
+
+/// Raw location data for estimating indirect exposure, e.g.
+struct Location {
     /// Measurement values, e.g. GPS coordinates in comma separated string format for latitude and longitude
-    let values: [String]
+    let value: LocationReference
     /// Time spent at location.
     let time: (start: Date, end: Date)
     /// Get plain text description of proximity data
     var description: String { get {
-        unit.rawValue + "[from=" + time.start.description + ",to=" + time.end.description + "]:" + values.description
+        value.description + ":[from=" + time.start.description + ",to=" + time.end.description + "]"
     }}
 }
 
+protocol LocationReference {
+    var description: String { get }
+}
+
+/// GPS coordinates (latitude,longitude,altitude) in WGS84 decimal format and meters from sea level.
+struct WGS84PointLocationReference : LocationReference {
+    let latitude: Double
+    let longitude: Double
+    let altitude: Double
+    var description: String { get {
+        "WGS84(lat=\(latitude),lon=\(longitude),alt=\(altitude))"
+        }}
+}
+
+/// GPS coordinates and region radius, e.g. latitude and longitude in decimal format and radius in meters.
+struct WGS84CircularAreaLocationReference : LocationReference {
+    let latitude: Double
+    let longitude: Double
+    let altitude: Double
+    let radius: Double
+    var description: String { get {
+        "WGS84(lat=\(latitude),lon=\(longitude),alt=\(altitude),radius=\(radius))"
+        }}
+}
+
+/// Free text place name.
+struct PlacenameLocationReference : LocationReference {
+    let name: String
+    var description: String { get {
+        "PLACE(name=\(name))"
+        }}
+}

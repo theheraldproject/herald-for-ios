@@ -38,11 +38,6 @@ protocol BLETransmitter {
      data to the transmitter.
      */
     func add(_ delegate: SensorDelegate)
-    
-    /**
-     Get all subscribers
-     */
-    func subscribers() -> [CBCentral]
 }
 
 /**
@@ -174,16 +169,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         notifyTimer = nil
     }
     
-    func subscribers() -> [CBCentral] {
-        guard let characteristic = signalCharacteristic else {
-            return []
-        }
-        guard let centrals = characteristic.subscribedCentrals else {
-            return []
-        }
-        return centrals
-    }
-    
     /**
      Generate updateValue notification after 8 seconds to notify all subscribers and keep the iOS receivers awake.
      */
@@ -298,9 +283,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                     delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
                     
                     if let rssi = payloadDataBundle.rssi {
-                        let proximityData = ProximityData(unit: .RSSI, values: [Double(rssi)])
-                        logger.debug("didReceiveWrite -> didMeasureProximity=\(proximityData.description),fromTarget=\(targetIdentifier)")
-                        delegates.forEach { $0.sensor(.BLE, didMeasureProximity: proximityData, fromTarget: targetIdentifier) }
+                        let proximity = Proximity(unit: .RSSI, value: Double(rssi))
+                        logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
+                        delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: targetIdentifier) }
                     }
                     
                     if let payloadData = payloadDataBundle.payloadData {

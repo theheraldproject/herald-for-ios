@@ -92,12 +92,14 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
         guard locations.count > 0 else {
             return
         }
-        let timestamps = locations.map { $0.timestamp }.sorted()
-        guard let start = timestamps.first, let end = timestamps.last else {
-            return
+        locations.forEach() { location in
+            let location = Location(
+                value: WGS84PointLocationReference(
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude,
+                    altitude: location.altitude),
+                time: (start: location.timestamp, end: location.timestamp))
+            delegates.forEach { $0.sensor(.GPS, didVisit: location) }
         }
-        let values = locations.map { $0.coordinate.latitude.description + "," + $0.coordinate.longitude.description + "," + $0.altitude.description }
-        let locationData = LocationData(unit: .WGS84_POINT, values: values, time: (start: start, end: end))
-        delegates.forEach { $0.sensor(.GPS, didVisit: locationData) }
     }
 }
