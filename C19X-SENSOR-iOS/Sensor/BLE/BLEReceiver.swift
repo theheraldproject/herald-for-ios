@@ -433,7 +433,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, CBCentralManagerDelegate, CBPe
      maximising the time interval between bluetooth calls to minimise power usage.
      */
     private func wakeTransmitter(_ source: String, _ beacon: Beacon) {
-        guard let operatingSystem = beacon.operatingSystem, operatingSystem == .ios, let characteristic = beacon.characteristic else {
+        guard let operatingSystem = beacon.operatingSystem, operatingSystem == .ios, let characteristic = beacon.signalCharacteristic else {
             return
         }
         logger.debug("wakeTransmitter (source=\(source),peripheral=\(beacon.uuidString))")
