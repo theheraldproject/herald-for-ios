@@ -30,6 +30,41 @@ extension CBManagerState: CustomStringConvertible {
     }
 }
 
+extension CBPeripheralManagerState : CustomStringConvertible {
+    /**
+     Get plain text description of state.
+     */
+    public var description: String {
+        switch self {
+        case .poweredOff: return ".poweredOff"
+        case .poweredOn: return ".poweredOn"
+        case .resetting: return ".resetting"
+        case .unauthorized: return ".unauthorized"
+        case .unknown: return ".unknown"
+        case .unsupported: return ".unsupported"
+        @unknown default: return "undefined"
+        }
+    }
+}
+
+extension CBCentralManagerState : CustomStringConvertible {
+    /**
+     Get plain text description of state.
+     */
+    public var description: String {
+        switch self {
+        case .poweredOff: return ".poweredOff"
+        case .poweredOn: return ".poweredOn"
+        case .resetting: return ".resetting"
+        case .unauthorized: return ".unauthorized"
+        case .unknown: return ".unknown"
+        case .unsupported: return ".unsupported"
+        @unknown default: return "undefined"
+        }
+    }
+}
+
+
 /**
  Extension to make the state human readable in logs.
  */

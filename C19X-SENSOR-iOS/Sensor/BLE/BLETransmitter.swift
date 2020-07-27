@@ -16,12 +16,6 @@ import CoreBluetooth
 */
 protocol BLETransmitter {
     /**
-     Create a transmitter  that uses the same sequential dispatch queue as the receiver.
-     Transmitter starts automatically when Bluetooth is enabled.
-     */
-    init(queue: DispatchQueue, payloadDataSupplier: PayloadDataSupplier, receiver: BLEReceiver)
-    
-    /**
      Start transmitter. The actual start is triggered by bluetooth state changes.
      */
     func start()
@@ -67,9 +61,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLETransmitter")
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue
+    private let database: BLEDatabase
     /// Beacon code generator for creating cryptographically secure public codes that can be later used for on-device matching.
     private let payloadDataSupplier: PayloadDataSupplier
-    private let receiver: BLEReceiver
     /// Peripheral manager for managing all connections, using a single manager for simplicity.
     private var peripheral: CBPeripheralManager!
     /// Beacon service and characteristics being broadcasted by the transmitter.
@@ -88,8 +82,13 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     /// Delegates for receiving beacon detection events.
     private var delegates: [SensorDelegate] = []
 
-    required init(queue: DispatchQueue, payloadDataSupplier: PayloadDataSupplier, receiver: BLEReceiver) {
+    /**
+     Create a transmitter  that uses the same sequential dispatch queue as the receiver.
+     Transmitter starts automatically when Bluetooth is enabled.
+     */
+    init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier, receiver: BLEReceiver) {
         self.queue = queue
+        self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         self.receiver = receiver
         super.init()
@@ -337,7 +336,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
 
 /// RSSI and Payload data transmitted from receiver via write to signal characteristic
 class PayloadDataBundle {
-    let rssi: RSSI?
+    let rssi: BLE_RSSI?
     let payloadData: PayloadData?
     
     init?(_ data: Data) {
@@ -348,7 +347,7 @@ class PayloadDataBundle {
             return nil
         }
         // RSSI is a 32-bit Java int (little-endian) at index 0
-        rssi = RSSI(PayloadDataBundle.getInt32(8, bytes: bytes))
+        rssi = BLE_RSSI(PayloadDataBundle.getInt32(8, bytes: bytes))
         guard bytes.count > 4 else {
             payloadData = nil
             return
