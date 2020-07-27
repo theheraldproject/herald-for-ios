@@ -41,25 +41,27 @@ Requires : Info.plist : Privacy - Bluetooth Peripheral Usage Description
 class ConcreteBLESensor : NSObject, BLESensor {
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLESensor")
     private let queue = DispatchQueue(label: "Sensor.BLE.ConcreteBLESensor")
+    private let database: BLEDatabase
     private let transmitter: BLETransmitter
     private let receiver: BLEReceiver
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
-        receiver = ConcreteBLEReceiver(queue: queue)
-        transmitter = ConcreteBLETransmitter(queue: queue, payloadDataSupplier: payloadDataSupplier, receiver: receiver)
+        database = ConcreteBLEDatabase()
+        receiver = ConcreteBLEReceiver(queue: queue, database: database)
+        transmitter = ConcreteBLETransmitter(queue: queue, database: database, payloadDataSupplier: payloadDataSupplier, receiver: receiver)
         super.init()
     }
     
     func start() {
         logger.debug("start")
         transmitter.start()
-//        receiver.start()
+        receiver.start()
     }
 
     func stop() {
         logger.debug("stop")
         transmitter.stop()
-//        receiver.stop()
+        receiver.stop()
     }
     
     func add(delegate: SensorDelegate) {

@@ -16,11 +16,6 @@ import os
 protocol BLEReceiver {
     
     /**
-     Create a receiver that uses the same sequential dispatch queue as the transmitter.
-     */
-    init(queue: DispatchQueue)
-    
-    /**
      Start receiver. The actual start is triggered by bluetooth state changes.
      */
     func start()
@@ -61,9 +56,6 @@ enum OperatingSystem {
     case unknown
 }
 
-/// RSSI in dBm.
-typealias RSSI = Int
-
 /**
  Beacon peripheral for collating information (beacon code) acquired from asynchronous callbacks.
  */
@@ -92,7 +84,7 @@ class Beacon {
         didSet { lastUpdatedAt = Date() }
     }
     /// RSSI value obtained from either scanForPeripheral or readRSSI.
-    var rssi: RSSI? {
+    var rssi: BLE_RSSI? {
         didSet { lastUpdatedAt = Date() }
     }
     /// Beacon code obtained from the lower 64-bits of the beacon characteristic UUID.
@@ -168,6 +160,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, CBCentralManagerDelegate, CBPe
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLEReceiver")
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue!
+    /// Database of peripherals
+    private let database: BLEDatabase
     /// Central manager for managing all connections, using a single manager for simplicity.
     private var central: CBCentralManager!
     /// Table of known beacons, indexed by the peripheral UUID.
@@ -187,8 +181,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, CBCentralManagerDelegate, CBPe
     private let statistics = TimeIntervalSample()
     
     
-    required init(queue: DispatchQueue) {
+    required init(queue: DispatchQueue, database: BLEDatabase) {
         self.queue = queue
+        self.database = database
         super.init()
         self.central = CBCentralManager(delegate: self, queue: queue, options: [
             CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
@@ -446,7 +441,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, CBCentralManagerDelegate, CBPe
             return
         }
         // Discard invalid RSSI values
-        if rssi >= RSSI(0) {
+        if rssi >= BLE_RSSI(0) {
             logger.debug("Discarded beacon, invalid RSSI value (source=\(source),peripheral=\(String(describing: beacon.uuidString)),code=\(String(describing: code)),rssi=\(String(describing: rssi)))")
             beacon.rssi = nil
             return

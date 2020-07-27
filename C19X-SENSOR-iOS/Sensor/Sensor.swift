@@ -47,7 +47,7 @@ class SensorArray : NSObject, Sensor {
     
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
-//        sensorArray.append(ConcreteGPSSensor(desiredAccuracy: 1, distanceFilter: 1, rangeForBeacon: UUID(uuidString: "0022D481-83FE-1F13-0000-000000000000")))
+        sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
     }
     
