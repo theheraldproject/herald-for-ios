@@ -24,7 +24,7 @@ class MockDatabase: Database {
 
 @available(iOS 10.0, *)
 class ConcreteDatabase: Database {
-    private let logger = ConcreteLogger(subsystem: "Data", category: "Database")
+    private let logger = ConcreteLogger(subsystem: "Sensor", category: "Data.Database")
     private let dispatchQueue = DispatchQueue(label: "Database")
     private var persistentContainer: NSPersistentContainer
     private var events: [Event] = []

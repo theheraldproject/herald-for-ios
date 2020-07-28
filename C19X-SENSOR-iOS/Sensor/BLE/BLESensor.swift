@@ -21,11 +21,13 @@ struct BLESensorConfiguration {
     */
     static let serviceUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000000")
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
-    static let signalCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000001")
+    static let androidSignalCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000001")
+    /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
+    static let iosSignalCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000002")
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
-    static let payloadCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000002")
+    static let payloadCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000003")
     /// Secondary payload characteristic (read) for sharing payload data acquired by this central, e.g. identity data of other peripherals in the vincinity
-    static let payloadSharingCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000003")
+    static let payloadSharingCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000004")
     /// Time delay between notifications for subscribers.
     static let notificationDelay = DispatchTimeInterval.seconds(8)
 }
@@ -38,34 +40,79 @@ Requires : Signing & Capabilities : BackgroundModes : Acts as a Bluetooth LE acc
 Requires : Info.plist : Privacy - Bluetooth Always Usage Description
 Requires : Info.plist : Privacy - Bluetooth Peripheral Usage Description
 */
-class ConcreteBLESensor : NSObject, BLESensor {
+class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLESensor")
-    private let queue = DispatchQueue(label: "Sensor.BLE.ConcreteBLESensor")
+    private let sensorQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLESensor.SensorQueue")
+    private let delegateQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLESensor.DelegateQueue")
+    private var delegates: [SensorDelegate] = []
     private let database: BLEDatabase
     private let transmitter: BLETransmitter
     private let receiver: BLEReceiver
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         database = ConcreteBLEDatabase()
-        receiver = ConcreteBLEReceiver(queue: queue, database: database)
-        transmitter = ConcreteBLETransmitter(queue: queue, database: database, payloadDataSupplier: payloadDataSupplier, receiver: receiver)
+        transmitter = ConcreteBLETransmitter(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
+        receiver = ConcreteBLEReceiver(queue: sensorQueue, database: database)
         super.init()
+        database.add(delegate: self)
     }
     
     func start() {
         logger.debug("start")
-        transmitter.start()
-        receiver.start()
+        // BLE transmitter and receivers start on powerOn event
     }
 
     func stop() {
         logger.debug("stop")
-        transmitter.stop()
-        receiver.stop()
+        // BLE transmitter and receivers stops on powerOff event
     }
     
     func add(delegate: SensorDelegate) {
-        transmitter.add(delegate)
-//        receiver.add(delegate)
+        delegates.append(delegate)
+        transmitter.add(delegate: delegate)
+        receiver.add(delegate: delegate)
+    }
+    
+    // MARK:- BLEDatabaseDelegate
+    
+    func bleDatabase(didCreate device: BLEDevice) {
+        logger.debug("didDetect (device=\(device.identifier))")
+        delegateQueue.async {
+            self.delegates.forEach { $0.sensor(.BLE, didDetect: device.identifier) }
+        }
+    }
+    
+    func bleDatabase(didUpdate device: BLEDevice, attribute: BLEDeviceAttribute) {
+        switch attribute {
+        case .rssi:
+            guard let rssi = device.rssi else {
+                return
+            }
+            let proximity = Proximity(unit: .RSSI, value: Double(rssi))
+            logger.debug("didMeasure (device=\(device.identifier),proximity=\(proximity.description))")
+            delegateQueue.async {
+                self.delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: device.identifier) }
+            }
+        case .payloadData:
+            guard let payloadData = device.payloadData else {
+                return
+            }
+            logger.debug("didRead (device=\(device.identifier),payloadData=\(payloadData.description))")
+            delegateQueue.async {
+                self.delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: device.identifier) }
+            }
+        default:
+            return
+        }
+    }
+    
+}
+
+extension TargetIdentifier {
+    init(peripheral: CBPeripheral) {
+        self.init(peripheral.identifier.uuidString)
+    }
+    init(central: CBCentral) {
+        self.init(central.identifier.uuidString)
     }
 }

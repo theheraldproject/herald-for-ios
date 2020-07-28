@@ -12,21 +12,19 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     private let logger = ConcreteLogger(subsystem: "App", category: "AppDelegate")
     var window: UIWindow?
-    var database: Database?
+
+    // Payload data supplier, sensor and contact log
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: Sensor?
+    let contactLog = ContactLog(filename: "contacts.csv")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
-        if #available(iOS 10.0, *) {
-            database = ConcreteDatabase()
-        } else {
-            database = nil
-        }
         payloadDataSupplier = MockSonarPayloadSupplier(identifier: 1)
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
+        sensor?.add(delegate: contactLog)
         sensor?.start()
         
         return true
