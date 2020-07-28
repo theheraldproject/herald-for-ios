@@ -14,24 +14,7 @@ import CoreBluetooth
  enters background mode, the UUID will disappear from the broadcast, so Android devices need to
  search for Apple devices and then connect and discover services to read the UUID.
 */
-protocol BLETransmitter {
-    /**
-     Start transmitter. The actual start is triggered by bluetooth state changes.
-     */
-    func start()
-
-    /**
-     Stops and resets transmitter.
-     */
-    func stop()
-
-    /**
-     Delegates for receiving beacon detection events. This is necessary because some Android devices (Samsung J6)
-     does not support BLE transmit, thus making the beacon characteristic writable offers a mechanism for such devices
-     to detect a beacon transmitter and make their own presence known by sending its own beacon code and RSSI as
-     data to the transmitter.
-     */
-    func add(_ delegate: SensorDelegate)
+protocol BLETransmitter : Sensor {
 }
 
 /**
@@ -59,6 +42,7 @@ protocol BLETransmitter {
  */
 class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDelegate {
     private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLETransmitter")
+    private var delegates: [SensorDelegate] = []
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue
     private let database: BLEDatabase
@@ -79,18 +63,15 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private var notifyTimer: DispatchSourceTimer?
     /// Dedicated sequential queue for the shifting timer.
     private let notifyTimerQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLETransmitter.Timer")
-    /// Delegates for receiving beacon detection events.
-    private var delegates: [SensorDelegate] = []
 
     /**
      Create a transmitter  that uses the same sequential dispatch queue as the receiver.
      Transmitter starts automatically when Bluetooth is enabled.
      */
-    init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier, receiver: BLEReceiver) {
+    init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
         self.queue = queue
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
-        self.receiver = receiver
         super.init()
         // Create a peripheral that supports state restoration
         self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
@@ -99,7 +80,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         ])
     }
     
-    func add(_ delegate: SensorDelegate) {
+    func add(delegate: SensorDelegate) {
         delegates.append(delegate)
     }
     
@@ -111,8 +92,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         }
         startAdvertising()
         signalCharacteristic?.subscribedCentrals?.forEach() { central in
-            // Help receiver detect central if it has changed identity
-            receiver.scan("transmitter|start", central: central)
+            // FEATURE : Symmetric connection on subscribe
+            _ = database.device(central.identifier.uuidString)
         }
         notifySubscribers("start")
     }
@@ -129,7 +110,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private func startAdvertising() {
         logger.debug("startAdvertising")
         if signalCharacteristic == nil {
-            signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.signalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
+            signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
             logger.debug("startAdvertising (signalCharacteristic=new)")
         } else {
             signalCharacteristic?.value = nil
@@ -200,12 +181,19 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                     for characteristic in characteristics {
                         logger.debug("willRestoreState (characteristic=\(characteristic.uuid.uuidString))")
                         switch characteristic.uuid {
-                        case BLESensorConfiguration.signalCharacteristicUUID:
+                        case BLESensorConfiguration.androidSignalCharacteristicUUID:
                             if let mutableCharacteristic = characteristic as? CBMutableCharacteristic {
                                 signalCharacteristic = mutableCharacteristic
-                                logger.debug("willRestoreState (signalCharacteristic=\(characteristic.uuid.uuidString))")
+                                logger.debug("willRestoreState (androidSignalCharacteristic=\(characteristic.uuid.uuidString))")
                             } else {
-                                logger.fault("willRestoreState characteristic not mutable (signalCharacteristic=\(characteristic.uuid.uuidString))")
+                                logger.fault("willRestoreState characteristic not mutable (androidSignalCharacteristic=\(characteristic.uuid.uuidString))")
+                            }
+                        case BLESensorConfiguration.iosSignalCharacteristicUUID:
+                            if let mutableCharacteristic = characteristic as? CBMutableCharacteristic {
+                                signalCharacteristic = mutableCharacteristic
+                                logger.debug("willRestoreState (iosSignalCharacteristic=\(characteristic.uuid.uuidString))")
+                            } else {
+                                logger.fault("willRestoreState characteristic not mutable (iosSignalCharacteristic=\(characteristic.uuid.uuidString))")
                             }
                         case BLESensorConfiguration.payloadCharacteristicUUID:
                             if let mutableCharacteristic = characteristic as? CBMutableCharacteristic {
@@ -272,11 +260,10 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         // Write -> Notify delegates -> Write response -> Notify subscribers
         for request in requests {
-            let uuid = request.central.identifier.uuidString
-            logger.debug("didReceiveWrite (central=\(uuid))")
+            let targetIdentifier = TargetIdentifier(central: request.central)
+            logger.debug("didReceiveWrite (central=\(targetIdentifier))")
             if let data = request.value {
                 // Receive beacon code and RSSI as data from receiver (e.g. Android device with no BLE transmit capability)
-                let targetIdentifier = TargetIdentifier(uuid)
                 if let payloadDataBundle = PayloadDataBundle(data) {
                     logger.debug("didReceiveWrite -> didDetect=\(targetIdentifier)")
                     delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
@@ -297,8 +284,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             } else {
                 peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
             }
-            // Help receiver detect central if it has changed identity
-            receiver.scan("transmitter|didReceiveWrite", central: request.central)
+            // FEATURE : Symmetric connection on write
+            _ = database.device(request.central.identifier.uuidString)
         }
         notifySubscribers("didReceiveWrite")
     }
@@ -307,11 +294,16 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // Read -> Notify subscribers
         logger.debug("Read (central=\(request.central.identifier.uuidString))")
         let payloadData = payloadDataSupplier.payload(PayloadTimestamp())
-        request.value = payloadData
-        logger.debug("Read (central=\(request.central.identifier.uuidString),payload=\(payloadData.description))")
+        guard request.offset < payloadData.count else {
+            logger.fault("Read invalid offset (central=\(request.central.identifier.uuidString),offset=\(request.offset),payload=\(payloadData.description))")
+            peripheral.respond(to: request, withResult: .invalidOffset)
+            return
+        }
+        request.value = (request.offset == 0 ? payloadData : payloadData.subdata(in: request.offset..<(payloadData.count - request.offset)))
+        logger.debug("Read (central=\(request.central.identifier.uuidString),offset=\(request.offset),payload=\(payloadData.description))")
         peripheral.respond(to: request, withResult: .success)
-        // Help receiver detect central if it has changed identity
-        receiver.scan("transmitter|didReceiveRead", central: request.central)
+        // FEATURE : Symmetric connection on read
+        _ = database.device(request.central.identifier.uuidString)
         notifySubscribers("didReceiveRead")
     }
     
@@ -320,16 +312,16 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // iOS receiver subscribes to the signal characteristic on first contact. This ensures the first call keeps
         // the transmitter and receiver awake. Future loops will rely on didReceiveWrite as the trigger.
         logger.debug("Subscribe (central=\(central.identifier.uuidString))")
-        // Help receiver detect central if it has changed identity
-        receiver.scan("transmitter|didSubscribeTo", central: central)
+        // FEATURE : Symmetric connection on subscribe
+        _ = database.device(central.identifier.uuidString)
         notifySubscribers("didSubscribeTo")
     }
     
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
         // Unsubscribe -> Notify subscribers
         logger.debug("Unsubscribe (central=\(central.identifier.uuidString))")
-        // Help receiver detect central if it has changed identity
-        receiver.scan("transmitter|didUnsubscribeFrom", central: central)
+        // FEATURE : Symmetric connection on unsubscribe
+        _ = database.device(central.identifier.uuidString)
         notifySubscribers("didUnsubscribeFrom")
     }
 }

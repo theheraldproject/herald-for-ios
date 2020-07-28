@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B6374DC524D00228005985BC /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6374DC424D00228005985BC /* ContactLog.swift */; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
@@ -29,9 +30,11 @@
 		B692CAD624CC30A700F45AEE /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD524CC30A700F45AEE /* BLEReceiver.swift */; };
 		B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD724CC30D300F45AEE /* BLEUtilities.swift */; };
 		B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADB24CD936B00F45AEE /* BLEDatabase.swift */; };
+		B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADD24CF2B1400F45AEE /* TextFile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B6374DC424D00228005985BC /* ContactLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* C19X-SENSOR-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "C19X-SENSOR-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -56,6 +59,7 @@
 		B692CAD524CC30A700F45AEE /* BLEReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
 		B692CAD724CC30D300F45AEE /* BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
 		B692CADB24CD936B00F45AEE /* BLEDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
+		B692CADD24CF2B1400F45AEE /* TextFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +109,9 @@
 			isa = PBXGroup;
 			children = (
 				B692CAAB24CADE4400F45AEE /* Database.swift */,
+				B692CADD24CF2B1400F45AEE /* TextFile.swift */,
 				B692CAAD24CADE7300F45AEE /* Logger.swift */,
+				B6374DC424D00228005985BC /* ContactLog.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -250,12 +256,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6374DC524D00228005985BC /* ContactLog.swift in Sources */,
 				B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */,
 				B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */,
 				B692CAAE24CADE7300F45AEE /* Logger.swift in Sources */,
 				B692CAB524CB096300F45AEE /* Sensor.swift in Sources */,
 				B692CACE24CC27F400F45AEE /* DayCodes.swift in Sources */,
 				B692CACC24CC27ED00F45AEE /* BeaconCodes.swift in Sources */,
+				B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */,
 				B692CAD224CC2BAA00F45AEE /* C19XPayloadSupplier.swift in Sources */,
 				B692CAD424CC2DA100F45AEE /* JavaData.swift in Sources */,
 				B692CA9E24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld in Sources */,

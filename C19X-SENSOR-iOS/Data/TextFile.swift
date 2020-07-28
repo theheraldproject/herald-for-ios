@@ -1,0 +1,45 @@
+//
+//  TextFile.swift
+//  C19X-SENSOR-iOS
+//
+//  Created by Freddy Choi on 27/07/2020.
+//  Copyright © 2020 C19X. All rights reserved.
+//
+
+import Foundation
+
+class TextFile {
+    private let logger = ConcreteLogger(subsystem: "Sensor", category: "Data.TextFile")
+    private var file: URL?
+    
+    init(filename: String) {
+        file = try? FileManager.default
+        .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        .appendingPathComponent(filename)
+    }
+    
+    func empty() -> Bool {
+        guard let file = file else {
+            return true
+        }
+        return !FileManager.default.fileExists(atPath: file.path)
+    }
+    
+    func write(_ line: String) {
+        guard let file = file else {
+            return
+        }
+        guard let data = (line+"\n").data(using: .utf8) else {
+            return
+        }
+        if FileManager.default.fileExists(atPath: file.path) {
+            if let fileHandle = try? FileHandle(forWritingTo: file) {
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(data)
+                fileHandle.closeFile()
+            }
+        } else {
+            try? data.write(to: file, options: .atomicWrite)
+        }
+    }
+}
