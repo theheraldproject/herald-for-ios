@@ -29,7 +29,7 @@ struct BLESensorConfiguration {
     /// Secondary payload characteristic (read) for sharing payload data acquired by this central, e.g. identity data of other peripherals in the vincinity
     static let payloadSharingCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000004")
     /// Time delay between notifications for subscribers.
-    static let notificationDelay = DispatchTimeInterval.seconds(2)
+    static let notificationDelay = DispatchTimeInterval.seconds(8)
 }
 
 
