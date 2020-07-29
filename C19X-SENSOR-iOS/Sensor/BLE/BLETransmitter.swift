@@ -290,18 +290,77 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         notifySubscribers("didReceiveWrite")
     }
     
+    /// Determine what payload data to share with peer
+    private func payloadSharingData(_ central: CBCentral) -> (identifiers: [TargetIdentifier], data: Data) {
+        let peer = database.device(central.identifier.uuidString)
+        // Get other devices that were seen recently by this device
+        var devices: [BLEDevice] = []
+        database.devices().forEach() { device in
+            // Device was seen in last minute
+            guard device.timeIntervalSinceLastUpdate < .minute else {
+                return
+            }
+            // Device has payload
+            guard let payload = device.payloadData else {
+                return
+            }
+            // Payload is new to peer
+            guard !peer.payloadSharingData.contains(payload) else {
+                return
+            }
+            devices.append(device)
+        }
+        // Most recently seen devices first
+        devices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
+        // Limit how much to share to avoid oversized data transfers over BLE (512 bytes limit according to spec)
+        var identifiers: [TargetIdentifier] = []
+        var data = Data()
+        devices.forEach() { device in
+            guard let payload = device.payloadData else {
+                return
+            }
+            guard data.count + payload.count < 512 else {
+                return
+            }
+            identifiers.append(device.identifier)
+            data.append(payload)
+            device.payloadSharingData.append(payload) 
+        }
+        return (identifiers, data)
+    }
+    
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
         // Read -> Notify subscribers
-        logger.debug("Read (central=\(request.central.identifier.uuidString))")
-        let payloadData = payloadDataSupplier.payload(PayloadTimestamp())
-        guard request.offset < payloadData.count else {
-            logger.fault("Read invalid offset (central=\(request.central.identifier.uuidString),offset=\(request.offset),payload=\(payloadData.description))")
-            peripheral.respond(to: request, withResult: .invalidOffset)
-            return
+        let targetIdentifier = TargetIdentifier(request.central.identifier.uuidString)
+        switch request.characteristic.uuid {
+        case BLESensorConfiguration.payloadCharacteristicUUID:
+            logger.debug("Read (central=\(targetIdentifier),characteristic=payload,offset=\(request.offset))")
+            let data = payloadDataSupplier.payload(PayloadTimestamp())
+            guard request.offset < data.count else {
+                logger.fault("Read, invalid offset (central=\(targetIdentifier),characteristic=payload,offset=\(request.offset),data=\(data.description))")
+                peripheral.respond(to: request, withResult: .invalidOffset)
+                return
+            }
+            request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
+            peripheral.respond(to: request, withResult: .success)
+        case BLESensorConfiguration.payloadSharingCharacteristicUUID:
+            let (identifiers, data) = payloadSharingData(request.central)
+            logger.debug("Read (central=\(targetIdentifier),characteristic=payloadSharing,offset=\(request.offset),shared=\(identifiers))")
+            guard identifiers.count > 0, data.count > 0 else {
+                peripheral.respond(to: request, withResult: .success)
+                return
+            }
+            guard request.offset < data.count else {
+                logger.fault("Read, invalid offset (central=\(targetIdentifier),characteristic=payloadSharing,offset=\(request.offset),data=\(data.description))")
+                peripheral.respond(to: request, withResult: .invalidOffset)
+                return
+            }
+            request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
+            peripheral.respond(to: request, withResult: .success)
+        default:
+            logger.fault("Read (central=\(request.central.identifier.uuidString),characteristic=unknown)")
+            peripheral.respond(to: request, withResult: .requestNotSupported)
         }
-        request.value = (request.offset == 0 ? payloadData : payloadData.subdata(in: request.offset..<(payloadData.count - request.offset)))
-        logger.debug("Read (central=\(request.central.identifier.uuidString),offset=\(request.offset),payload=\(payloadData.description))")
-        peripheral.respond(to: request, withResult: .success)
         // FEATURE : Symmetric connection on read
         _ = database.device(request.central.identifier.uuidString)
         notifySubscribers("didReceiveRead")

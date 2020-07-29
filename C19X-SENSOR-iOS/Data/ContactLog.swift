@@ -49,9 +49,8 @@ class ContactLog: NSObject, SensorDelegate {
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let prefix = timestamp() + "," + sensor.rawValue + "," + csv(fromTarget)
-        didShare.map { $0.base64EncodedString() }.sorted().forEach() { dataString in
-            textFile.write(prefix + ",,,,4,," + csv(dataString))
-        }
+        let payloads = didShare.map { $0.base64EncodedString() }
+        textFile.write(prefix + ",,,,4,," + csv(payloads.description))
     }
     
     func sensor(_ sensor: SensorType, didVisit: Location) {

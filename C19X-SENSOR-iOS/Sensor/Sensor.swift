@@ -89,6 +89,8 @@ typealias TargetIdentifier = String
 protocol PayloadDataSupplier {
     /// Get payload for given timestamp. Use this for integration with any payload generator, e.g. BeaconCodes or SonarBroadcastPayloadService
     func payload(_ timestamp: PayloadTimestamp) -> PayloadData
+    /// Parse raw data into payloads
+    func payload(_ data: Data) -> [PayloadData]
 }
 
 /// Payload timestamp, should normally be Date, but it may change to UInt64 in the future to use server synchronised relative timestamp.

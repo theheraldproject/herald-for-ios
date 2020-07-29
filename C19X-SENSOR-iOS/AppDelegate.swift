@@ -63,7 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
-        logger.info(sensor.rawValue + ",didShare=" + didShare.description + ",fromTarget=" + fromTarget.description)
+        let payloads = didShare.map { $0.base64EncodedString() }
+        logger.info(sensor.rawValue + ",didShare=" + payloads.description + ",fromTarget=" + fromTarget.description)
     }
     
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {

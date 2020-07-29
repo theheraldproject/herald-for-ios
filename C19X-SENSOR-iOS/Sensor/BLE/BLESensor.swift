@@ -29,7 +29,7 @@ struct BLESensorConfiguration {
     /// Secondary payload characteristic (read) for sharing payload data acquired by this central, e.g. identity data of other peripherals in the vincinity
     static let payloadSharingCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000004")
     /// Time delay between notifications for subscribers.
-    static let notificationDelay = DispatchTimeInterval.seconds(8)
+    static let notificationDelay = DispatchTimeInterval.seconds(2)
 }
 
 
@@ -52,7 +52,7 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         database = ConcreteBLEDatabase()
         transmitter = ConcreteBLETransmitter(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
-        receiver = ConcreteBLEReceiver(queue: sensorQueue, database: database)
+        receiver = ConcreteBLEReceiver(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
         super.init()
         database.add(delegate: self)
     }

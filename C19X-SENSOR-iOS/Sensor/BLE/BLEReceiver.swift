@@ -37,6 +37,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private let queue: DispatchQueue!
     /// Database of peripherals
     private let database: BLEDatabase
+    /// Payload data supplier for parsing shared payloads
+    private let payloadDataSupplier: PayloadDataSupplier
     /// Central manager for managing all connections, using a single manager for simplicity.
     private var central: CBCentralManager!
     /// Dummy data for writing to the transmitter to trigger state restoration or resume from suspend state to background state.
@@ -52,9 +54,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private let statistics = TimeIntervalSample()
     
     
-    required init(queue: DispatchQueue, database: BLEDatabase) {
+    required init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
         self.queue = queue
         self.database = database
+        self.payloadDataSupplier = payloadDataSupplier
         super.init()
         self.central = CBCentralManager(delegate: self, queue: queue, options: [
             CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
@@ -158,15 +161,21 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             guard let duplicate = index[payloadData] else {
                 return
             }
-            if device.lastUpdatedAt > duplicate.lastUpdatedAt {
-                self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.description),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=former)")
-                database.delete(duplicate.identifier)
-                index[payloadData] = device
+            var keeping = device
+            if device.peripheral != nil, duplicate.peripheral == nil {
+                keeping = device
+            } else if duplicate.peripheral != nil, device.peripheral == nil {
+                keeping = duplicate
+            } else if device.lastUpdatedAt > duplicate.lastUpdatedAt {
+                keeping = device
             } else {
-                self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.description),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=latter)")
-                database.delete(device.identifier)
-                index[payloadData] = duplicate
+                keeping = duplicate
             }
+            let discarding = (keeping.identifier == device.identifier ? duplicate : device)
+            index[payloadData] = keeping
+            database.delete(discarding.identifier)
+            self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.description),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=\((keeping.identifier == device.identifier ? "former" : "latter")))")
+                index[payloadData] = device
             // CoreBluetooth will eventually give warning and disconnect actual duplicate silently.
             // While calling disconnect here is cleaner but it will trigger didDiscover and
             // retain the duplicates. Expect to see message :
@@ -311,7 +320,21 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         peripheral.readValue(for: payloadCharacteristic)
     }
-    
+
+    private func readPayloadSharing(_ source: String, _ device: BLEDevice) {
+        logger.debug("readPayloadSharing (source=\(source),peripheral=\(device.identifier))")
+        guard let peripheral = device.peripheral, peripheral.state == .connected else {
+            logger.fault("readPayloadSharing denied, peripheral not connected (source=\(source),peripheral=\(device.identifier))")
+            return
+        }
+        guard let payloadSharingCharacteristic = device.payloadSharingCharacteristic else {
+            logger.fault("readPayload denied, device missing payload sharing characteristic (source=\(source),peripheral=\(device.identifier))")
+            discoverServices("readPayloadSharing", peripheral)
+            return
+        }
+        peripheral.readValue(for: payloadSharingCharacteristic)
+    }
+
     /**
      Wake transmitter by writing blank data to the beacon characteristic. This will trigger the transmitter to generate a data value update notification
      in 8 seconds, which in turn will trigger this receiver to receive a didUpdateValueFor call to keep both the transmitter and receiver awake, while
@@ -457,6 +480,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             discoverServices("didReadRSSI", peripheral)
         } else if device.payloadData == nil {
             readPayload("didReadRSSI", device)
+        } else if device.timeIntervalSinceLastPayloadShared > .minute {
+            readPayloadSharing("didReadRSSI", device)
         } else if device.operatingSystem != .ios {
             disconnect("didReadRSSI", peripheral)
         }
@@ -590,6 +615,14 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         case BLESensorConfiguration.payloadSharingCharacteristicUUID:
             logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=payloadSharingCharacteristic,error=\(String(describing: error)))")
+            if let data = characteristic.value {
+                let payloads = payloadDataSupplier.payload(data)
+                payloads.forEach() { payload in
+                    _ = database.device(payload)
+                }
+                delegates.forEach { $0.sensor(.BLE, didShare: payloads, fromTarget: device.identifier)}
+            }
+            device.payloadSharingDataLastUpdatedAt = Date()
             scheduleScan("didUpdateValueFor")
             return
         default:

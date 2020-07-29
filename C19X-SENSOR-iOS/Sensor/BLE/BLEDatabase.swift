@@ -21,6 +21,9 @@ protocol BLEDatabase {
     /// Get or create device for collating information from asynchronous BLE operations.
     func device(_ peripheral: CBPeripheral, delegate: CBPeripheralDelegate) -> BLEDevice
 
+    /// Get or create device for collating information from asynchronous BLE operations.
+    func device(_ payload: PayloadData) -> BLEDevice
+
     /// Get all devices
     func devices() -> [BLEDevice]
     
@@ -88,6 +91,19 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
         peripheral.delegate = delegate
         return device
     }
+    
+    func device(_ payload: PayloadData) -> BLEDevice {
+        if let device = database.values.filter({ $0.payloadData == payload }).first {
+            return device
+        }
+        // Create temporary UUID, the taskRemoveDuplicatePeripherals function
+        // will delete this when a direct connection to the peripheral has been
+        // established
+        let identifier = TargetIdentifier(UUID().uuidString)
+        let placeholder = device(identifier)
+        placeholder.payloadData = payload
+        return placeholder
+    }
 
     func delete(_ identifier: TargetIdentifier) {
         guard let device = database[identifier] else {
@@ -113,60 +129,88 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
 // MARK:- BLEDatabase data
 
 class BLEDevice {
+    /// Device registratiion timestamp
+    let createdAt: Date
+    /// Last time anything changed, e.g. attribute update
+    var lastUpdatedAt: Date
+    /// Ephemeral device identifier, e.g. peripheral identifier UUID
     let identifier: TargetIdentifier
+    /// Delegate for listening to attribute updates events.
     let delegate: BLEDeviceDelegate
+    /// CoreBluetooth peripheral object for interacting with this device.
     var peripheral: CBPeripheral? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .peripheral)
         }}
+    /// Service characteristic for signalling between BLE devices, e.g. to keep awake
     var signalCharacteristic: CBCharacteristic? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .signalCharacteristic)
         }}
+    /// Service characteristic for reading payload data, e.g.  beacon code or Sonar encrypted identifier
     var payloadCharacteristic: CBCharacteristic? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .payloadCharacteristic)
         }}
+    /// Service characteristic for reading payload sharing data, e.g.  beacon code or Sonar encrypted identifier recently acquired by this device
     var payloadSharingCharacteristic: CBCharacteristic? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .payloadSharingCharacteristic)
         }}
+    /// Device operating system, this is necessary for selecting different interaction procedures for each platform.
     var operatingSystem: BLEDeviceOperatingSystem = .unknown {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .operatingSystem)
         }}
+    /// Payload data acquired from the device via payloadCharacteristic read, e.g.  beacon code or Sonar encrypted identifier
     var payloadData: PayloadData? {
         didSet {
-            lastUpdatedAt = Date()
+            payloadDataLastUpdatedAt = Date()
+            lastUpdatedAt = payloadDataLastUpdatedAt
             delegate.device(self, didUpdate: .payloadData)
         }}
+    /// Payload data last update timestamp, this is used to determine what needs to be shared with peers.
+    var payloadDataLastUpdatedAt: Date = Date.distantPast
+    /// Payload data already shared with this peer
+    var payloadSharingData: [PayloadData] = []
+    /// Payload sharing last update to this device, this is used to determine what doesn't need to be shared with this peer.
+    var payloadSharingDataLastUpdatedAt: Date = Date.distantPast
+    
+    /// Most recent RSSI measurement taken by readRSSI or didDiscover.
     var rssi: BLE_RSSI? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .rssi)
         }}
+    /// Transmit power data where available (only provided by Android devices)
     var txPower: BLE_TxPower? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .txPower)
         }}
-    var lastUpdatedAt: Date
+
+    /// Time interval since last attribute value update, this is used to identify devices that may have expired and should be removed from the database.
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
+        }}
+    /// Time interval since last payload sharing  value update, this is used to identify devices that may have expired and should be removed from the database.
+    var timeIntervalSinceLastPayloadShared: TimeInterval { get {
+            Date().timeIntervalSince(payloadSharingDataLastUpdatedAt)
         }}
     var description: String { get {
         return "BLEDevice[id=\(identifier),lastUpdatedAt=\(lastUpdatedAt.description),peripheral=\(peripheral == nil ? "-" : "T"),os=\(operatingSystem.rawValue)]"
         }}
     
     init(_ identifier: TargetIdentifier, delegate: BLEDeviceDelegate) {
+        self.createdAt = Date()
         self.identifier = identifier
         self.delegate = delegate
-        lastUpdatedAt = Date()
+        lastUpdatedAt = createdAt
     }
 }
 
