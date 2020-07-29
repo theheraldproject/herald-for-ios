@@ -219,7 +219,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
-    // All roads lead to scan loop
+    /// All work starts from scan loop.
     func scan(_ source: String) {
         statistics.add()
         logger.debug("scan (source=\(source),statistics={\(statistics.description)})")
@@ -420,7 +420,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if txPower != nil {
             device.txPower = BLE_TxPower(txPower!)
         }
-        
         // Schedule scan (actual connect is initiated from scan via prioritisation logic)
         scheduleScan("didDiscover")
     }
@@ -438,7 +437,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        // Connect fail -> Unregister | Connect
+        // Connect fail -> Delete | Connect
         // Failure for peripherals advertising the beacon service should be transient, so try again.
         // This is also where iOS reports invalidated devices if connect is called after restore,
         // thus offers an opportunity for house keeping.
@@ -485,8 +484,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         } else if device.operatingSystem != .ios {
             disconnect("didReadRSSI", peripheral)
         }
-        // For initial connection, the scheduleScan call would have been made just before connect.
-        // It is called again here to extend the time interval between scans.
         scheduleScan("didReadRSSI")
     }
     
@@ -611,8 +608,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let data = characteristic.value {
                 device.payloadData = PayloadData(data)
             }
-            scheduleScan("didUpdateValueFor")
-            return
         case BLESensorConfiguration.payloadSharingCharacteristicUUID:
             logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=payloadSharingCharacteristic,error=\(String(describing: error)))")
             if let data = characteristic.value {
@@ -623,11 +618,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 delegates.forEach { $0.sensor(.BLE, didShare: payloads, fromTarget: device.identifier)}
             }
             device.payloadSharingDataLastUpdatedAt = Date()
-            scheduleScan("didUpdateValueFor")
-            return
         default:
             logger.fault("didUpdateValueFor, unknown characteristic (peripheral=\(device.identifier),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")
         }
+        scheduleScan("didUpdateValueFor")
+        return
     }
 }
 

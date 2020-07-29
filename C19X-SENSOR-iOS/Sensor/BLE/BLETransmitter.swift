@@ -54,6 +54,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private var signalCharacteristic: CBMutableCharacteristic?
     private var payloadCharacteristic: CBMutableCharacteristic?
     private var payloadSharingCharacteristic: CBMutableCharacteristic?
+    private var advertisingStartedAt: Date = Date.distantPast
     /// Dummy data for writing to the receivers to trigger state restoration or resume from suspend state to background state.
     private let emptyData = Data(repeating: 0, count: 0)
     /**
@@ -149,9 +150,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         notifyTimer = nil
     }
     
-    /**
-     Generate updateValue notification after 8 seconds to notify all subscribers and keep the iOS receivers awake.
-     */
+    /// All work starts from notify subscribers loop.
+    /// Generate updateValue notification after 8 seconds to notify all subscribers and keep the iOS receivers awake.
     private func notifySubscribers(_ source: String) {
         notifyTimer?.cancel()
         notifyTimer = DispatchSource.makeTimerSource(queue: notifyTimerQueue)
@@ -160,9 +160,18 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             guard let s = self, let logger = self?.logger, let signalCharacteristic = self?.signalCharacteristic else {
                 return
             }
+            // Notify subscribers to keep them awake
             s.queue.async {
                 logger.debug("notifySubscribers (source=\(source))")
                 s.peripheral.updateValue(s.emptyData, for: signalCharacteristic, onSubscribedCentrals: nil)
+            }
+            // Restart advert if required
+            let advertUpTime = Date().timeIntervalSince(s.advertisingStartedAt)
+            if s.peripheral.isAdvertising, advertUpTime > BLESensorConfiguration.advertRestartTimeInterval {
+                s.queue.async {
+                    logger.debug("advertRestart (upTime=\(advertUpTime))")
+                    s.startAdvertising()
+                }
             }
         }
         notifyTimer?.resume()
@@ -249,6 +258,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
         logger.debug("peripheralManagerDidStartAdvertising (error=\(String(describing: error)))")
+        if error == nil {
+            advertisingStartedAt = Date()
+        }
     }
     
     /**

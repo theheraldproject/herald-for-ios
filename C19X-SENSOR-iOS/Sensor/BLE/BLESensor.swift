@@ -30,6 +30,8 @@ struct BLESensorConfiguration {
     static let payloadSharingCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000004")
     /// Time delay between notifications for subscribers.
     static let notificationDelay = DispatchTimeInterval.seconds(8)
+    /// Time delay between advert restart
+    static let advertRestartTimeInterval = TimeInterval.minute
 }
 
 

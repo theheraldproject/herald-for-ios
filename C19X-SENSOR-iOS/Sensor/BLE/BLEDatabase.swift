@@ -198,7 +198,7 @@ class BLEDevice {
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
         }}
-    /// Time interval since last payload sharing  value update, this is used to identify devices that may have expired and should be removed from the database.
+    /// Time interval since last payload sharing value update, this is used to throttle read payload sharing calls
     var timeIntervalSinceLastPayloadShared: TimeInterval { get {
             Date().timeIntervalSince(payloadSharingDataLastUpdatedAt)
         }}
