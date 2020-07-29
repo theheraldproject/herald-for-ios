@@ -304,6 +304,10 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             guard let payload = device.payloadData else {
                 return
             }
+            // Device is iOS (Android is always discoverable)
+            guard device.operatingSystem == .ios else {
+                return
+            }
             // Payload is new to peer
             guard !peer.payloadSharingData.contains(payload) else {
                 return

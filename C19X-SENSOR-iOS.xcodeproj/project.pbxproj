@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B6374DC524D00228005985BC /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6374DC424D00228005985BC /* ContactLog.swift */; };
+		B6374DC924D18598005985BC /* TestScript.txt in Resources */ = {isa = PBXBuildFile; fileRef = B6374DC824D18598005985BC /* TestScript.txt */; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
@@ -35,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		B6374DC424D00228005985BC /* ContactLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
+		B6374DC824D18598005985BC /* TestScript.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestScript.txt; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* C19X-SENSOR-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "C19X-SENSOR-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -73,10 +75,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B6374DC624D1856B005985BC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B6374DC724D1857B005985BC /* Documents */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B6374DC724D1857B005985BC /* Documents */ = {
+			isa = PBXGroup;
+			children = (
+				B6374DC824D18598005985BC /* TestScript.txt */,
+			);
+			path = Documents;
+			sourceTree = "<group>";
+		};
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
 				B692CA9224CADA7500F45AEE /* C19X-SENSOR-iOS */,
+				B6374DC624D1856B005985BC /* Resources */,
 				B692CA9124CADA7500F45AEE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -244,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */,
+				B6374DC924D18598005985BC /* TestScript.txt in Resources */,
 				B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */,
 				B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */,
 			);
