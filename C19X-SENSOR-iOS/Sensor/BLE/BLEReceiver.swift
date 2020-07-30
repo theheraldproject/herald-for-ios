@@ -334,6 +334,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("readRSSI (source=\(source),peripheral=\(targetIdentifier))")
         guard peripheral.state == .connected else {
             logger.fault("readRSSI denied, peripheral not connected (source=\(source),peripheral=\(targetIdentifier))")
+            scheduleScan("readRSSI")
             return
         }
         queue.async { peripheral.readRSSI() }
@@ -345,6 +346,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("discoverServices (source=\(source),peripheral=\(targetIdentifier))")
         guard peripheral.state == .connected else {
             logger.fault("discoverServices denied, peripheral not connected (source=\(source),peripheral=\(targetIdentifier))")
+            scheduleScan("discoverServices")
             return
         }
         queue.async { peripheral.discoverServices([BLESensorConfiguration.serviceUUID]) }
@@ -602,27 +604,14 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
-//        // iOS only
-//        // Modified service -> Invalidate beacon -> Read Code | Connect
-//        let characteristics = invalidatedServices.map { $0.characteristics }.count
-//        guard characteristics == 0 else {
-//            // Value of characteristic > 0 implies invalidation of service, wait
-//            // for characteristic == 0 to read code, as that implies a new service with a new beacon code
-//            // will be ready for read. Otherwise, this will result in two readCode requests for every beacon
-//            // code update.
-//            return
-//        }
+        // iOS only
+        // Modified service -> Invalidate beacon -> Scan
         let device = database.device(peripheral, delegate: self)
         let characteristics = invalidatedServices.map { $0.characteristics }.count
         logger.debug("didModifyServices (peripheral=\(device.identifier),characteristics=\(characteristics))")
         device.signalCharacteristic = nil
         device.payloadCharacteristic = nil
         device.payloadSharingCharacteristic = nil
-//        if device.peripheral?.state == .connected {
-//            discoverServices("didModifyServices", peripheral)
-//        } else if device.peripheral?.state != .connecting {
-//            connect("didModifyServices", peripheral)
-//        }
         scheduleScan("didModifyServices")
     }
     

@@ -29,12 +29,14 @@ enum LogLevel: String {
 class ConcreteLogger: NSObject, Logger {
     private let subsystem: String
     private let category: String
+    private let dateFormatter = DateFormatter()
     private let log: OSLog?
     private static let logFile = TextFile(filename: "log.txt")
 
     required init(subsystem: String, category: String) {
         self.subsystem = subsystem
         self.category = category
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         if #available(iOS 10.0, *) {
             log = OSLog(subsystem: subsystem, category: category)
         } else {
@@ -44,10 +46,13 @@ class ConcreteLogger: NSObject, Logger {
 
     func log(_ level: LogLevel, _ message: String) {
         // Write to unified os log if available, else print to console
-        let entry = Date().description + "::" + level.rawValue + "::" + subsystem + "::" + category + " :: " + message
+        let timestamp = dateFormatter.string(from: Date())
+        let csvMessage = message.replacingOccurrences(of: "\"", with: "'")
+        let quotedMessage = (message.contains(",") ? "\"" + csvMessage + "\"" : csvMessage)
+        let entry = timestamp + "," + level.rawValue + "," + subsystem + "," + category + "," + quotedMessage
         ConcreteLogger.logFile.write(entry)
         guard let log = log else {
-            debugPrint(entry)
+            print(entry)
             return
         }
         if #available(iOS 10.0, *) {
