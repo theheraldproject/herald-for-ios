@@ -29,6 +29,7 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
         self.rangeForBeacon = rangeForBeacon
         super.init()
         locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
         locationManager.requestAlwaysAuthorization()
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = desiredAccuracy

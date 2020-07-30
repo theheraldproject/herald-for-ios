@@ -133,6 +133,8 @@ class BLEDevice {
     let createdAt: Date
     /// Last time anything changed, e.g. attribute update
     var lastUpdatedAt: Date
+    /// Last time a wake up call was received from this device (iOS only)
+    var lastNotifiedAt: Date = Date.distantPast
     /// Ephemeral device identifier, e.g. peripheral identifier UUID
     let identifier: TargetIdentifier
     /// Delegate for listening to attribute updates events.
@@ -178,7 +180,7 @@ class BLEDevice {
     var payloadDataLastUpdatedAt: Date = Date.distantPast
     /// Payload data already shared with this peer
     var payloadSharingData: [PayloadData] = []
-    /// Payload sharing last update to this device, this is used to determine what doesn't need to be shared with this peer.
+    /// Payload sharing last update timestamp, , this is used to throttle read payload sharing calls
     var payloadSharingDataLastUpdatedAt: Date = Date.distantPast
     
     /// Most recent RSSI measurement taken by readRSSI or didDiscover.
