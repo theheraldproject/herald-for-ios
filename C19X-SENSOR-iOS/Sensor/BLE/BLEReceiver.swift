@@ -201,10 +201,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
-    private func taskMinimiseConnections() {
-        database.devices()
-    }
-    
     /**
      Issue pending connnect for unknown and restored devices. This will establish the operating system of the target device.
      */
@@ -228,21 +224,57 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      The primary goal of readRSSI is achieved by scanForPeripheral and didDiscover.
      */
     private func taskConnectAndroid() {
-        database.devices().forEach() { device in
-            guard let peripheral = device.peripheral else {
-                return
-            }
-            guard device.operatingSystem == .android else {
-                return
-            }
-            guard device.payloadData == nil || device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval else {
-                return
-            }
-            guard peripheral.state != .connected, peripheral.state != .connecting else {
-                return
-            }
-            connect("taskConnectAndroid", peripheral)
+        // Define concurrent connection quota for Android, these should be short lived connections
+        let connectionQuotaForAndroid = 2
+        // Get Android devices
+        let androidDevices = database.devices().filter({
+            $0.operatingSystem == .android && $0.peripheral != nil
+        })
+        // Get connected or connecting Android devices
+        let connectedAndroidDevices = androidDevices.filter({
+            $0.peripheral?.state == .connected || $0.peripheral?.state == .connecting
+        })
+        // Connect only if there is connection quota remaining
+        guard connectedAndroidDevices.count < connectionQuotaForAndroid else {
+            return
         }
+        // Get devices that would like to be connected
+        let candidateDevices = androidDevices.filter({
+            $0.peripheral?.state == .disconnected &&
+            ($0.payloadData == nil || $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval)
+        })
+        candidateDevices.forEach({ device in
+            connect("taskConnectAndroid", device.peripheral!)
+        })
+//
+//
+//        // Identify connected devices to ensure these processes run to completion
+//        let connectedAndroidDevices = database.devices().filter({
+//            $0.operatingSystem == .android &&
+//            $0.peripheral != nil &&
+//            ($0.peripheral!.state == .connected || $0.peripheral!.state == .connecting)
+//        })
+//        // Identify devices that need to be connected
+//        let pendingAndroidDevices = database.devices().filter({
+//            $0
+//        })
+//
+//
+//        forEach() { device in
+//            guard let peripheral = device.peripheral else {
+//                return
+//            }
+//            guard device.operatingSystem == .android else {
+//                return
+//            }
+//            guard device.payloadData == nil || device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval else {
+//                return
+//            }
+//            guard peripheral.state != .connected, peripheral.state != .connecting else {
+//                return
+//            }
+//            connect("taskConnectAndroid", peripheral)
+//        }
     }
 
     /**
@@ -311,7 +343,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         queue.async {
-            self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach{ self.central.connect($0) }
+            self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach{
+                self.central.connect($0)
+            }
         }
         scheduleScan("connect")
     }
@@ -613,13 +647,16 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let device = database.device(peripheral, delegate: self)
         let characteristics = invalidatedServices.map { $0.characteristics }.count
         logger.debug("didModifyServices (peripheral=\(device.identifier),characteristics=\(characteristics))")
+        guard characteristics == 0 else {
+            return
+        }
         device.signalCharacteristic = nil
         device.payloadCharacteristic = nil
         device.payloadSharingCharacteristic = nil
         if peripheral.state == .connected {
             discoverServices("didModifyServices", peripheral)
-        } else {
-            scheduleScan("didModifyServices")
+        } else if peripheral.state != .connecting {
+            connect("didModifyServices", peripheral)
         }
     }
     

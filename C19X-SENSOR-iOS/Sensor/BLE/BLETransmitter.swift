@@ -91,15 +91,20 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.fault("start denied, not powered on")
             return
         }
-        if !peripheral.isAdvertising {
-            logger.fault("starting advert")
-            startAdvertising()
-        } else {
-            logger.fault("restarting advert")
-            queue.async {
-                self.peripheral.stopAdvertising()
-                self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
+        if signalCharacteristic != nil, payloadCharacteristic != nil, payloadSharingCharacteristic != nil {
+            logger.debug("starting advert with existing characteristics")
+            if !peripheral.isAdvertising {
+                startAdvertising(withNewCharacteristics: false)
+            } else {
+                queue.async {
+                    self.peripheral.stopAdvertising()
+                    self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
+                }
             }
+            logger.debug("start successful, for existing characteristics")
+        } else {
+            startAdvertising(withNewCharacteristics: true)
+            logger.debug("start successful, for new characteristics")
         }
         signalCharacteristic?.subscribedCentrals?.forEach() { central in
             // FEATURE : Symmetric connection on subscribe
@@ -117,28 +122,12 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         stopAdvertising()
     }
     
-    private func startAdvertising() {
+    private func startAdvertising(withNewCharacteristics: Bool) {
         logger.debug("startAdvertising")
-        if signalCharacteristic == nil {
+        if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil || payloadSharingCharacteristic == nil{
             signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
-            logger.debug("startAdvertising (signalCharacteristic=new)")
-        } else {
-            signalCharacteristic?.value = nil
-            logger.debug("startAdvertising (signalCharacteristic=existing)")
-        }
-        if payloadCharacteristic == nil {
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
-            logger.debug("startAdvertising (payloadCharacteristic=new)")
-        } else {
-            payloadCharacteristic?.value = nil
-            logger.debug("startAdvertising (payloadCharacteristic=existing)")
-        }
-        if payloadSharingCharacteristic == nil {
             payloadSharingCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadSharingCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
-            logger.debug("startAdvertising (payloadSharingCharacteristic=new)")
-        } else {
-            payloadSharingCharacteristic?.value = nil
-            logger.debug("startAdvertising (payloadSharingCharacteristic=existing)")
         }
         let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
         service.characteristics = [signalCharacteristic!, payloadCharacteristic!, payloadSharingCharacteristic!]
@@ -178,7 +167,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             let advertUpTime = Date().timeIntervalSince(s.advertisingStartedAt)
             if s.peripheral.isAdvertising, advertUpTime > BLESensorConfiguration.advertRestartTimeInterval {
                 logger.debug("advertRestart (upTime=\(advertUpTime))")
-                s.startAdvertising()
+                s.startAdvertising(withNewCharacteristics: true)
             }
         }
         notifyTimer?.resume()
