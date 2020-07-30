@@ -201,6 +201,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
+    private func taskMinimiseConnections() {
+        database.devices()
+    }
+    
     /**
      Issue pending connnect for unknown and restored devices. This will establish the operating system of the target device.
      */
@@ -612,7 +616,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         device.signalCharacteristic = nil
         device.payloadCharacteristic = nil
         device.payloadSharingCharacteristic = nil
-        scheduleScan("didModifyServices")
+        if peripheral.state == .connected {
+            discoverServices("didModifyServices", peripheral)
+        } else {
+            scheduleScan("didModifyServices")
+        }
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {

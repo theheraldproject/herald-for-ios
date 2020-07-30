@@ -133,6 +133,8 @@ class BLEDevice {
     let createdAt: Date
     /// Last time anything changed, e.g. attribute update
     var lastUpdatedAt: Date
+    /// Last time a connection was established with this device
+    var lastConnectedAt: Date = Date.distantPast
     /// Last time a wake up call was received from this device (iOS only)
     var lastNotifiedAt: Date = Date.distantPast
     /// Ephemeral device identifier, e.g. peripheral identifier UUID
