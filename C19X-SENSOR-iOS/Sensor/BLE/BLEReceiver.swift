@@ -202,20 +202,60 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     /**
-     Issue pending connnect for all devices.
+     Issue pending connnect for unknown and restored devices. This will establish the operating system of the target device.
      */
-    private func taskConnect() {
+    private func taskConnectUnknownOrRestored() {
         database.devices().forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
-            guard device.operatingSystem != .android else {
+            guard device.operatingSystem == .unknown || device.operatingSystem == .restored else {
                 return
             }
             guard peripheral.state != .connected, peripheral.state != .connecting else {
                 return
             }
-            connect("taskConnect", peripheral)
+            connect("taskConnectUnknownOrRestored", peripheral)
+        }
+    }
+
+    /**
+     Issue connnect for Android devices. Connection to Android devices should be minimised to avoid silent fault on Android BLE stack.
+     The primary goal of readRSSI is achieved by scanForPeripheral and didDiscover.
+     */
+    private func taskConnectAndroid() {
+        database.devices().forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            guard device.operatingSystem == .android else {
+                return
+            }
+            guard device.payloadData == nil || device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval else {
+                return
+            }
+            guard peripheral.state != .connected, peripheral.state != .connecting else {
+                return
+            }
+            connect("taskConnectAndroid", peripheral)
+        }
+    }
+
+    /**
+     Issue pending connnect for all devices.
+     */
+    private func taskConnectIos() {
+        database.devices().forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            guard device.operatingSystem == .ios else {
+                return
+            }
+            guard peripheral.state != .connected, peripheral.state != .connecting else {
+                return
+            }
+            connect("taskConnectIos", peripheral)
         }
     }
     
@@ -233,7 +273,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         queue.async { self.taskRemoveExpiredDevices() }
         queue.async { self.taskRemoveDuplicatePeripherals() }
         queue.async { self.taskWakeTransmitters() }
-        queue.async { self.taskConnect() }
+        queue.async { self.taskConnectUnknownOrRestored() }
+        queue.async { self.taskConnectAndroid() }
+        queue.async { self.taskConnectIos() }
+        scheduleScan("scan")
     }
     
     /**
@@ -263,10 +306,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.fault("connect denied, central not powered on (source=\(source),peripheral=\(targetIdentifier))")
             return
         }
-        scheduleScan("connect")
         queue.async {
             self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach{ self.central.connect($0) }
         }
+        scheduleScan("connect")
     }
     
     /**
@@ -479,7 +522,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             discoverServices("didReadRSSI", peripheral)
         } else if device.payloadData == nil {
             readPayload("didReadRSSI", device)
-        } else if device.timeIntervalSinceLastPayloadShared > .minute {
+        } else if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval {
             readPayloadSharing("didReadRSSI", device)
         } else if device.operatingSystem != .ios {
             disconnect("didReadRSSI", peripheral)
@@ -559,26 +602,28 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
-        // iOS only
-        // Modified service -> Invalidate beacon -> Read Code | Connect
-        let characteristics = invalidatedServices.map { $0.characteristics }.count
-        guard characteristics == 0 else {
-            // Value of characteristic > 0 implies invalidation of service with existing beacon code, wait
-            // for characteristic == 0 to read code, as that implies a new service with a new beacon code
-            // will be ready for read. Otherwise, this will result in two readCode requests for every beacon
-            // code update.
-            return
-        }
+//        // iOS only
+//        // Modified service -> Invalidate beacon -> Read Code | Connect
+//        let characteristics = invalidatedServices.map { $0.characteristics }.count
+//        guard characteristics == 0 else {
+//            // Value of characteristic > 0 implies invalidation of service, wait
+//            // for characteristic == 0 to read code, as that implies a new service with a new beacon code
+//            // will be ready for read. Otherwise, this will result in two readCode requests for every beacon
+//            // code update.
+//            return
+//        }
         let device = database.device(peripheral, delegate: self)
-        logger.debug("didModifyServices (peripheral=\(device.identifier))")
+        let characteristics = invalidatedServices.map { $0.characteristics }.count
+        logger.debug("didModifyServices (peripheral=\(device.identifier),characteristics=\(characteristics))")
         device.signalCharacteristic = nil
         device.payloadCharacteristic = nil
         device.payloadSharingCharacteristic = nil
-        if device.peripheral?.state == .connected {
-            discoverServices("didModifyServices", peripheral)
-        } else if device.peripheral?.state != .connecting {
-            connect("didModifyServices", peripheral)
-        }
+//        if device.peripheral?.state == .connected {
+//            discoverServices("didModifyServices", peripheral)
+//        } else if device.peripheral?.state != .connecting {
+//            connect("didModifyServices", peripheral)
+//        }
+        scheduleScan("didModifyServices")
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -597,6 +642,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         case BLESensorConfiguration.iosSignalCharacteristicUUID:
             // Wake up call from transmitter
             logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=iosSignalCharacteristic,error=\(String(describing: error)))")
+            device.lastNotifiedAt = Date()
             readRSSI("didUpdateValueFor", peripheral)
             return
         case BLESensorConfiguration.androidSignalCharacteristicUUID:

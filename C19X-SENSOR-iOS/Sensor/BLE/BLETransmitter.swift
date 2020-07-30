@@ -91,7 +91,16 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.fault("start denied, not powered on")
             return
         }
-        startAdvertising()
+        if !peripheral.isAdvertising {
+            logger.fault("starting advert")
+            startAdvertising()
+        } else {
+            logger.fault("restarting advert")
+            queue.async {
+                self.peripheral.stopAdvertising()
+                self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
+            }
+        }
         signalCharacteristic?.subscribedCentrals?.forEach() { central in
             // FEATURE : Symmetric connection on subscribe
             _ = database.device(central.identifier.uuidString)
@@ -137,7 +146,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
             self.peripheral.add(service)
-            self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [service.uuid]])
+            self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
         }
     }
     
@@ -168,10 +177,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             // Restart advert if required
             let advertUpTime = Date().timeIntervalSince(s.advertisingStartedAt)
             if s.peripheral.isAdvertising, advertUpTime > BLESensorConfiguration.advertRestartTimeInterval {
-                s.queue.async {
-                    logger.debug("advertRestart (upTime=\(advertUpTime))")
-                    s.startAdvertising()
-                }
+                logger.debug("advertRestart (upTime=\(advertUpTime))")
+                s.startAdvertising()
             }
         }
         notifyTimer?.resume()
@@ -308,8 +315,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // Get other devices that were seen recently by this device
         var devices: [BLEDevice] = []
         database.devices().forEach() { device in
-            // Device was seen in last minute
-            guard device.timeIntervalSinceLastUpdate < .minute else {
+            // Device was seen recently
+            guard device.timeIntervalSinceLastUpdate < BLESensorConfiguration.payloadSharingTimeInterval else {
                 return
             }
             // Device has payload
