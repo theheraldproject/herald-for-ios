@@ -11,26 +11,33 @@ Test scripts
 
 T1 : iOS - iOS : Initial encounter of unknown device
 1. 4S and X1, uninstall app, airplane mode on, reboot
-2. 4S, install app, background, airplane mode off, lock, in faraday bag
+2. 4S, install app, background, airplane mode off, lock, detach from Xcode, in faraday bag
 3. X1, install app, background, airplane mode off, lock, leave connected to Xcode
-4. 4S, out of faraday bag, expect X1 no change
+4. 4S, out of faraday bag, expect no detection by X1
 5. X1, raise to wake (or touch screen to wake), expect detection and tracking of 4S
 6. 4S, expect detection and tracking of X1
 
 T2 : iOS - iOS : Resume tracking of known device for short breaks
 1. 4S and X1, uninstall app, airplane mode on, reboot
-2. 4S, install app, background, airplane mode off, lock
+2. 4S, install app, background, airplane mode off, lock, detach from Xcode
 3. X1, install app, background, airplane mode off, lock, leave connected to Xcode, expect detection and tracking of 4S
 4. 4S, in faraday bag, expect X1 tracking of 4S to stop
-5. Wait 5/10 minutes
+5. Wait 1 minute
 6. 4S, out of faraday bag, expect X1 to resume tracking of 4S
 
 T3 : iOS - iOS : Resume tracking of known device for long breaks
 1. 4S and X1, uninstall app, airplane mode on, reboot
-2. 4S, install app, background, airplane mode off, lock
+2. 4S, install app, background, airplane mode off, lock, detach from Xcode
 3. X1, install app, background, airplane mode off, lock, leave connected to Xcode, expect detection and tracking of 4S
 4. 4S, in faraday bag, expect X1 tracking of 4S to stop
 5. Wait 60 minutes
-6. 4S, out of faraday bag, expect X1 no change (may resume tracking of 4S, but unlikely)
+6. 4S, out of faraday bag, expect no detection by X1 (may resume tracking of 4S, but unlikely)
 7. X1, raise to wake (or touch screen to wake), expect detection and tracking of 4S
 8. 4S, expect detection and tracking of X1
+
+T4 : iOS - iOS : Continuous tracking
+1. 4S and X1, uninstall app, airplane mode on, reboot
+2. 4S, install app, background, airplane mode off, lock, detach from Xcode
+3. X1, install app, background, airplane mode off, lock, expect detection and tracking of 4S, detach from Xcode
+4. Keep 4S and X1 in close proximity for 8+ hours
+5. Review contact logs, expect 4S and X1 to track each other for the entire test period
