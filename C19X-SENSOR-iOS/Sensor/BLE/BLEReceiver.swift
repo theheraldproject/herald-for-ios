@@ -194,7 +194,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 return
             }
             guard device.timeIntervalSinceLastUpdate < TimeInterval.minute else {
-                // Throttle back keep awake calls when out of range
+                // Throttle back keep awake calls when out of range, issue pending connect instead
+                connect("taskWakeTransmitters", peripheral)
                 return
             }
             wakeTransmitter("taskWakeTransmitters", device)
@@ -202,96 +203,84 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     /**
-     Issue pending connnect for unknown and restored devices. This will establish the operating system of the target device.
+     Connect to devices and maintain concurrent connection quota
      */
-    private func taskConnectUnknownOrRestored() {
+    private func taskConnect() {
+        // Define fixed concurrent connection quota
+        let concurrentConnectionQuota = 5
+        // Get connection status
+        var connected: [BLEDevice] = []
+        var connecting: [BLEDevice] = []
+        var disconnected: [BLEDevice] = []
         database.devices().forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
-            guard device.operatingSystem == .unknown || device.operatingSystem == .restored else {
-                return
+            switch peripheral.state {
+            case .connected:
+                connected.append(device)
+            case .connecting:
+                connecting.append(device)
+            default:
+                disconnected.append(device)
             }
-            guard peripheral.state != .connected, peripheral.state != .connecting else {
-                return
-            }
-            connect("taskConnectUnknownOrRestored", peripheral)
         }
-    }
-
-    /**
-     Issue connnect for Android devices. Connection to Android devices should be minimised to avoid silent fault on Android BLE stack.
-     The primary goal of readRSSI is achieved by scanForPeripheral and didDiscover.
-     */
-    private func taskConnectAndroid() {
-        // Define concurrent connection quota for Android, these should be short lived connections
-        let connectionQuotaForAndroid = 2
-        // Get Android devices
-        let androidDevices = database.devices().filter({
-            $0.operatingSystem == .android && $0.peripheral != nil
-        })
-        // Get connected or connecting Android devices
-        let connectedAndroidDevices = androidDevices.filter({
-            $0.peripheral?.state == .connected || $0.peripheral?.state == .connecting
-        })
-        // Connect only if there is connection quota remaining
-        guard connectedAndroidDevices.count < connectionQuotaForAndroid else {
+        logger.debug("taskConnect status (connected=\(connected.count),connecting=\(connecting.count),disconnected=\(disconnected.count))")
+        
+        // Establish connections to keep
+        // - Unknown or restored devices take highest priority to identify operating system
+        // - Android connections are short lived and should be left to complete
+        // - iOS connections for getting the payload data should be left to complete
+        var keep: [BLEDevice] = []
+        let keepUnknownOrRestored = connected.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored })
+        let keepAndroid = connected.filter({ $0.operatingSystem == .android })
+        let keepIosNew = connected.filter({ $0.operatingSystem == .ios && $0.payloadData == nil })
+        keep.append(contentsOf: keepUnknownOrRestored)
+        keep.append(contentsOf: keepAndroid)
+        keep.append(contentsOf: keepIosNew)
+        logger.debug("taskConnect keep (unknown=\(keepUnknownOrRestored.count),android=\(keepAndroid.count),ios=\(keepIosNew.count))")
+        
+        // Establish connections to discard
+        // - iOS devices with payload data, sorted by last updated at timestamp (most recent first)
+        var discard: [BLEDevice] = []
+        let discardIos = connected.filter({ $0.operatingSystem == .ios && $0.payloadData != nil }).sorted(by: { $0.lastUpdatedAt > $1.lastUpdatedAt })
+        discard.append(contentsOf: discardIos)
+        
+        // Discard connections to meet quota
+        let capacity = concurrentConnectionQuota - connected.count
+        guard capacity > 0 else {
+            logger.fault("taskConnect quota exceeded, suspending new connections (connected=\(connected.count),keep=\(keep.count),quota=\(concurrentConnectionQuota))")
+            // Keep most recently updated iOS devices first as devices that haven't been updated for a while may be going out of range
+            let capacity = concurrentConnectionQuota - keep.count
+            if capacity > 0 {
+                _ = discard.dropFirst(capacity)
+            }
+            discard.forEach() { device in
+                guard let peripheral = device.peripheral else {
+                    return
+                }
+                disconnect("taskConnect", peripheral)
+            }
             return
         }
-        // Get devices that would like to be connected
-        let candidateDevices = androidDevices.filter({
-            $0.peripheral?.state == .disconnected &&
-            ($0.payloadData == nil || $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval)
-        })
-        candidateDevices.forEach({ device in
-            connect("taskConnectAndroid", device.peripheral!)
-        })
-//
-//
-//        // Identify connected devices to ensure these processes run to completion
-//        let connectedAndroidDevices = database.devices().filter({
-//            $0.operatingSystem == .android &&
-//            $0.peripheral != nil &&
-//            ($0.peripheral!.state == .connected || $0.peripheral!.state == .connecting)
-//        })
-//        // Identify devices that need to be connected
-//        let pendingAndroidDevices = database.devices().filter({
-//            $0
-//        })
-//
-//
-//        forEach() { device in
-//            guard let peripheral = device.peripheral else {
-//                return
-//            }
-//            guard device.operatingSystem == .android else {
-//                return
-//            }
-//            guard device.payloadData == nil || device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval else {
-//                return
-//            }
-//            guard peripheral.state != .connected, peripheral.state != .connecting else {
-//                return
-//            }
-//            connect("taskConnectAndroid", peripheral)
-//        }
-    }
-
-    /**
-     Issue pending connnect for all devices.
-     */
-    private func taskConnectIos() {
-        database.devices().forEach() { device in
+        
+        // Establish pending connections
+        // - New devices without payload data
+        // - iOS devices sorted by last updated at timestamp (least recent first)
+        var pending: [BLEDevice] = []
+        let pendingNew = disconnected.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored || $0.payloadData == nil })
+        let pendingIos = disconnected.filter({ $0.operatingSystem == .ios }).sorted(by: { $0.lastUpdatedAt < $1.lastUpdatedAt })
+        pending.append(contentsOf: pendingNew)
+        pending.append(contentsOf: pendingIos)
+        logger.debug("taskConnect (pending=\(pending.count),capacity=\(capacity))")
+        if pending.count > capacity {
+            _ = pending.dropLast(pending.count - capacity)
+        }
+        pending.forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
-            guard device.operatingSystem == .ios else {
-                return
-            }
-            guard peripheral.state != .connected, peripheral.state != .connecting else {
-                return
-            }
-            connect("taskConnectIos", peripheral)
+            connect("taskConnect", peripheral)
         }
     }
     
@@ -309,9 +298,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         queue.async { self.taskRemoveExpiredDevices() }
         queue.async { self.taskRemoveDuplicatePeripherals() }
         queue.async { self.taskWakeTransmitters() }
-        queue.async { self.taskConnectUnknownOrRestored() }
-        queue.async { self.taskConnectAndroid() }
-        queue.async { self.taskConnectIos() }
+        queue.async { self.taskConnect() }
         scheduleScan("scan")
     }
     
