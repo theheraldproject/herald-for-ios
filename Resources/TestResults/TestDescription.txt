@@ -5,3 +5,10 @@ Tests conducted
 4S in background mode, screen locked, zero interaction.
 X being used as normal phone with average screen on and interactions.
 Results in "T4-20200731-Contacts-4S" and "T4-20200731-Contacts-X" show constant detection and tracking
+
+::::: 2020-08-01 : Continuous detection and tracking for iOS-iOS : TestScript T4 : PASSED
+4S and X in close proximity for over 12 hours.
+4S in background mode, screen locked, zero interaction.
+X being used as normal phone with average screen on and interactions.
+Results in "T4-20200801-Contacts-4S" and "T4-20200801-Contacts-X" show constant detection and tracking
+
