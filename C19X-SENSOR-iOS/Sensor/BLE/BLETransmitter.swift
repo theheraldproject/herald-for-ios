@@ -123,7 +123,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     }
     
     private func startAdvertising(withNewCharacteristics: Bool) {
-        logger.debug("startAdvertising")
+        logger.debug("startAdvertising (withNewCharacteristics=\(withNewCharacteristics))")
         if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil || payloadSharingCharacteristic == nil{
             signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])

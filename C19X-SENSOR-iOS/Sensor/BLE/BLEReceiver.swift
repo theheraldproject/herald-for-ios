@@ -528,6 +528,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("didDisconnectPeripheral (peripheral=\(targetIdentifier),error=\(String(describing: error)))")
         let device = database.device(peripheral, delegate: self)
         if device.operatingSystem == .ios {
+            // Invalidate characteristics
+            device.signalCharacteristic = nil
+            device.payloadCharacteristic = nil
+            device.payloadSharingCharacteristic = nil
+            // Reconnect
             connect("didDisconnectPeripheral", peripheral)
         }
     }
