@@ -19,3 +19,10 @@ X being used as normal phone with average screen on and interactions. Minimal in
 Results in "T4-20200802-Contacts-4S" and "T4-20200802-Contacts-X" show constant detection and tracking.
 Failed on payload sharing from 4S to X, caused by unexplained disconnection event at 00:19 that left stale characteristics in X.
 Code updated to invalidate all characteristics on disconnect.
+
+::::: 2020-08-02 : Continuous detection and tracking for iOS-iOS : TestScript T4 : PASSED
+4S and X in close proximity for over 6 hours.
+4S in background mode, screen locked, zero interaction.
+X being used as normal phone with average screen on and interactions.
+Results in "T4-20200802b-Contacts-4S" and "T4-20200802b-Contacts-X" show constant detection and tracking.
+Test confirms payload sharing resumes successfully following disconnection events

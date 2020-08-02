@@ -16,6 +16,8 @@
 		B6374DD424D62724005985BC /* T4-20200801-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */; };
 		B6374DD724D6BACB005985BC /* T4-20200802-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */; };
 		B6374DD824D6BACB005985BC /* T4-20200802-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */; };
+		B6845AD224D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */; };
+		B6845AD324D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
@@ -49,6 +51,8 @@
 		B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200801-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802-Contacts-4S.numbers"; sourceTree = "<group>"; };
+		B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802b-Contacts-4S.numbers"; sourceTree = "<group>"; };
+		B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802b-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* C19X-SENSOR-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "C19X-SENSOR-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,6 +116,8 @@
 				B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */,
 				B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */,
 				B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */,
+				B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */,
+				B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */,
 			);
 			path = TestResults;
 			sourceTree = "<group>";
@@ -287,6 +293,8 @@
 			files = (
 				B6374DD724D6BACB005985BC /* T4-20200802-Contacts-X.numbers in Resources */,
 				B6374DD024D4D9D0005985BC /* TestDescription.txt in Resources */,
+				B6845AD324D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers in Resources */,
+				B6845AD224D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers in Resources */,
 				B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */,
 				B6374DD424D62724005985BC /* T4-20200801-Contacts-X.numbers in Resources */,
 				B6374DCE24D4D9AA005985BC /* T4-20200731-Contacts-4S.numbers in Resources */,
