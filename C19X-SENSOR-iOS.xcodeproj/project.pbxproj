@@ -19,10 +19,8 @@
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
-		B692CA9E24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9C24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld */; };
 		B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9F24CADA7A00F45AEE /* Assets.xcassets */; };
 		B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */; };
-		B692CAAC24CADE4400F45AEE /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAB24CADE4400F45AEE /* Database.swift */; };
 		B692CAAE24CADE7300F45AEE /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAD24CADE7300F45AEE /* Logger.swift */; };
 		B692CAB524CB096300F45AEE /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB424CB096300F45AEE /* Sensor.swift */; };
 		B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */; };
@@ -55,11 +53,9 @@
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B692CA9A24CADA7500F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		B692CA9D24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = C19X_SENSOR_iOS.xcdatamodel; sourceTree = "<group>"; };
 		B692CA9F24CADA7A00F45AEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B692CAA224CADA7A00F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B692CAA424CADA7A00F45AEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B692CAAB24CADE4400F45AEE /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		B692CAAD24CADE7300F45AEE /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		B692CAB424CB096300F45AEE /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
@@ -141,14 +137,12 @@
 			isa = PBXGroup;
 			children = (
 				B692CAB324CB093A00F45AEE /* Sensor */,
-				B692CAAA24CADE2E00F45AEE /* Data */,
 				B692CA9324CADA7500F45AEE /* AppDelegate.swift */,
 				B692CA9724CADA7500F45AEE /* ViewController.swift */,
 				B692CA9924CADA7500F45AEE /* Main.storyboard */,
 				B692CA9F24CADA7A00F45AEE /* Assets.xcassets */,
 				B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */,
 				B692CAA424CADA7A00F45AEE /* Info.plist */,
-				B692CA9C24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld */,
 			);
 			path = "C19X-SENSOR-iOS";
 			sourceTree = "<group>";
@@ -156,7 +150,6 @@
 		B692CAAA24CADE2E00F45AEE /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				B692CAAB24CADE4400F45AEE /* Database.swift */,
 				B692CADD24CF2B1400F45AEE /* TextFile.swift */,
 				B692CAAD24CADE7300F45AEE /* Logger.swift */,
 				B6374DC424D00228005985BC /* ContactLog.swift */,
@@ -167,6 +160,7 @@
 		B692CAB324CB093A00F45AEE /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				B692CAAA24CADE2E00F45AEE /* Data */,
 				B692CABF24CB3E7E00F45AEE /* Payload */,
 				B692CAB724CB1A0700F45AEE /* GPS */,
 				B692CAC224CB410200F45AEE /* ULTRASOUND */,
@@ -322,10 +316,8 @@
 				B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */,
 				B692CAD224CC2BAA00F45AEE /* C19XPayloadSupplier.swift in Sources */,
 				B692CAD424CC2DA100F45AEE /* JavaData.swift in Sources */,
-				B692CA9E24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld in Sources */,
 				B692CAD624CC30A700F45AEE /* BLEReceiver.swift in Sources */,
 				B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */,
-				B692CAAC24CADE4400F45AEE /* Database.swift in Sources */,
 				B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */,
 				B692CAC424CB41B800F45AEE /* UltrasoundSensor.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
@@ -532,19 +524,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		B692CA9C24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				B692CA9D24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodel */,
-			);
-			currentVersion = B692CA9D24CADA7500F45AEE /* C19X_SENSOR_iOS.xcdatamodel */;
-			path = C19X_SENSOR_iOS.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = B692CA8824CADA7500F45AEE /* Project object */;
 }
