@@ -21,7 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
-        payloadDataSupplier = MockSonarPayloadSupplier(identifier: 1)
+        let timeBasedIdentifier = Int32(Int64(Date().timeIntervalSince1970).remainderReportingOverflow(dividingBy: 24*60*60).partialValue)
+        payloadDataSupplier = MockSonarPayloadSupplier(identifier: timeBasedIdentifier)
+        let payloadString = payloadDataSupplier?.payload(Date()).base64EncodedString()
+        logger.info("DEVICE ID = \(timeBasedIdentifier), PAYLOAD = \(String(describing: payloadString))")
+
+
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
         sensor?.add(delegate: contactLog)

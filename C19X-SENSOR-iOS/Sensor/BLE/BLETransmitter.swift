@@ -331,7 +331,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             guard let payload = device.payloadData else {
                 return
             }
-            guard data.count + payload.count < 512 else {
+            guard data.count + payload.count < (2*129) else {
                 return
             }
             identifiers.append(device.identifier)
