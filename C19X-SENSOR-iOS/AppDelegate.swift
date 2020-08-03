@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: Sensor?
     let contactLog = ContactLog(filename: "contacts.csv")
+    let rScriptLog = RScriptLog(filename: "rScriptLog.csv")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
@@ -30,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
         sensor?.add(delegate: contactLog)
+        sensor?.add(delegate: rScriptLog)
         sensor?.start()
         
         return true
