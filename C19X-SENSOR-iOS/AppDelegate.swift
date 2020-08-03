@@ -19,13 +19,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     let contactLog = ContactLog(filename: "contacts.csv")
     let rScriptLog = RScriptLog(filename: "rScriptLog.csv")
 
+    private func identifier() -> Int32 {
+        let text = UIDevice.current.name + ":" + UIDevice.current.model + ":" + UIDevice.current.systemName + ":" + UIDevice.current.systemVersion
+        var hash = UInt64 (5381)
+        let buf = [UInt8](text.utf8)
+        for b in buf {
+            hash = 127 * (hash & 0x00ffffffffffffff) + UInt64(b)
+        }
+        let value = Int32(hash.remainderReportingOverflow(dividingBy: UInt64(Int32.max)).partialValue)
+        logger.debug("Identifier (text=\(text),hash=\(hash),value=\(value))")
+        return value
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
-        let timeBasedIdentifier = Int32(Int64(Date().timeIntervalSince1970).remainderReportingOverflow(dividingBy: 24*60*60).partialValue)
-        payloadDataSupplier = MockSonarPayloadSupplier(identifier: timeBasedIdentifier)
-        let payloadString = payloadDataSupplier?.payload(Date()).base64EncodedString()
-        logger.info("DEVICE ID = \(timeBasedIdentifier), PAYLOAD = \(String(describing: payloadString))")
+        let deviceIdentifier = identifier()
+        payloadDataSupplier = MockSonarPayloadSupplier(identifier: deviceIdentifier)
+        let payloadString = payloadDataSupplier!.payload(Date()).base64EncodedString()
+        logger.info("DEVICE ID (identifier=\(deviceIdentifier),payloadPrefix=\(payloadString.prefix(6)),payload=\(payloadString))")
 
 
         sensor = SensorArray(payloadDataSupplier!)
