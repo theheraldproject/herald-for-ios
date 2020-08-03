@@ -145,6 +145,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         devicesToRemove.forEach() { device in
             logger.debug("taskRemoveExpiredDevices (removed=\(device.identifier))")
             database.delete(device.identifier)
+            if let peripheral = device.peripheral {
+                disconnect("taskRemoveExpiredDevices", peripheral)
+            }
         }
     }
     
@@ -248,20 +251,19 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         
         // Discard connections to meet quota
         let capacity = concurrentConnectionQuota - connected.count
-        guard capacity > 0 else {
+        if capacity <= 0 {
             logger.fault("taskConnect quota exceeded, suspending new connections (connected=\(connected.count),keep=\(keep.count),quota=\(concurrentConnectionQuota))")
             // Keep most recently updated iOS devices first as devices that haven't been updated for a while may be going out of range
-            let capacity = concurrentConnectionQuota - keep.count
-            if capacity > 0 {
+            let surplusCapacity = concurrentConnectionQuota - keep.count
+            if surplusCapacity > 0 {
                 _ = discard.dropFirst(capacity)
             }
             discard.forEach() { device in
                 guard let peripheral = device.peripheral else {
                     return
                 }
-                disconnect("taskConnect", peripheral)
+                disconnect("taskConnect|discard", peripheral)
             }
-            return
         }
         
         // Establish pending connections
@@ -272,7 +274,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let pendingIos = disconnected.filter({ $0.operatingSystem == .ios }).sorted(by: { $0.lastUpdatedAt < $1.lastUpdatedAt })
         pending.append(contentsOf: pendingNew)
         pending.append(contentsOf: pendingIos)
-        logger.debug("taskConnect (pending=\(pending.count),capacity=\(capacity))")
+        logger.debug("taskConnect pending (pending=\(pending.count),capacity=\(capacity))")
         if pending.count > capacity {
             _ = pending.dropLast(pending.count - capacity)
         }
@@ -280,7 +282,21 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             guard let peripheral = device.peripheral else {
                 return
             }
-            connect("taskConnect", peripheral)
+            connect("taskConnect|pending", peripheral)
+        }
+        
+        // Refresh existing connections
+        var refresh: [BLEDevice] = []
+        let refreshUnknown = connected.filter({ $0.operatingSystem == .unknown })
+        let refreshRestored = connected.filter({ $0.operatingSystem == .restored })
+        refresh.append(contentsOf: refreshUnknown)
+        refresh.append(contentsOf: refreshRestored)
+        logger.debug("taskConnect refresh (unknown=\(refreshUnknown.count),restored=\(refreshRestored.count))")
+        refresh.forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            connect("taskConnect|refresh", peripheral)
         }
     }
     

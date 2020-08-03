@@ -302,7 +302,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private func payloadSharingData(_ central: CBCentral) -> (identifiers: [TargetIdentifier], data: Data) {
         let peer = database.device(central.identifier.uuidString)
         // Get other devices that were seen recently by this device
-        var devices: [BLEDevice] = []
+        var unknownDevices: [BLEDevice] = []
+        var knownDevices: [BLEDevice] = []
         database.devices().forEach() { device in
             // Device was seen recently
             guard device.timeIntervalSinceLastUpdate < BLESensorConfiguration.payloadSharingTimeInterval else {
@@ -317,14 +318,19 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                 return
             }
             // Payload is new to peer
-            guard !peer.payloadSharingData.contains(payload) else {
-                return
+            if peer.payloadSharingData.contains(payload) {
+                knownDevices.append(device)
+            } else {
+                unknownDevices.append(device)
             }
-            devices.append(device)
         }
-        // Most recently seen devices first
-        devices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
-        // Limit how much to share to avoid oversized data transfers over BLE (512 bytes limit according to spec)
+        // Most recently seen unknown devices first
+        var devices: [BLEDevice] = []
+        unknownDevices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
+        knownDevices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
+        devices.append(contentsOf: unknownDevices)
+        devices.append(contentsOf: knownDevices)
+        // Limit how much to share to avoid oversized data transfers over BLE (512 bytes limit according to spec, 510 with response, iOS requires response)
         var identifiers: [TargetIdentifier] = []
         var data = Data()
         devices.forEach() { device in
