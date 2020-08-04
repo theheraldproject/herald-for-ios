@@ -335,6 +335,39 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         scanTimer?.resume()
     }
     
+    /// Initiate next action on peripheral based on current state and information available
+    private func taskInitiateNextAction(_ source: String, peripheral: CBPeripheral) {
+        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
+        let device = database.device(peripheral, delegate: self)
+        if device.rssi == nil {
+            // 1. RSSI
+            logger.debug("taskInitiateNextAction (goal=rssi,peripheral=\(targetIdentifier))")
+            readRSSI("taskInitiateNextAction|" + source, peripheral)
+        } else if device.signalCharacteristic == nil || device.payloadCharacteristic == nil || device.payloadSharingCharacteristic == nil {
+            // 2. Characteristics
+            logger.debug("taskInitiateNextAction (goal=characteristics,peripheral=\(targetIdentifier))")
+            discoverServices("taskInitiateNextAction|" + source, peripheral)
+        } else if device.payloadData == nil {
+            // 3. Payload
+            logger.debug("taskInitiateNextAction (goal=payload,peripheral=\(targetIdentifier))")
+            readPayload("taskInitiateNextAction|" + source, device)
+        } else if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval {
+            // 4. Payload sharing
+            logger.debug("taskInitiateNextAction (goal=payloadSharing|\(device.timeIntervalSinceLastPayloadShared.description),peripheral=\(targetIdentifier))")
+            readPayloadSharing("taskInitiateNextAction|" + source, device)
+        } else if device.operatingSystem != .ios {
+            // 5. Disconnect Android
+            logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),peripheral=\(targetIdentifier))")
+            disconnect("taskInitiateNextAction|" + source, peripheral)
+        } else {
+            // 6. Scan
+            logger.debug("taskInitiateNextAction (goal=scan,peripheral=\(targetIdentifier))")
+            scheduleScan("taskInitiateNextAction|" + source)
+        }
+    }
+    
+
+    
     /**
      Connect peripheral. Scanning is stopped temporarily, as recommended by Apple documentation, before initiating connect, otherwise
      pending scan operations tend to take priority and connect takes longer to start. Scanning is scheduled to resume later, to ensure scan
@@ -516,12 +549,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // connect -> readRSSI -> discoverServices
         let targetIdentifier = TargetIdentifier(peripheral: peripheral)
         logger.debug("didConnect (peripheral=\(targetIdentifier))")
-        let device = database.device(peripheral, delegate: self)
-        if device.rssi == nil {
-            readRSSI("didConnect", peripheral)
-        } else {
-            discoverServices("didConnect", peripheral)
-        }
+        taskInitiateNextAction("didConnect", peripheral: peripheral)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -567,17 +595,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("didReadRSSI (peripheral=\(targetIdentifier),rssi=\(rssi),error=\(String(describing: error)))")
         let device = database.device(peripheral, delegate: self)
         device.rssi = BLE_RSSI(rssi)
-        
-        if device.payloadCharacteristic == nil {
-            discoverServices("didReadRSSI", peripheral)
-        } else if device.payloadData == nil {
-            readPayload("didReadRSSI", device)
-        } else if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval {
-            readPayloadSharing("didReadRSSI", device)
-        } else if device.operatingSystem != .ios {
-            disconnect("didReadRSSI", peripheral)
-        }
-        scheduleScan("didReadRSSI")
+        taskInitiateNextAction("didReadRSSI", peripheral: peripheral)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
