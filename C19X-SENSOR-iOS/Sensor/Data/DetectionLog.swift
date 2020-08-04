@@ -16,7 +16,8 @@ class DetectionLog: NSObject, SensorDelegate {
     private let prefixLength: Int
     private let deviceName = UIDevice.current.name
     private let deviceOS = UIDevice.current.systemVersion
-    private var payloads = Set<String>()
+    private var payloads: Set<String> = []
+    private let queue = DispatchQueue(label: "Sensor.Data.DetectionLog.Queue")
     
     init(filename: String, payloadString: String, prefixLength: Int) {
         textFile = TextFile(filename: filename)
@@ -54,8 +55,10 @@ class DetectionLog: NSObject, SensorDelegate {
     
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         let payload = didRead.base64EncodedString()
-        if payloads.insert(payload).inserted {
-            write()
+        queue.async {
+            if self.payloads.insert(payload).inserted {
+                self.write()
+            }
         }
     }
     
@@ -65,8 +68,10 @@ class DetectionLog: NSObject, SensorDelegate {
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         didShare.forEach() { data in
             let payload = data.base64EncodedString()
-            if payloads.insert(payload).inserted {
-                write()
+            queue.async {
+                if self.payloads.insert(payload).inserted {
+                    self.write()
+                }
             }
         }
     }
