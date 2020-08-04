@@ -26,7 +26,7 @@ protocol BeaconCodes {
 typealias BeaconCode = Int64
 
 class ConcreteBeaconCodes : BeaconCodes {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "Payload..ConcreteBeaconCodes")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload..ConcreteBeaconCodes")
     static let codesPerDay = 240
     private var dayCodes: DayCodes
     private var seed: BeaconCodeSeed?

@@ -10,7 +10,7 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
-    private let logger = ConcreteLogger(subsystem: "App", category: "AppDelegate")
+    private let logger = ConcreteSensorLogger(subsystem: "App", category: "AppDelegate")
     var window: UIWindow?
 
     // Payload data supplier, sensor and contact log
