@@ -28,7 +28,7 @@ Results in "T4-20200802b-Contacts-4S" and "T4-20200802b-Contacts-X" show constan
 Test confirms payload sharing resumes successfully following disconnection events
 
 ::::: 2020-08-04 : Continuous detection and tracking for iOS-iOS : TestScript T4 : PASSED
-4S and X in close proximity for 8 hours.
+4S and X in close proximity for over 12 hours.
 4S in background mode, screen locked, zero interaction.
 X being used as normal phone with average screen on and interactions. Minimal interaction over night.
 Results in "T4-20200804-Contacts-4S" and "T4-20200804-Contacts-X" show constant detection and tracking.
