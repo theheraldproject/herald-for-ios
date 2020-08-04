@@ -9,7 +9,7 @@
 import Foundation
 
 class TextFile {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "Data.TextFile")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.TextFile")
     private var file: URL?
     
     init(filename: String) {

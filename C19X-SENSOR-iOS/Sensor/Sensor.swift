@@ -42,7 +42,7 @@ protocol SensorDelegate {
 
 /// Sensor array for combining multiple detection and tracking methods.
 class SensorArray : NSObject, Sensor {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "SensorArray")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
     private var sensorArray: [Sensor] = []
     
     init(_ payloadDataSupplier: PayloadDataSupplier) {

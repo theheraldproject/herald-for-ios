@@ -41,7 +41,7 @@ protocol BLETransmitter : Sensor {
  on Android does not support notify and also a connect is only performed on first contact to get the bacon code.
  */
 class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDelegate {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLETransmitter")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "BLE.ConcreteBLETransmitter")
     private var delegates: [SensorDelegate] = []
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue

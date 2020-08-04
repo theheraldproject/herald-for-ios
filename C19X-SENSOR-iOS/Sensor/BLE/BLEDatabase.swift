@@ -50,7 +50,7 @@ extension BLEDatabaseDelegate {
 }
 
 class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLEDatabase")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "BLE.ConcreteBLEDatabase")
     private var delegates: [BLEDatabaseDelegate] = []
     private var database: [TargetIdentifier : BLEDevice] = [:]
     private var queue = DispatchQueue(label: "Sensor.BLE.ConcreteBLEDatabase")

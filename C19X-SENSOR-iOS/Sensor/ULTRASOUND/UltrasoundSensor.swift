@@ -19,7 +19,7 @@ protocol UltrasoundSensor : Sensor {
  Requires : Info.plist : Privacy - Microphone Usage Description
  */
 class ConcreteUltrasoundSensor : NSObject, UltrasoundSensor {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "ConcreteUltrasoundSensor")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteUltrasoundSensor")
     private var delegates: [SensorDelegate] = []
     
     func add(delegate: SensorDelegate) {
@@ -36,7 +36,7 @@ class ConcreteUltrasoundSensor : NSObject, UltrasoundSensor {
 }
 
 class UltrasoundReceiver : NSObject {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "UltrasoundReceiver")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "UltrasoundReceiver")
     private let audioSession = AVAudioSession.sharedInstance()
     private let audioEngine = AVAudioEngine()
 

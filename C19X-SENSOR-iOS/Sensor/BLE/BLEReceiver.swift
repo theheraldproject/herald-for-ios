@@ -31,7 +31,7 @@ protocol BLEReceiver : Sensor {
  handled reliably by CoreBluetooth state restoration.
  */
 class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentralManagerDelegate, CBPeripheralDelegate {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLEReceiver")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "BLE.ConcreteBLEReceiver")
     private var delegates: [SensorDelegate] = []
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue!
