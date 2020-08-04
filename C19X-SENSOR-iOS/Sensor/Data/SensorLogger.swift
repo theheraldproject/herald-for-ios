@@ -10,10 +10,10 @@ import Foundation
 import UIKit
 import os
 
-protocol Logger {
+protocol SensorLogger {
     init(subsystem: String, category: String)
     
-    func log(_ level: LogLevel, _ message: String)
+    func log(_ level: SensorLoggerLevel, _ message: String)
     
     func debug(_ message: String)
     
@@ -22,11 +22,11 @@ protocol Logger {
     func fault(_ message: String)
 }
 
-enum LogLevel: String {
+enum SensorLoggerLevel: String {
     case debug, info, fault
 }
 
-class ConcreteLogger: NSObject, Logger {
+class ConcreteSensorLogger: NSObject, SensorLogger {
     private let subsystem: String
     private let category: String
     private let dateFormatter = DateFormatter()
@@ -44,13 +44,13 @@ class ConcreteLogger: NSObject, Logger {
         }
     }
 
-    func log(_ level: LogLevel, _ message: String) {
+    func log(_ level: SensorLoggerLevel, _ message: String) {
         // Write to unified os log if available, else print to console
         let timestamp = dateFormatter.string(from: Date())
         let csvMessage = message.replacingOccurrences(of: "\"", with: "'")
         let quotedMessage = (message.contains(",") ? "\"" + csvMessage + "\"" : csvMessage)
         let entry = timestamp + "," + level.rawValue + "," + subsystem + "," + category + "," + quotedMessage
-        ConcreteLogger.logFile.write(entry)
+        ConcreteSensorLogger.logFile.write(entry)
         guard let log = log else {
             print(entry)
             return

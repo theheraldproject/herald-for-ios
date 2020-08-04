@@ -19,7 +19,7 @@ protocol GPSSensor : Sensor {
  Requires : Info.plist : Privacy - Location Always and When In Use Usage Description
  */
 class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "ConcreteGPSSensor")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteGPSSensor")
     private var delegates: [SensorDelegate] = []
     private let locationManager = CLLocationManager()
     private let rangeForBeacon: UUID?

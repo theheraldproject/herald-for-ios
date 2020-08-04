@@ -45,7 +45,7 @@ Requires : Info.plist : Privacy - Bluetooth Always Usage Description
 Requires : Info.plist : Privacy - Bluetooth Peripheral Usage Description
 */
 class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
-    private let logger = ConcreteLogger(subsystem: "Sensor", category: "BLE.ConcreteBLESensor")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "BLE.ConcreteBLESensor")
     private let sensorQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLESensor.SensorQueue")
     private let delegateQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLESensor.DelegateQueue")
     private var delegates: [SensorDelegate] = []
