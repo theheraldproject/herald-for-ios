@@ -235,13 +235,15 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // - Android connections are short lived and should be left to complete
         // - iOS connections for getting the payload data should be left to complete
         var keep: [BLEDevice] = []
-        let keepUnknownOrRestored = connected.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored })
+        let keepUnknown = connected.filter({ $0.operatingSystem == .unknown })
+        let keepRestored = connected.filter({ $0.operatingSystem == .restored })
         let keepAndroid = connected.filter({ $0.operatingSystem == .android })
         let keepIosNew = connected.filter({ $0.operatingSystem == .ios && $0.payloadData == nil })
-        keep.append(contentsOf: keepUnknownOrRestored)
+        keep.append(contentsOf: keepUnknown)
+        keep.append(contentsOf: keepRestored)
         keep.append(contentsOf: keepAndroid)
         keep.append(contentsOf: keepIosNew)
-        logger.debug("taskConnect keep (unknown=\(keepUnknownOrRestored.count),android=\(keepAndroid.count),ios=\(keepIosNew.count))")
+        logger.debug("taskConnect keep (unknown=\(keepUnknown.count),restored=\(keepRestored.count),android=\(keepAndroid.count),ios=\(keepIosNew.count))")
         
         // Establish connections to discard
         // - iOS devices with payload data, sorted by last updated at timestamp (most recent first)

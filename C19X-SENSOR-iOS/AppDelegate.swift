@@ -16,9 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     // Payload data supplier, sensor and contact log
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: Sensor?
-    let contactLog = ContactLog(filename: "contacts.csv")
-    let rScriptLog = RScriptLog(filename: "rScriptLog.csv")
 
+    /// Generate unique and consistent device identifier for testing detection and tracking
     private func identifier() -> Int32 {
         let text = UIDevice.current.name + ":" + UIDevice.current.model + ":" + UIDevice.current.systemName + ":" + UIDevice.current.systemVersion
         var hash = UInt64 (5381)
@@ -42,8 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
 
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
-        sensor?.add(delegate: contactLog)
-        sensor?.add(delegate: rScriptLog)
+        sensor?.add(delegate: ContactLog(filename: "contacts.csv"))
+        sensor?.add(delegate: RScriptLog(filename: "rScriptLog.csv"))
+        sensor?.add(delegate: DetectionLog(filename: "detection.csv", payloadString: payloadString, prefixLength: 6))
         sensor?.start()
         
         return true

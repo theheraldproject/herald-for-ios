@@ -25,6 +25,7 @@ class TextFile {
         return !FileManager.default.fileExists(atPath: file.path)
     }
     
+    /// Append line to new or existing file
     func write(_ line: String) {
         guard let file = file else {
             return
@@ -41,5 +42,16 @@ class TextFile {
         } else {
             try? data.write(to: file, options: .atomicWrite)
         }
+    }
+    
+    /// Overwrite file content
+    func overwrite(_ content: String) {
+        guard let file = file else {
+            return
+        }
+        guard let data = content.data(using: .utf8) else {
+            return
+        }
+        try? data.write(to: file, options: .atomicWrite)
     }
 }
