@@ -16,6 +16,8 @@
 		B6374DD424D62724005985BC /* T4-20200801-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */; };
 		B6374DD724D6BACB005985BC /* T4-20200802-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */; };
 		B6374DD824D6BACB005985BC /* T4-20200802-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */; };
+		B64C6B1624DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B64C6B1424DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers */; };
+		B64C6B1724DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */; };
 		B66F71C224D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */; };
 		B66F71C324D98C9900FB17DF /* T4-20200804-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */; };
 		B66F71F424D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */; };
@@ -57,6 +59,8 @@
 		B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200801-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802-Contacts-4S.numbers"; sourceTree = "<group>"; };
+		B64C6B1424DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804c-Contacts-X.numbers"; sourceTree = "<group>"; };
+		B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804c-Contacts-4S.numbers"; sourceTree = "<group>"; };
 		B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; name = "T4-20200804-Contacts-4S.numbers"; path = "../../../../../../../Tmp/T4-20200804-Contacts-4S.numbers"; sourceTree = "<group>"; };
 		B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; name = "T4-20200804-Contacts-X.numbers"; path = "../../../../../../../Tmp/T4-20200804-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804b-Contacts-4S.numbers"; sourceTree = "<group>"; };
@@ -122,6 +126,8 @@
 			isa = PBXGroup;
 			children = (
 				B6374DCF24D4D9D0005985BC /* TestDescription.txt */,
+				B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */,
+				B64C6B1424DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers */,
 				B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */,
 				B66F71F324D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers */,
 				B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */,
@@ -313,6 +319,7 @@
 				B6374DD024D4D9D0005985BC /* TestDescription.txt in Resources */,
 				B66F71F424D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers in Resources */,
 				B6845AD324D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers in Resources */,
+				B64C6B1724DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers in Resources */,
 				B6845AD224D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers in Resources */,
 				B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */,
 				B6374DD424D62724005985BC /* T4-20200801-Contacts-X.numbers in Resources */,
@@ -325,6 +332,7 @@
 				B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */,
 				B6374DCD24D4D9AA005985BC /* T4-20200731-Contacts-X.numbers in Resources */,
 				B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */,
+				B64C6B1624DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers in Resources */,
 				B66F71C224D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
