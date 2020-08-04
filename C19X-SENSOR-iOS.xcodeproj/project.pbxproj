@@ -25,7 +25,7 @@
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
 		B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9F24CADA7A00F45AEE /* Assets.xcassets */; };
 		B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */; };
-		B692CAAE24CADE7300F45AEE /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAD24CADE7300F45AEE /* Logger.swift */; };
+		B692CAAE24CADE7300F45AEE /* SensorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAD24CADE7300F45AEE /* SensorLogger.swift */; };
 		B692CAB524CB096300F45AEE /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB424CB096300F45AEE /* Sensor.swift */; };
 		B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */; };
 		B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */; };
@@ -64,7 +64,7 @@
 		B692CA9F24CADA7A00F45AEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B692CAA224CADA7A00F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B692CAA424CADA7A00F45AEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B692CAAD24CADE7300F45AEE /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		B692CAAD24CADE7300F45AEE /* SensorLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorLogger.swift; sourceTree = "<group>"; };
 		B692CAB424CB096300F45AEE /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
 		B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
@@ -161,7 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				B692CADD24CF2B1400F45AEE /* TextFile.swift */,
-				B692CAAD24CADE7300F45AEE /* Logger.swift */,
+				B692CAAD24CADE7300F45AEE /* SensorLogger.swift */,
 				B6374DC424D00228005985BC /* ContactLog.swift */,
 				B6845AD424D8983B004B8E5C /* RScriptLog.swift */,
 				B6845AD624D8D746004B8E5C /* DetectionLog.swift */,
@@ -323,7 +323,7 @@
 				B6374DC524D00228005985BC /* ContactLog.swift in Sources */,
 				B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */,
 				B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */,
-				B692CAAE24CADE7300F45AEE /* Logger.swift in Sources */,
+				B692CAAE24CADE7300F45AEE /* SensorLogger.swift in Sources */,
 				B6845AD524D8983B004B8E5C /* RScriptLog.swift in Sources */,
 				B692CAB524CB096300F45AEE /* Sensor.swift in Sources */,
 				B692CACE24CC27F400F45AEE /* DayCodes.swift in Sources */,

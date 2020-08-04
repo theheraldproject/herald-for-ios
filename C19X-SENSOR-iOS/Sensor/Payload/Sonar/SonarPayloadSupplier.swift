@@ -21,9 +21,14 @@ class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
         self.identifier = identifier
     }
     
+    private func networkByteOrderData(_ identifier: Int32) -> Data {
+        var mutableSelf = identifier.bigEndian // network byte order
+        return Data(bytes: &mutableSelf, count: MemoryLayout.size(ofValue: mutableSelf))
+    }
+    
     func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
         var payloadData = PayloadData()
-        payloadData.append(identifier.networkByteOrderData)
+        payloadData.append(networkByteOrderData(identifier))
         //payloadData.append(Int32(timestamp.timeIntervalSince1970).networkByteOrderData)
         // Fill with blank data to make payload the same size as that in Sonar
         payloadData.append(Data(repeating: 0, count: MockSonarPayloadSupplier.length - payloadData.count))
@@ -40,12 +45,5 @@ class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
             indexEnd += MockSonarPayloadSupplier.length
         }
         return payloads
-    }
-}
-
-extension FixedWidthInteger {
-    var networkByteOrderData: Data {
-        var mutableSelf = self.bigEndian // network byte order
-        return Data(bytes: &mutableSelf, count: MemoryLayout.size(ofValue: mutableSelf))
     }
 }
