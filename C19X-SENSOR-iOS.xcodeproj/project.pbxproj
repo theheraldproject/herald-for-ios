@@ -19,6 +19,7 @@
 		B6845AD224D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */; };
 		B6845AD324D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */; };
 		B6845AD524D8983B004B8E5C /* RScriptLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD424D8983B004B8E5C /* RScriptLog.swift */; };
+		B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD624D8D746004B8E5C /* DetectionLog.swift */; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
@@ -55,6 +56,7 @@
 		B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802b-Contacts-4S.numbers"; sourceTree = "<group>"; };
 		B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802b-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B6845AD424D8983B004B8E5C /* RScriptLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RScriptLog.swift; sourceTree = "<group>"; };
+		B6845AD624D8D746004B8E5C /* DetectionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ".app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				B692CAAD24CADE7300F45AEE /* Logger.swift */,
 				B6374DC424D00228005985BC /* ContactLog.swift */,
 				B6845AD424D8983B004B8E5C /* RScriptLog.swift */,
+				B6845AD624D8D746004B8E5C /* DetectionLog.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */,
 				B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */,
 				B692CAC424CB41B800F45AEE /* UltrasoundSensor.swift in Sources */,
+				B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
 				B692CAC824CC27BC00F45AEE /* BLETransmitter.swift in Sources */,
 				B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */,
