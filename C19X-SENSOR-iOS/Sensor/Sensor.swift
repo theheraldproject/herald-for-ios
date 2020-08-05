@@ -49,6 +49,15 @@ class SensorArray : NSObject, Sensor {
         logger.debug("init")
         sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
+        super.init()
+        
+        // Loggers
+        let payloadString = payloadDataSupplier.payload(PayloadTimestamp()).base64EncodedString();
+        add(delegate: ContactLog(filename: "contacts.csv"))
+        add(delegate: RScriptLog(filename: "rScriptLog.csv"))
+        add(delegate: DetectionLog(filename: "detection.csv", payloadString: payloadString, prefixLength: 6))
+        logger.info("DEVICE ID (payloadPrefix=\(payloadString.prefix(6)))")
+
     }
     
     func add(delegate: SensorDelegate) {
