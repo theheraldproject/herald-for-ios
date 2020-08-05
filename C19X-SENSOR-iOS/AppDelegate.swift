@@ -33,17 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
-        let deviceIdentifier = identifier()
-        payloadDataSupplier = MockSonarPayloadSupplier(identifier: deviceIdentifier)
-        let payloadString = payloadDataSupplier!.payload(Date()).base64EncodedString()
-        logger.info("DEVICE ID (identifier=\(deviceIdentifier),payloadPrefix=\(payloadString.prefix(6)),payload=\(payloadString))")
-
-
+        payloadDataSupplier = MockSonarPayloadSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
-        sensor?.add(delegate: ContactLog(filename: "contacts.csv"))
-        sensor?.add(delegate: RScriptLog(filename: "rScriptLog.csv"))
-        sensor?.add(delegate: DetectionLog(filename: "detection.csv", payloadString: payloadString, prefixLength: 6))
         sensor?.start()
         
         return true

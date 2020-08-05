@@ -11,6 +11,7 @@ import UIKit
 
 /// CSV contact log for post event analysis and visualisation
 class DetectionLog: NSObject, SensorDelegate {
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.DetectionLog")
     private let textFile: TextFile
     private let payloadString: String
     private let prefixLength: Int
@@ -46,6 +47,7 @@ class DetectionLog: NSObject, SensorDelegate {
         }
         content.append("\n")
         textFile.overwrite(content)
+        logger.debug("write (content=\(content))")
     }
     
     // MARK:- SensorDelegate
@@ -57,6 +59,7 @@ class DetectionLog: NSObject, SensorDelegate {
         let payload = didRead.base64EncodedString()
         queue.async {
             if self.payloads.insert(payload).inserted {
+                self.logger.debug("didRead (payload=\(payload))")
                 self.write()
             }
         }
@@ -70,6 +73,7 @@ class DetectionLog: NSObject, SensorDelegate {
             let payload = data.base64EncodedString()
             queue.async {
                 if self.payloads.insert(payload).inserted {
+                    self.logger.debug("didShare (payload=\(payload))")
                     self.write()
                 }
             }
