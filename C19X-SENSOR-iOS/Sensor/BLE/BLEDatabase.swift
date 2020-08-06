@@ -87,8 +87,10 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
             }
         }
         let device = database[identifier]!
-        device.peripheral = peripheral
-        peripheral.delegate = delegate
+        if device.peripheral != peripheral {
+            device.peripheral = peripheral
+            peripheral.delegate = delegate
+        }
         return device
     }
     
