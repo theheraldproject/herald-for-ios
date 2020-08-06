@@ -178,7 +178,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             index[payloadData] = keeping
             database.delete(discarding.identifier)
             self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.description),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=\((keeping.identifier == device.identifier ? "former" : "latter")))")
-                index[payloadData] = device
             // CoreBluetooth will eventually give warning and disconnect actual duplicate silently.
             // While calling disconnect here is cleaner but it will trigger didDiscover and
             // retain the duplicates. Expect to see message :
