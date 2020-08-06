@@ -41,3 +41,11 @@ T4 : iOS - iOS : Continuous tracking
 3. X1, install app, background, airplane mode off, lock, expect detection and tracking of 4S, detach from Xcode
 4. Keep 4S and X1 in close proximity for 8+ hours
 5. Review contact logs, expect 4S and X1 to track each other for the entire test period
+
+T5 : iOS central - Android peripheral : Continuous tracking
+1. P2 and X1, uninstall app, airplane mode on, reboot
+2. P2, install app, background, airplane mode off, lock, detach from Android Studio
+3. X1, install app, background, airplane mode off, lock, expect detection and tracking of 4S, detach from Xcode
+4. Keep 4S and X1 in close proximity for 8+ hours
+5. Review contact logs, expect X1 to detect and track P2 for the entire test period
+
