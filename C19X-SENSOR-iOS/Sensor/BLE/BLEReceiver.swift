@@ -260,7 +260,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // Keep most recently updated iOS devices first as devices that haven't been updated for a while may be going out of range
             let surplusCapacity = concurrentConnectionQuota - keep.count
             if surplusCapacity > 0 {
-                _ = discard.dropFirst(capacity)
+                _ = discard.dropFirst(surplusCapacity)
             }
             discard.forEach() { device in
                 guard let peripheral = device.peripheral else {
