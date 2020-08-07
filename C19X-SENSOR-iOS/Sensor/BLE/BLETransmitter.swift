@@ -416,7 +416,7 @@ class PayloadDataBundle {
             return nil
         }
         // RSSI is a 32-bit Java int (little-endian) at index 0
-        rssi = BLE_RSSI(PayloadDataBundle.getInt32(8, bytes: bytes))
+        rssi = BLE_RSSI(PayloadDataBundle.getInt32(0, bytes: bytes))
         guard bytes.count > 4 else {
             payloadData = nil
             return
