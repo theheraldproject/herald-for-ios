@@ -70,12 +70,17 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txD-W3-4Y5" userLabel="crash">
+                                <rect key="frame" x="73.5" y="812" width="267" height="30"/>
+                                <state key="normal" title="Tap 3 times to crash app in 10 seconds"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="aMc-Ll-VVc" firstAttribute="top" secondItem="5wC-Oz-y4W" secondAttribute="bottom" constant="8" symbolic="YES" id="2B2-WW-t62"/>
                             <constraint firstItem="jt7-VE-xfW" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="3Sf-yK-40c"/>
                             <constraint firstItem="hbb-1p-Wxd" firstAttribute="leading" secondItem="jt7-VE-xfW" secondAttribute="leading" id="4Ro-yb-QpQ"/>
+                            <constraint firstItem="txD-W3-4Y5" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6fT-av-Ti7"/>
                             <constraint firstItem="5wC-Oz-y4W" firstAttribute="top" secondItem="exT-eT-0M5" secondAttribute="bottom" constant="8" symbolic="YES" id="7km-cE-CfH"/>
                             <constraint firstItem="dPO-Dv-CDF" firstAttribute="top" secondItem="kUM-Z2-P2r" secondAttribute="bottom" constant="8" symbolic="YES" id="Gyz-vb-RUw"/>
                             <constraint firstItem="exT-eT-0M5" firstAttribute="leading" secondItem="jt7-VE-xfW" secondAttribute="leading" id="HRg-BE-0Zq"/>
@@ -98,12 +103,14 @@
                             <constraint firstItem="jt7-VE-xfW" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="rEy-Jj-Z7s"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="exT-eT-0M5" secondAttribute="trailing" symbolic="YES" id="rXD-tC-FpB"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="kUM-Z2-P2r" secondAttribute="trailing" symbolic="YES" id="tHP-J3-77k"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="txD-W3-4Y5" secondAttribute="bottom" constant="20" id="wIq-hA-Tfp"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hbb-1p-Wxd" secondAttribute="trailing" symbolic="YES" id="yew-HR-scj"/>
                             <constraint firstItem="hbb-1p-Wxd" firstAttribute="top" secondItem="dPO-Dv-CDF" secondAttribute="bottom" constant="8" symbolic="YES" id="ykC-Ms-Jqm"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="buttonCrash" destination="txD-W3-4Y5" id="VVf-LP-zJo"/>
                         <outlet property="labelDetection" destination="aMc-Ll-VVc" id="y7u-dc-r1r"/>
                         <outlet property="labelDevice" destination="jt7-VE-xfW" id="yY6-HA-pxx"/>
                         <outlet property="labelDidDetect" destination="dPO-Dv-CDF" id="0rO-rk-Obq"/>
