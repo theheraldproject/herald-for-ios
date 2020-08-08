@@ -32,6 +32,11 @@ class ViewController: UIViewController, SensorDelegate {
     @IBOutlet weak var labelDidVisit: UILabel!
     @IBOutlet weak var labelDetection: UILabel!
     @IBOutlet weak var labelPayloads: UILabel!
+    @IBOutlet weak var buttonCrash: UIButton!
+    
+    @IBAction func buttonCrashTouchDown(_ sender: Any) {
+        simulateCrash(after: 10)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +49,34 @@ class ViewController: UIViewController, SensorDelegate {
         if let payloadPrefix = (appDelegate.sensor as? SensorArray)?.payloadPrefix {
             labelPayload.text = "PAYLOAD : \(payloadPrefix)"
         }
+        
+        enableCrashButton()
     }
+    
+    private func enableCrashButton() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(simulateCrashInTen))
+        tapGesture.numberOfTapsRequired = 3
+        buttonCrash.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func simulateCrashInTen() {
+        simulateCrash(after: 10)
+        buttonCrash.isUserInteractionEnabled = false
+        buttonCrash.setTitle("Crashing in 10 seconds", for: .normal)
+    }
+    
+    func simulateCrash(after: Double) {
+        logger.info("simulateCrash (after=\(after))")
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + after) {
+            self.logger.fault("simulateCrash now")
+            // CRASH
+            if ([0][1] == 1) {
+                exit(0)
+            }
+            exit(1)
+        }
+    }
+
     
     private func timestamp() -> String {
         let timestamp = dateFormatter.string(from: Date())
