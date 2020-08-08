@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Sensor for detecting and tracking various kinds of disease transmission vectors, e.g. contact with people, time at location.
 protocol Sensor {
@@ -44,20 +45,24 @@ protocol SensorDelegate {
 class SensorArray : NSObject, Sensor {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
     private var sensorArray: [Sensor] = []
-    
+    private let payloadPrefixLength = 6
+    private let payloadString: String
+    public let payloadPrefix: String
+    public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
+
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
         sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
+        payloadString = payloadDataSupplier.payload(PayloadTimestamp()).base64EncodedString();
+        payloadPrefix = String(payloadString.prefix(6))
         super.init()
         
         // Loggers
-        let payloadString = payloadDataSupplier.payload(PayloadTimestamp()).base64EncodedString();
         add(delegate: ContactLog(filename: "contacts.csv"))
         add(delegate: RScriptLog(filename: "rScriptLog.csv"))
         add(delegate: DetectionLog(filename: "detection.csv", payloadString: payloadString, prefixLength: 6))
-        logger.info("DEVICE ID (payloadPrefix=\(payloadString.prefix(6)))")
-
+        logger.info("DEVICE (payloadPrefix=\(payloadPrefix),description=\(SensorArray.deviceDescription))")
     }
     
     func add(delegate: SensorDelegate) {

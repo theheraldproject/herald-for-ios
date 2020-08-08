@@ -56,10 +56,10 @@ class RScriptLog: NSObject, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
-        let timestamp = timestamp()
+        let now = timestamp()
         didShare.forEach() { data in
             let payload = data.base64EncodedString()
-            textFile.write(timestamp + "," + payload + "," + deviceName + ",iOS," + deviceOS)
+            textFile.write(now + "," + payload + "," + deviceName + ",iOS," + deviceOS)
         }
     }
     
