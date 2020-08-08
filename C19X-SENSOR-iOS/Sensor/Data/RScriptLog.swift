@@ -16,7 +16,6 @@ class RScriptLog: NSObject, SensorDelegate {
     private let deviceOS = UIDevice.current.systemVersion
     private let deviceName = UIDevice.current.name
     private var identifierToPayload: [String:String] = [:]
-    private var identifierToSharedPayloads: [String:[String]] = [:]
     
     init(filename: String) {
         textFile = TextFile(filename: filename)
@@ -57,15 +56,10 @@ class RScriptLog: NSObject, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
-        if identifierToSharedPayloads[fromTarget] == nil {
-            identifierToSharedPayloads[fromTarget] = []
-        }
+        let timestamp = timestamp()
         didShare.forEach() { data in
             let payload = data.base64EncodedString()
-            identifierToSharedPayloads[fromTarget]?.append(payload)
-        }
-        identifierToSharedPayloads[fromTarget]?.forEach() { payload in
-            textFile.write(timestamp() + "," + payload + "," + deviceName + ",iOS," + deviceOS)
+            textFile.write(timestamp + "," + payload + "," + deviceName + ",iOS," + deviceOS)
         }
     }
     
