@@ -31,19 +31,15 @@ class ViewController: UIViewController, SensorDelegate {
     @IBOutlet weak var labelDidShare: UILabel!
     @IBOutlet weak var labelDidVisit: UILabel!
     @IBOutlet weak var labelDetection: UILabel!
-    @IBOutlet weak var labelPayloads: UILabel!
     @IBOutlet weak var buttonCrash: UIButton!
-    
-    @IBAction func buttonCrashTouchDown(_ sender: Any) {
-        simulateCrash(after: 10)
-    }
+    @IBOutlet weak var textViewPayloads: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateFormatter.dateFormat = "MMdd HH:mm:ss"
         
         labelDevice.text = SensorArray.deviceDescription
         if let payloadPrefix = (appDelegate.sensor as? SensorArray)?.payloadPrefix {
@@ -85,22 +81,27 @@ class ViewController: UIViewController, SensorDelegate {
     
     private func updateDetection() {
         var payloadPrefixes: [String:String] = [:]
-        didSharePayloads.forEach() { payload in
-            let payloadPrefix = String(payload.prefix(payloadPrefixLength))
-            payloadPrefixes[payloadPrefix] = "(shared)"
-        }
         didReadPayloads.forEach() { payload in
             let payloadPrefix = String(payload.prefix(payloadPrefixLength))
-            payloadPrefixes[payloadPrefix] = "(read)"
+            payloadPrefixes[payloadPrefix] = "read"
+        }
+        didSharePayloads.forEach() { payload in
+            let payloadPrefix = String(payload.prefix(payloadPrefixLength))
+            if payloadPrefixes[payloadPrefix] == nil {
+                payloadPrefixes[payloadPrefix] = "shared"
+            } else {
+                payloadPrefixes[payloadPrefix] = "read,shared"
+            }
         }
         var payloadPrefixesList: [String] = []
         payloadPrefixes.keys.forEach() { payloadPrefix in
             if let method = payloadPrefixes[payloadPrefix] {
-                payloadPrefixesList.append("\(payloadPrefix) \(method)")
+                payloadPrefixesList.append("\(payloadPrefix) (\(method))")
             }
         }
         payloadPrefixesList.sort()
-        labelPayloads.text = payloadPrefixesList.joined(separator: "\n")
+        textViewPayloads.text = payloadPrefixesList.joined(separator: "\n")
+        labelDetection.text = "DETECTION (\(didDetect))"
     }
 
     // MARK:- SensorDelegate
@@ -108,7 +109,7 @@ class ViewController: UIViewController, SensorDelegate {
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
         self.didDetect += 1
         DispatchQueue.main.async {
-            self.labelDidDetect.text = "didDetect : \(self.didDetect) (\(self.timestamp()))"
+            self.labelDidDetect.text = "didDetect: \(self.didDetect) (\(self.timestamp()))"
         }
     }
 
@@ -116,7 +117,7 @@ class ViewController: UIViewController, SensorDelegate {
         self.didRead += 1
         self.didReadPayloads.insert(didRead.base64EncodedString())
         DispatchQueue.main.async {
-            self.labelDidRead.text = "didRead : \(self.didRead) (\(self.timestamp()))"
+            self.labelDidRead.text = "didRead: \(self.didRead) (\(self.timestamp()))"
             self.updateDetection()
         }
     }
@@ -125,7 +126,7 @@ class ViewController: UIViewController, SensorDelegate {
         self.didShare += 1
         didShare.forEach { self.didSharePayloads.insert($0.base64EncodedString()) }
         DispatchQueue.main.async {
-            self.labelDidShare.text = "didShare : \(self.didShare) (\(self.timestamp()))"
+            self.labelDidShare.text = "didShare: \(self.didShare) (\(self.timestamp()))"
             self.updateDetection()
         }
     }
@@ -133,14 +134,14 @@ class ViewController: UIViewController, SensorDelegate {
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         self.didMeasure += 1;
         DispatchQueue.main.async {
-            self.labelDidMeasure.text = "didMeasure : \(self.didMeasure) (\(self.timestamp()))"
+            self.labelDidMeasure.text = "didMeasure: \(self.didMeasure) (\(self.timestamp()))"
         }
     }
 
     func sensor(_ sensor: SensorType, didVisit: Location) {
         self.didVisit += 1;
         DispatchQueue.main.async {
-            self.labelDidVisit.text = "didVisit : \(self.didVisit) (\(self.timestamp()))"
+            self.labelDidVisit.text = "didVisit: \(self.didVisit) (\(self.timestamp()))"
         }
     }
 }
