@@ -269,31 +269,71 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // Write -> Notify delegates -> Write response -> Notify subscribers
         for request in requests {
             let targetIdentifier = TargetIdentifier(central: request.central)
+            // FEATURE : Symmetric connection on write
+            _ = database.device(targetIdentifier)
             logger.debug("didReceiveWrite (central=\(targetIdentifier))")
             if let data = request.value {
-                // Receive beacon code and RSSI as data from receiver (e.g. Android device with no BLE transmit capability)
-                if let payloadDataBundle = PayloadDataBundle(data) {
-                    logger.debug("didReceiveWrite -> didDetect=\(targetIdentifier)")
-                    delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
-                    
-                    if let rssi = payloadDataBundle.rssi {
-                        let proximity = Proximity(unit: .RSSI, value: Double(rssi))
-                        logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
-                        delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: targetIdentifier) }
-                    }
-                    
-                    if let payloadData = payloadDataBundle.payloadData {
-                        logger.debug("didReceiveWrite -> didRead=\(payloadData.description),fromTarget=\(targetIdentifier)")
-                        delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: targetIdentifier) }
+                if data.count == 0 {
+                    // Receiver writes blank data on detection of transmitter to bring iOS transmitter back from suspended state
+                    logger.debug("didReceiveWrite (central=\(targetIdentifier),action=wakeTransmitter)")
+                } else if let actionCode = data.uint8(0) {
+                    switch actionCode {
+                    case BLESensorConfiguration.signalCharacteristicActionWritePayload:
+                        logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writePayload)")
+                        // writePayload data format
+                        // 0-0 : actionCode
+                        // 1-2 : payload data count in bytes (Int16)
+                        // 3.. : payload data
+                        if let payloadDataCount = data.int16(1) {
+                            logger.debug("didReceiveWrite -> didDetect=\(targetIdentifier)")
+                            delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
+                            if data.count == (3 + payloadDataCount) {
+                                let payloadData = PayloadData(data.subdata(in: 3..<data.count))
+                                logger.debug("didReceiveWrite -> didRead=\(payloadData.description),fromTarget=\(targetIdentifier)")
+                                delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: targetIdentifier) }
+                            } else {
+                                logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
+                            }
+                        } else {
+                            logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writePayload)")
+                        }
+                    case BLESensorConfiguration.signalCharacteristicActionWriteRSSI:
+                        logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writeRSSI)")
+                        // writeRSSI data format
+                        // 0-0 : actionCode
+                        // 1-2 : rssi value (Int16)
+                        if let rssi = data.int16(1) {
+                            let proximity = Proximity(unit: .RSSI, value: Double(rssi))
+                            logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
+                            delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: targetIdentifier) }
+                        } else {
+                            logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writeRSSI)")
+                        }
+                    case BLESensorConfiguration.signalCharacteristicActionWritePayloadSharing:
+                        logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writePayloadSharing)")
+                        // writePayloadSharing data format
+                        // 0-0 : actionCode
+                        // 1-2 : payload sharing data count in bytes (Int16)
+                        // 3.. : payload sharing data (to be parsed by payload data supplier)
+                        if let payloadDataCount = data.int16(1) {
+                            if data.count == (3 + payloadDataCount) {
+                                let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 3..<data.count))
+                                logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
+                                delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
+                            } else {
+                                logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayloadSharing)")
+                            }
+                        } else {
+                            logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writePayloadSharing)")
+                        }
+                    default:
+                        logger.fault("didReceiveWrite (central=\(targetIdentifier),action=unknown,actionCode=\(actionCode))")
                     }
                 }
-                // Receiver writes blank data on detection of transmitter to bring iOS transmitter back from suspended state
                 peripheral.respond(to: request, withResult: .success)
             } else {
                 peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
             }
-            // FEATURE : Symmetric connection on write
-            _ = database.device(request.central.identifier.uuidString)
         }
         notifySubscribers("didReceiveWrite")
     }
@@ -403,6 +443,88 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     }
 }
 
+extension Data {
+    /// Get Int8 from byte array (little-endian).
+    func int8(_ index: Int) -> Int8? {
+        guard let value = uint8(index) else {
+            return nil
+        }
+        return Int8(bitPattern: value)
+    }
+
+    /// Get UInt8 from byte array (little-endian).
+    func uint8(_ index: Int) -> UInt8? {
+        let bytes = [UInt8](self)
+        guard index < bytes.count else {
+            return nil
+        }
+        return bytes[index]
+    }
+    
+    /// Get Int16 from byte array (little-endian).
+    func int16(_ index: Int) -> Int16? {
+        guard let value = uint16(index) else {
+            return nil
+        }
+        return Int16(bitPattern: value)
+    }
+    
+    /// Get UInt16 from byte array (little-endian).
+    func uint16(_ index: Int) -> UInt16? {
+        let bytes = [UInt8](self)
+        guard index < (bytes.count - 1) else {
+            return nil
+        }
+        return UInt16(bytes[index]) |
+            UInt16(bytes[index + 1]) << 8
+    }
+    
+    /// Get Int32 from byte array (little-endian).
+    func int32(_ index: Int) -> Int32? {
+        guard let value = uint32(index) else {
+            return nil
+        }
+        return Int32(bitPattern: value)
+    }
+    
+    /// Get UInt32 from byte array (little-endian).
+    func uint32(_ index: Int) -> UInt32? {
+        let bytes = [UInt8](self)
+        guard index < (bytes.count - 3) else {
+            return nil
+        }
+        return UInt32(bytes[index]) |
+            UInt32(bytes[index + 1]) << 8 |
+            UInt32(bytes[index + 2]) << 16 |
+            UInt32(bytes[index + 3]) << 24
+    }
+
+    /// Get Int64 from byte array (little-endian).
+    func int64(_ index: Int) -> Int64? {
+        guard let value = uint64(index) else {
+            return nil
+        }
+        return Int64(bitPattern: value)
+    }
+    
+    /// Get UInt64 from byte array (little-endian).
+    func uint64(_ index: Int) -> UInt64? {
+        let bytes = [UInt8](self)
+        guard index < (bytes.count - 7) else {
+            return nil
+        }
+        return UInt64(bytes[index]) |
+            UInt64(bytes[index + 1]) << 8 |
+            UInt64(bytes[index + 2]) << 16 |
+            UInt64(bytes[index + 3]) << 24 |
+            UInt64(bytes[index + 4]) << 32 |
+            UInt64(bytes[index + 5]) << 40 |
+            UInt64(bytes[index + 6]) << 48 |
+            UInt64(bytes[index + 7]) << 56
+    }
+
+}
+
 /// RSSI and Payload data transmitted from receiver via write to signal characteristic
 class PayloadDataBundle {
     let rssi: BLE_RSSI?
@@ -424,6 +546,18 @@ class PayloadDataBundle {
         // Payload data is the remainder
         // e.g. C19X beacon code is a 64-bit Java long (little-endian) at index 4
         payloadData = PayloadData(data.subdata(in: 4..<data.count))
+    }
+
+    /// Get Int16 from byte array (little-endian).
+    static func getInt16(_ index: Int, bytes:[UInt8]) -> Int16 {
+        return Int16(bitPattern: getUInt16(index, bytes: bytes))
+    }
+    
+    /// Get UInt16 from byte array (little-endian).
+    static func getUInt16(_ index: Int, bytes:[UInt8]) -> UInt16 {
+        let returnValue = UInt16(bytes[index]) |
+            UInt16(bytes[index + 1]) << 8
+        return returnValue
     }
 
     /// Get Int32 from byte array (little-endian).
