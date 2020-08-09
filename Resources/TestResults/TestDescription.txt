@@ -47,3 +47,12 @@ X being used as normal phone with average screen on and interactions. Sensor run
 Results in "T4-20200804c-Contacts-4S" and "T4-20200804c-Contacts-X" show constant detection and tracking.
 Test validates integration of Sensor in NHSX app.
 
+::::: 2020-08-08 : Continuous detection and tracking for iOS-Android : TestScript T4 : PASSED
+4S, X, J6 and S3 in close proximity for over 12 hours.
+4S, J6 and S3 in background mode, screen locked, zero interaction.
+X being used as normal phone with average screen on and interactions.
+Results in "T4-20200808-Contacts-4S" and "T4-20200808-Contacts-X" show constant detection and tracking.
+Test validates iOS detection and tracking of iOS
+Test validates iOS detection and tracking of Android transmit/receive device (S3)
+Test validates iOS detection and tracking of Android receive only device (J6)
+
