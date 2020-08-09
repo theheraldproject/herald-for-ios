@@ -20,6 +20,7 @@
 		B64C6B1724DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */; };
 		B652340924DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B652340724DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers */; };
 		B652340A24DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B652340824DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers */; };
+		B652340C24E0754E004D0CCC /* C19X-Sensor-DetectionAndTracking.pdf in Resources */ = {isa = PBXBuildFile; fileRef = B652340B24E0754E004D0CCC /* C19X-Sensor-DetectionAndTracking.pdf */; };
 		B66F71C224D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */; };
 		B66F71C324D98C9900FB17DF /* T4-20200804-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */; };
 		B66F71F424D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */; };
@@ -65,6 +66,7 @@
 		B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804c-Contacts-4S.numbers"; sourceTree = "<group>"; };
 		B652340724DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200808-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B652340824DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200808-Contacts-4S.numbers"; sourceTree = "<group>"; };
+		B652340B24E0754E004D0CCC /* C19X-Sensor-DetectionAndTracking.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "C19X-Sensor-DetectionAndTracking.pdf"; sourceTree = "<group>"; };
 		B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; name = "T4-20200804-Contacts-4S.numbers"; path = "../../../../../../../Tmp/T4-20200804-Contacts-4S.numbers"; sourceTree = "<group>"; };
 		B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; name = "T4-20200804-Contacts-X.numbers"; path = "../../../../../../../Tmp/T4-20200804-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804b-Contacts-4S.numbers"; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 		B6374DC724D1857B005985BC /* Documents */ = {
 			isa = PBXGroup;
 			children = (
+				B652340B24E0754E004D0CCC /* C19X-Sensor-DetectionAndTracking.pdf */,
 				B6374DC824D18598005985BC /* TestScript.txt */,
 			);
 			path = Documents;
@@ -335,6 +338,7 @@
 				B6374DD324D62724005985BC /* T4-20200801-Contacts-4S.numbers in Resources */,
 				B66F71C324D98C9900FB17DF /* T4-20200804-Contacts-X.numbers in Resources */,
 				B66F71F524D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers in Resources */,
+				B652340C24E0754E004D0CCC /* C19X-Sensor-DetectionAndTracking.pdf in Resources */,
 				B6374DC924D18598005985BC /* TestScript.txt in Resources */,
 				B652340924DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers in Resources */,
 				B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */,
