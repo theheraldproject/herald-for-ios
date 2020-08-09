@@ -101,7 +101,7 @@ class ViewController: UIViewController, SensorDelegate {
         }
         payloadPrefixesList.sort()
         textViewPayloads.text = payloadPrefixesList.joined(separator: "\n")
-        labelDetection.text = "DETECTION (\(didDetect))"
+        labelDetection.text = "DETECTION (\(payloadPrefixesList.count))"
     }
 
     // MARK:- SensorDelegate
