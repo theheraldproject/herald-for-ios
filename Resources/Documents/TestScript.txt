@@ -5,6 +5,7 @@ X1 : iPhone X, iOS 13.2.3
 X2 : iPhone X, iOS 13.5.1
 J6 : Samsung J6, Android
 P2 : Google Pixel 2, Android
+S3 : Samsung Galaxy Tab S3, Android
 
 Test scripts
 ============
