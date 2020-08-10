@@ -212,7 +212,7 @@ class BLEDevice {
             Date().timeIntervalSince(payloadSharingDataLastUpdatedAt)
         }}
     var description: String { get {
-        return "BLEDevice[id=\(identifier),lastUpdatedAt=\(lastUpdatedAt.description),peripheral=\(peripheral == nil ? "-" : "T"),os=\(operatingSystem.rawValue)]"
+        return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue)]"
         }}
     
     init(_ identifier: TargetIdentifier, delegate: BLEDeviceDelegate) {

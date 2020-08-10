@@ -34,7 +34,10 @@ struct BLESensorConfiguration {
     static let advertRestartTimeInterval = TimeInterval.minute
     /// Time delay between payload sharing
     static let payloadSharingTimeInterval = TimeInterval.minute
-    
+    /// Expiry time for shared payloads, to ensure only recently seen payloads are shared
+    /// Must be > payloadSharingTimeInterval to share pending payloads
+    static let payloadSharingExpiryTimeInterval = TimeInterval.minute * 5
+
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
     static let signalCharacteristicActionWritePayload = UInt8(1)
     /// Signal characteristic action code for write RSSI, expect 1 byte action code followed by 4 byte little-endian Int32 integer value for RSSI value
