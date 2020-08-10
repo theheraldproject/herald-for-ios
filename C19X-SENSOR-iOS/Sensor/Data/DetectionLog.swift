@@ -13,17 +13,15 @@ import UIKit
 class DetectionLog: NSObject, SensorDelegate {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.DetectionLog")
     private let textFile: TextFile
-    private let payloadString: String
-    private let prefixLength: Int
+    private let payloadData: PayloadData
     private let deviceName = UIDevice.current.name
     private let deviceOS = UIDevice.current.systemVersion
     private var payloads: Set<String> = []
     private let queue = DispatchQueue(label: "Sensor.Data.DetectionLog.Queue")
     
-    init(filename: String, payloadString: String, prefixLength: Int) {
+    init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
-        self.payloadString = payloadString
-        self.prefixLength = prefixLength
+        self.payloadData = payloadData
     }
     
     private func csv(_ value: String) -> String {
@@ -35,13 +33,12 @@ class DetectionLog: NSObject, SensorDelegate {
 
     private func write() {
         let device = "\(deviceName) (iOS \(deviceOS))"
-        let payloadPrefix = String(payloadString.prefix(prefixLength))
         var payloadList: [String] = []
         payloads.forEach() { payload in
-            payloadList.append(String(payload.prefix(prefixLength)))
+            payloadList.append(payload)
         }
         payloadList.sort()
-        var content = csv(device) + ",id=" + payloadPrefix
+        var content = csv(device) + ",id=" + payloadData.shortName
         payloadList.forEach() { payload in
             content.append("," + payload)
         }
@@ -56,10 +53,9 @@ class DetectionLog: NSObject, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
-        let payload = didRead.base64EncodedString()
         queue.async {
-            if self.payloads.insert(payload).inserted {
-                self.logger.debug("didRead (payload=\(payload))")
+            if self.payloads.insert(didRead.shortName).inserted {
+                self.logger.debug("didRead (payload=\(didRead.shortName))")
                 self.write()
             }
         }
@@ -69,11 +65,10 @@ class DetectionLog: NSObject, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
-        didShare.forEach() { data in
-            let payload = data.base64EncodedString()
+        didShare.forEach() { payloadData in
             queue.async {
-                if self.payloads.insert(payload).inserted {
-                    self.logger.debug("didShare (payload=\(payload))")
+                if self.payloads.insert(payloadData.shortName).inserted {
+                    self.logger.debug("didShare (payload=\(payloadData.shortName))")
                     self.write()
                 }
             }

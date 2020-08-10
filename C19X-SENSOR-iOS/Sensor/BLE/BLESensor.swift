@@ -111,7 +111,7 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
             guard let payloadData = device.payloadData else {
                 return
             }
-            logger.debug("didRead (device=\(device.identifier),payloadData=\(payloadData.description))")
+            logger.debug("didRead (device=\(device.identifier),payloadData=\(payloadData.shortName))")
             delegateQueue.async {
                 self.delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: device.identifier) }
             }

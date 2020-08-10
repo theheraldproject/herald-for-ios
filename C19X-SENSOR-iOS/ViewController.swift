@@ -42,8 +42,8 @@ class ViewController: UIViewController, SensorDelegate {
         dateFormatter.dateFormat = "MMdd HH:mm:ss"
         
         labelDevice.text = SensorArray.deviceDescription
-        if let payloadPrefix = (appDelegate.sensor as? SensorArray)?.payloadPrefix {
-            labelPayload.text = "PAYLOAD : \(payloadPrefix)"
+        if let payloadData = (appDelegate.sensor as? SensorArray)?.payloadData {
+            labelPayload.text = "PAYLOAD : \(payloadData.shortName)"
         }
         
         enableCrashButton()
@@ -115,7 +115,7 @@ class ViewController: UIViewController, SensorDelegate {
 
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         self.didRead += 1
-        self.didReadPayloads.insert(didRead.base64EncodedString())
+        didReadPayloads.insert(didRead.shortName)
         DispatchQueue.main.async {
             self.labelDidRead.text = "didRead: \(self.didRead) (\(self.timestamp()))"
             self.updateDetection()
@@ -124,7 +124,7 @@ class ViewController: UIViewController, SensorDelegate {
 
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         self.didShare += 1
-        didShare.forEach { self.didSharePayloads.insert($0.base64EncodedString()) }
+        didShare.forEach { self.didSharePayloads.insert($0.shortName) }
         DispatchQueue.main.async {
             self.labelDidShare.text = "didShare: \(self.didShare) (\(self.timestamp()))"
             self.updateDetection()
