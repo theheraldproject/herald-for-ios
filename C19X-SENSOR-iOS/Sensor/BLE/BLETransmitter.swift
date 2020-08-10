@@ -270,7 +270,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         for request in requests {
             let targetIdentifier = TargetIdentifier(central: request.central)
             // FEATURE : Symmetric connection on write
-            _ = database.device(targetIdentifier)
+            let targetDevice = database.device(targetIdentifier)
             logger.debug("didReceiveWrite (central=\(targetIdentifier))")
             if let data = request.value {
                 if data.count == 0 {
@@ -290,6 +290,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (3 + payloadDataCount) {
                                 let payloadData = PayloadData(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didRead=\(payloadData.description),fromTarget=\(targetIdentifier)")
+                                targetDevice.receiveOnly = true
                                 delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: targetIdentifier) }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
@@ -305,6 +306,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         if let rssi = data.int16(1) {
                             let proximity = Proximity(unit: .RSSI, value: Double(rssi))
                             logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
+                            targetDevice.receiveOnly = true
                             delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: targetIdentifier) }
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writeRSSI)")
@@ -319,6 +321,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (3 + payloadDataCount) {
                                 let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
+                                targetDevice.receiveOnly = true
                                 delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayloadSharing)")
@@ -353,8 +356,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             guard let payload = device.payloadData else {
                 return
             }
-            // Device is iOS (Android is always discoverable)
-            guard device.operatingSystem == .ios else {
+            // Device is iOS or receive only (Samsung J6)
+            guard device.operatingSystem == .ios || device.receiveOnly else {
                 return
             }
             // Payload is new to peer
@@ -377,7 +380,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             guard let payload = device.payloadData else {
                 return
             }
-            guard data.count + payload.count < (2*129) else {
+            guard data.count + payload.count < (2 * 129) else {
                 return
             }
             identifiers.append(device.identifier)
@@ -521,74 +524,5 @@ extension Data {
             UInt64(bytes[index + 5]) << 40 |
             UInt64(bytes[index + 6]) << 48 |
             UInt64(bytes[index + 7]) << 56
-    }
-
-}
-
-/// RSSI and Payload data transmitted from receiver via write to signal characteristic
-class PayloadDataBundle {
-    let rssi: BLE_RSSI?
-    let payloadData: PayloadData?
-    
-    init?(_ data: Data) {
-        let bytes = [UInt8](data)
-        guard bytes.count >= 4 else {
-            rssi = nil
-            payloadData = nil
-            return nil
-        }
-        // RSSI is a 32-bit Java int (little-endian) at index 0
-        rssi = BLE_RSSI(PayloadDataBundle.getInt32(0, bytes: bytes))
-        guard bytes.count > 4 else {
-            payloadData = nil
-            return
-        }
-        // Payload data is the remainder
-        // e.g. C19X beacon code is a 64-bit Java long (little-endian) at index 4
-        payloadData = PayloadData(data.subdata(in: 4..<data.count))
-    }
-
-    /// Get Int16 from byte array (little-endian).
-    static func getInt16(_ index: Int, bytes:[UInt8]) -> Int16 {
-        return Int16(bitPattern: getUInt16(index, bytes: bytes))
-    }
-    
-    /// Get UInt16 from byte array (little-endian).
-    static func getUInt16(_ index: Int, bytes:[UInt8]) -> UInt16 {
-        let returnValue = UInt16(bytes[index]) |
-            UInt16(bytes[index + 1]) << 8
-        return returnValue
-    }
-
-    /// Get Int32 from byte array (little-endian).
-    static func getInt32(_ index: Int, bytes:[UInt8]) -> Int32 {
-        return Int32(bitPattern: getUInt32(index, bytes: bytes))
-    }
-    
-    /// Get UInt32 from byte array (little-endian).
-    static func getUInt32(_ index: Int, bytes:[UInt8]) -> UInt32 {
-        let returnValue = UInt32(bytes[index]) |
-            UInt32(bytes[index + 1]) << 8 |
-            UInt32(bytes[index + 2]) << 16 |
-            UInt32(bytes[index + 3]) << 24
-        return returnValue
-    }
-    
-    /// Get Int64 from byte array (little-endian).
-    static func getInt64(_ index: Int, bytes:[UInt8]) -> Int64 {
-        return Int64(bitPattern: getUInt64(index, bytes: bytes))
-    }
-    
-    /// Get UInt64 from byte array (little-endian).
-    static func getUInt64(_ index: Int, bytes:[UInt8]) -> UInt64 {
-        let returnValue = UInt64(bytes[index]) |
-            UInt64(bytes[index + 1]) << 8 |
-            UInt64(bytes[index + 2]) << 16 |
-            UInt64(bytes[index + 3]) << 24 |
-            UInt64(bytes[index + 4]) << 32 |
-            UInt64(bytes[index + 5]) << 40 |
-            UInt64(bytes[index + 6]) << 48 |
-            UInt64(bytes[index + 7]) << 56
-        return returnValue
     }
 }
