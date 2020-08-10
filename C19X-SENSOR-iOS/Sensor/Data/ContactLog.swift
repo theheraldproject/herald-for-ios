@@ -40,7 +40,7 @@ class ContactLog: NSObject, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
-        textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,2,,,," + csv(didRead.base64EncodedString()))
+        textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,2,,,," + csv(didRead.shortName))
     }
     
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
@@ -49,7 +49,7 @@ class ContactLog: NSObject, SensorDelegate {
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let prefix = timestamp() + "," + sensor.rawValue + "," + csv(fromTarget)
-        let payloads = didShare.map { $0.base64EncodedString() }
+        let payloads = didShare.map { $0.shortName }
         textFile.write(prefix + ",,,,4,," + csv(payloads.description))
     }
     

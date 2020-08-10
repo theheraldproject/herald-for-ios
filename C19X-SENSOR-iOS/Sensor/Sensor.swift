@@ -45,24 +45,21 @@ protocol SensorDelegate {
 class SensorArray : NSObject, Sensor {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
     private var sensorArray: [Sensor] = []
-    private let payloadPrefixLength = 6
-    private let payloadString: String
-    public let payloadPrefix: String
+    public let payloadData: PayloadData
     public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
         sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
-        payloadString = payloadDataSupplier.payload(PayloadTimestamp()).base64EncodedString();
-        payloadPrefix = String(payloadString.prefix(6))
+        payloadData = payloadDataSupplier.payload(PayloadTimestamp())
         super.init()
         
         // Loggers
         add(delegate: ContactLog(filename: "contacts.csv"))
         add(delegate: RScriptLog(filename: "rScriptLog.csv"))
-        add(delegate: DetectionLog(filename: "detection.csv", payloadString: payloadString, prefixLength: 6))
-        logger.info("DEVICE (payloadPrefix=\(payloadPrefix),description=\(SensorArray.deviceDescription))")
+        add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
+        logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
     }
     
     func add(delegate: SensorDelegate) {
@@ -113,8 +110,8 @@ typealias PayloadTimestamp = Date
 /// Encrypted payload data received from target. This is likely to be an encrypted datagram of the target's actual permanent identifier.
 typealias PayloadData = Data
 extension PayloadData {
-    var description: String {
-        self.base64EncodedString()
+    var shortName: String {
+        return String(subdata(in: 3..<count-3).base64EncodedString().prefix(6))
     }
 }
 

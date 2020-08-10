@@ -28,6 +28,7 @@ class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
     
     func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
         var payloadData = PayloadData()
+        payloadData.append(Data(repeating: 0, count: 3))
         payloadData.append(networkByteOrderData(identifier))
         //payloadData.append(Int32(timestamp.timeIntervalSince1970).networkByteOrderData)
         // Fill with blank data to make payload the same size as that in Sonar

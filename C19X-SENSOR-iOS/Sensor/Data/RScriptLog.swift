@@ -43,9 +43,8 @@ class RScriptLog: NSObject, SensorDelegate {
     }
     
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
-        let payload = didRead.base64EncodedString()
-        identifierToPayload[fromTarget] = payload
-        textFile.write(timestamp() + "," + payload + "," + deviceName + ",iOS," + deviceOS)
+        identifierToPayload[fromTarget] = didRead.shortName
+        textFile.write(timestamp() + "," + didRead.shortName + "," + deviceName + ",iOS," + deviceOS)
     }
     
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
@@ -57,9 +56,8 @@ class RScriptLog: NSObject, SensorDelegate {
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let now = timestamp()
-        didShare.forEach() { data in
-            let payload = data.base64EncodedString()
-            textFile.write(now + "," + payload + "," + deviceName + ",iOS," + deviceOS)
+        didShare.forEach() { payloadData in
+            textFile.write(now + "," + payloadData.shortName + "," + deviceName + ",iOS," + deviceOS)
         }
     }
     

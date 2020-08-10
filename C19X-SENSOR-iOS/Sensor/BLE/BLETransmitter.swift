@@ -289,7 +289,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
                             if data.count == (3 + payloadDataCount) {
                                 let payloadData = PayloadData(data.subdata(in: 3..<data.count))
-                                logger.debug("didReceiveWrite -> didRead=\(payloadData.description),fromTarget=\(targetIdentifier)")
+                                logger.debug("didReceiveWrite -> didRead=\(payloadData.shortName),fromTarget=\(targetIdentifier)")
                                 targetDevice.operatingSystem = .android
                                 targetDevice.receiveOnly = true
                                 targetDevice.payloadData = payloadData
@@ -404,7 +404,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.debug("Read (central=\(central.description),characteristic=payload,offset=\(request.offset))")
             let data = payloadDataSupplier.payload(PayloadTimestamp())
             guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.description))")
+                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.count))")
                 peripheral.respond(to: request, withResult: .invalidOffset)
                 return
             }
@@ -418,7 +418,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                 return
             }
             guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payloadSharing,offset=\(request.offset),data=\(data.description))")
+                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payloadSharing,offset=\(request.offset),data=\(data.count))")
                 peripheral.respond(to: request, withResult: .invalidOffset)
                 return
             }
