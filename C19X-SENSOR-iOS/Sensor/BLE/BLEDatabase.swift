@@ -171,6 +171,11 @@ class BLEDevice {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .operatingSystem)
         }}
+    /// Device is receive only, this is necessary for filtering payload sharing data
+    var receiveOnly: Bool = false {
+        didSet {
+            lastUpdatedAt = Date()
+        }}
     /// Payload data acquired from the device via payloadCharacteristic read, e.g.  beacon code or Sonar encrypted identifier
     var payloadData: PayloadData? {
         didSet {

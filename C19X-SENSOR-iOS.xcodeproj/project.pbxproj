@@ -8,25 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B6374DC524D00228005985BC /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6374DC424D00228005985BC /* ContactLog.swift */; };
-		B6374DC924D18598005985BC /* TestScript.txt in Resources */ = {isa = PBXBuildFile; fileRef = B6374DC824D18598005985BC /* TestScript.txt */; };
-		B6374DCD24D4D9AA005985BC /* T4-20200731-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DCB24D4D9A9005985BC /* T4-20200731-Contacts-X.numbers */; };
-		B6374DCE24D4D9AA005985BC /* T4-20200731-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DCC24D4D9AA005985BC /* T4-20200731-Contacts-4S.numbers */; };
-		B6374DD024D4D9D0005985BC /* TestDescription.txt in Resources */ = {isa = PBXBuildFile; fileRef = B6374DCF24D4D9D0005985BC /* TestDescription.txt */; };
-		B6374DD324D62724005985BC /* T4-20200801-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD124D62724005985BC /* T4-20200801-Contacts-4S.numbers */; };
-		B6374DD424D62724005985BC /* T4-20200801-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */; };
-		B6374DD724D6BACB005985BC /* T4-20200802-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */; };
-		B6374DD824D6BACB005985BC /* T4-20200802-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */; };
-		B64C6B1624DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B64C6B1424DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers */; };
-		B64C6B1724DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */; };
-		B652340924DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B652340724DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers */; };
-		B652340A24DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B652340824DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers */; };
-		B652340C24E0754E004D0CCC /* -Sensor-DetectionAndTracking.pdf in Resources */ = {isa = PBXBuildFile; fileRef = B652340B24E0754E004D0CCC /* -Sensor-DetectionAndTracking.pdf */; };
-		B66F71C224D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */; };
-		B66F71C324D98C9900FB17DF /* T4-20200804-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */; };
-		B66F71F424D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */; };
-		B66F71F524D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B66F71F324D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers */; };
-		B6845AD224D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */; };
-		B6845AD324D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers in Resources */ = {isa = PBXBuildFile; fileRef = B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */; };
 		B6845AD524D8983B004B8E5C /* RScriptLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD424D8983B004B8E5C /* RScriptLog.swift */; };
 		B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD624D8D746004B8E5C /* DetectionLog.swift */; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
@@ -54,25 +35,6 @@
 
 /* Begin PBXFileReference section */
 		B6374DC424D00228005985BC /* ContactLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
-		B6374DC824D18598005985BC /* TestScript.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestScript.txt; sourceTree = "<group>"; };
-		B6374DCB24D4D9A9005985BC /* T4-20200731-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200731-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B6374DCC24D4D9AA005985BC /* T4-20200731-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200731-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B6374DCF24D4D9D0005985BC /* TestDescription.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestDescription.txt; sourceTree = "<group>"; };
-		B6374DD124D62724005985BC /* T4-20200801-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200801-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200801-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B64C6B1424DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804c-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804c-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B652340724DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200808-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B652340824DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200808-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B652340B24E0754E004D0CCC /* -Sensor-DetectionAndTracking.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "-Sensor-DetectionAndTracking.pdf"; sourceTree = "<group>"; };
-		B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; name = "T4-20200804-Contacts-4S.numbers"; path = "../../../../../../../Tmp/T4-20200804-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; name = "T4-20200804-Contacts-X.numbers"; path = "../../../../../../../Tmp/T4-20200804-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804b-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B66F71F324D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200804b-Contacts-X.numbers"; sourceTree = "<group>"; };
-		B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802b-Contacts-4S.numbers"; sourceTree = "<group>"; };
-		B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "T4-20200802b-Contacts-X.numbers"; sourceTree = "<group>"; };
 		B6845AD424D8983B004B8E5C /* RScriptLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RScriptLog.swift; sourceTree = "<group>"; };
 		B6845AD624D8D746004B8E5C /* DetectionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ".app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,53 +73,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B6374DC624D1856B005985BC /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				B6374DC724D1857B005985BC /* Documents */,
-				B6374DCA24D4D97D005985BC /* TestResults */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		B6374DC724D1857B005985BC /* Documents */ = {
-			isa = PBXGroup;
-			children = (
-				B652340B24E0754E004D0CCC /* -Sensor-DetectionAndTracking.pdf */,
-				B6374DC824D18598005985BC /* TestScript.txt */,
-			);
-			path = Documents;
-			sourceTree = "<group>";
-		};
-		B6374DCA24D4D97D005985BC /* TestResults */ = {
-			isa = PBXGroup;
-			children = (
-				B6374DCF24D4D9D0005985BC /* TestDescription.txt */,
-				B652340824DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers */,
-				B652340724DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers */,
-				B64C6B1524DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers */,
-				B64C6B1424DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers */,
-				B66F71F224D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers */,
-				B66F71F324D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers */,
-				B66F71C024D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers */,
-				B66F71C124D98C9900FB17DF /* T4-20200804-Contacts-X.numbers */,
-				B6845AD024D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers */,
-				B6845AD124D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers */,
-				B6374DD624D6BACB005985BC /* T4-20200802-Contacts-4S.numbers */,
-				B6374DD524D6BACB005985BC /* T4-20200802-Contacts-X.numbers */,
-				B6374DD124D62724005985BC /* T4-20200801-Contacts-4S.numbers */,
-				B6374DD224D62724005985BC /* T4-20200801-Contacts-X.numbers */,
-				B6374DCC24D4D9AA005985BC /* T4-20200731-Contacts-4S.numbers */,
-				B6374DCB24D4D9A9005985BC /* T4-20200731-Contacts-X.numbers */,
-			);
-			path = TestResults;
-			sourceTree = "<group>";
-		};
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
 				B692CA9224CADA7500F45AEE /*  */,
-				B6374DC624D1856B005985BC /* Resources */,
 				B692CA9124CADA7500F45AEE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -324,28 +243,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6374DD724D6BACB005985BC /* T4-20200802-Contacts-X.numbers in Resources */,
-				B6374DD024D4D9D0005985BC /* TestDescription.txt in Resources */,
-				B66F71F424D9ABCC00FB17DF /* T4-20200804b-Contacts-4S.numbers in Resources */,
-				B6845AD324D727FA004B8E5C /* T4-20200802b-Contacts-X.numbers in Resources */,
-				B64C6B1724DA1C9E009DFD2D /* T4-20200804c-Contacts-4S.numbers in Resources */,
-				B6845AD224D727FA004B8E5C /* T4-20200802b-Contacts-4S.numbers in Resources */,
 				B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */,
-				B6374DD424D62724005985BC /* T4-20200801-Contacts-X.numbers in Resources */,
-				B652340A24DFE5EE004D0CCC /* T4-20200808-Contacts-4S.numbers in Resources */,
-				B6374DCE24D4D9AA005985BC /* T4-20200731-Contacts-4S.numbers in Resources */,
-				B6374DD824D6BACB005985BC /* T4-20200802-Contacts-4S.numbers in Resources */,
-				B6374DD324D62724005985BC /* T4-20200801-Contacts-4S.numbers in Resources */,
-				B66F71C324D98C9900FB17DF /* T4-20200804-Contacts-X.numbers in Resources */,
-				B66F71F524D9ABCC00FB17DF /* T4-20200804b-Contacts-X.numbers in Resources */,
-				B652340C24E0754E004D0CCC /* -Sensor-DetectionAndTracking.pdf in Resources */,
-				B6374DC924D18598005985BC /* TestScript.txt in Resources */,
-				B652340924DFE5EE004D0CCC /* T4-20200808-Contacts-X.numbers in Resources */,
 				B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */,
-				B6374DCD24D4D9AA005985BC /* T4-20200731-Contacts-X.numbers in Resources */,
 				B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */,
-				B64C6B1624DA1C9E009DFD2D /* T4-20200804c-Contacts-X.numbers in Resources */,
-				B66F71C224D98C9900FB17DF /* T4-20200804-Contacts-4S.numbers in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -522,6 +422,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -541,6 +442,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
