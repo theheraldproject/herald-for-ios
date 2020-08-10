@@ -290,7 +290,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (3 + payloadDataCount) {
                                 let payloadData = PayloadData(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didRead=\(payloadData.description),fromTarget=\(targetIdentifier)")
+                                targetDevice.operatingSystem = .android
                                 targetDevice.receiveOnly = true
+                                targetDevice.payloadData = payloadData
                                 delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: targetIdentifier) }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
@@ -306,6 +308,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         if let rssi = data.int16(1) {
                             let proximity = Proximity(unit: .RSSI, value: Double(rssi))
                             logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
+                            targetDevice.operatingSystem = .android
                             targetDevice.receiveOnly = true
                             delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: targetIdentifier) }
                         } else {
@@ -321,6 +324,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (3 + payloadDataCount) {
                                 let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
+                                targetDevice.operatingSystem = .android
                                 targetDevice.receiveOnly = true
                                 delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
                             } else {
@@ -348,8 +352,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         var unknownDevices: [BLEDevice] = []
         var knownDevices: [BLEDevice] = []
         database.devices().forEach() { device in
-            // Device was seen recently
-            guard device.timeIntervalSinceLastUpdate < BLESensorConfiguration.payloadSharingTimeInterval else {
+            // Device was seen recently, need multiplier to ensure sharing
+            guard device.timeIntervalSinceLastUpdate < BLESensorConfiguration.payloadSharingExpiryTimeInterval else {
                 return
             }
             // Device has payload
@@ -373,6 +377,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         knownDevices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
         devices.append(contentsOf: unknownDevices)
         devices.append(contentsOf: knownDevices)
+        let pending = devices.map { $0.description }
         // Limit how much to share to avoid oversized data transfers over BLE (512 bytes limit according to spec, 510 with response, iOS requires response)
         var identifiers: [TargetIdentifier] = []
         var data = Data()
@@ -387,18 +392,19 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             data.append(payload)
             device.payloadSharingData.append(payload) 
         }
+        logger.debug("payloadSharingData (peer=\(peer.description),pending=\(pending.description),sharing=\(identifiers))")
         return (identifiers, data)
     }
     
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
         // Read -> Notify subscribers
-        let targetIdentifier = TargetIdentifier(request.central.identifier.uuidString)
+        let central = database.device(TargetIdentifier(request.central.identifier.uuidString))
         switch request.characteristic.uuid {
         case BLESensorConfiguration.payloadCharacteristicUUID:
-            logger.debug("Read (central=\(targetIdentifier),characteristic=payload,offset=\(request.offset))")
+            logger.debug("Read (central=\(central.description),characteristic=payload,offset=\(request.offset))")
             let data = payloadDataSupplier.payload(PayloadTimestamp())
             guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(targetIdentifier),characteristic=payload,offset=\(request.offset),data=\(data.description))")
+                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.description))")
                 peripheral.respond(to: request, withResult: .invalidOffset)
                 return
             }
@@ -406,24 +412,22 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             peripheral.respond(to: request, withResult: .success)
         case BLESensorConfiguration.payloadSharingCharacteristicUUID:
             let (identifiers, data) = payloadSharingData(request.central)
-            logger.debug("Read (central=\(targetIdentifier),characteristic=payloadSharing,offset=\(request.offset),shared=\(identifiers))")
+            logger.debug("Read (central=\(central.description),characteristic=payloadSharing,offset=\(request.offset),shared=\(identifiers))")
             guard identifiers.count > 0, data.count > 0 else {
                 peripheral.respond(to: request, withResult: .success)
                 return
             }
             guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(targetIdentifier),characteristic=payloadSharing,offset=\(request.offset),data=\(data.description))")
+                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payloadSharing,offset=\(request.offset),data=\(data.description))")
                 peripheral.respond(to: request, withResult: .invalidOffset)
                 return
             }
             request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
             peripheral.respond(to: request, withResult: .success)
         default:
-            logger.fault("Read (central=\(request.central.identifier.uuidString),characteristic=unknown)")
+            logger.fault("Read (central=\(central.description),characteristic=unknown)")
             peripheral.respond(to: request, withResult: .requestNotSupported)
         }
-        // FEATURE : Symmetric connection on read
-        _ = database.device(request.central.identifier.uuidString)
         notifySubscribers("didReceiveRead")
     }
     
