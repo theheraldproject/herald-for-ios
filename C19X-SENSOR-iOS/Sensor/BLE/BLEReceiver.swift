@@ -326,6 +326,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let tracked = ios.filter({ $0.timeIntervalBetweenLastConnectedAndLastAdvert > TimeInterval.minute })
         // Sort by up time to disconnect longest running connections
         let candidates = tracked.sorted(by: { $0.timeIntervalBetweenLastConnectedAndLastAdvert > $1.timeIntervalBetweenLastConnectedAndLastAdvert })
+        let candidateList = candidates.map({ $0.description + ":" + $0.timeIntervalBetweenLastConnectedAndLastAdvert.description }).joined(separator: ",")
+        logger.debug("taskConnect capacity, candidates (devices=\(candidateList))")
         // Disconnect devices to meet capacity request
         var keepConnected: [BLEDevice] = []
         var willDisconnect: [BLEDevice] = []
