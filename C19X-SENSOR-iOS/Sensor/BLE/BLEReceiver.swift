@@ -305,7 +305,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     /// Free connection capacity for pending devices if possible by disconnecting long running connections to iOS devices
     func taskConnectRequestConnectionCapacity(connected: [BLEDevice], pending: [BLEDevice]) -> (capacity: Int, keepConnected: [BLEDevice]) {
-        let quota = 5
+        let quota = BLESensorConfiguration.concurrentConnectionQuota
         let capacityRequest = 1
         guard pending.count > 0, (capacityRequest + connected.count) > quota else {
             let capacity = quota - connected.count
