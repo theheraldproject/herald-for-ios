@@ -130,7 +130,7 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
 
 // MARK:- BLEDatabase data
 
-class BLEDevice {
+class BLEDevice : NSObject {
     /// Device registratiion timestamp
     let createdAt: Date
     /// Last time anything changed, e.g. attribute update
@@ -187,22 +187,40 @@ class BLEDevice {
     var payloadDataLastUpdatedAt: Date = Date.distantPast
     /// Payload data already shared with this peer
     var payloadSharingData: [PayloadData] = []
-    /// Payload sharing last update timestamp, , this is used to throttle read payload sharing calls
+    /// Payload sharing last update timestamp (successful read of payload sharing data from this peer), this is used to throttle read payload sharing calls
     var payloadSharingDataLastUpdatedAt: Date = Date.distantPast
-    
     /// Most recent RSSI measurement taken by readRSSI or didDiscover.
     var rssi: BLE_RSSI? {
         didSet {
             lastUpdatedAt = Date()
+            rssiLastUpdatedAt = lastUpdatedAt
             delegate.device(self, didUpdate: .rssi)
         }}
+    /// RSSI last update timestamp, this is used to track last advertised at without relying on didDiscover
+    var rssiLastUpdatedAt: Date = Date.distantPast
     /// Transmit power data where available (only provided by Android devices)
     var txPower: BLE_TxPower? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .txPower)
         }}
-
+    /// Track discovered at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
+    var lastDiscoveredAt: Date = Date.distantPast
+    /// Track connect request at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
+    var lastConnectRequestedAt: Date = Date.distantPast
+    /// Track connected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
+    var lastConnectedAt: Date? {
+        didSet {
+            // Reset lastDisconnectedAt
+            lastDisconnectedAt = nil
+        }}
+    /// Track disconnected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
+    var lastDisconnectedAt: Date?
+    /// Last advert timestamp, inferred from payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt
+    var lastAdvertAt: Date { get {
+            max(createdAt, lastDiscoveredAt, payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt)
+        }}
+    
     /// Time interval since last attribute value update, this is used to identify devices that may have expired and should be removed from the database.
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
@@ -211,7 +229,30 @@ class BLEDevice {
     var timeIntervalSinceLastPayloadShared: TimeInterval { get {
             Date().timeIntervalSince(payloadSharingDataLastUpdatedAt)
         }}
-    var description: String { get {
+    /// Time interval since last advert detected, this is used to detect concurrent connection quota and prioritise disconnections
+    var timeIntervalSinceLastAdvert: TimeInterval { get {
+        Date().timeIntervalSince(lastAdvertAt)
+        }}
+    /// Time interval between last connection request, this is used to priortise disconnections
+    var timeIntervalSinceLastConnectRequestedAt: TimeInterval { get {
+        Date().timeIntervalSince(lastConnectRequestedAt)
+        }}
+    /// Time interval between last connected at and last advert, this is used to estimate last period of continuous tracking, to priortise disconnections
+    var timeIntervalSinceLastDisconnectedAt: TimeInterval { get {
+        guard let lastDisconnectedAt = lastDisconnectedAt else {
+            return Date().timeIntervalSince(createdAt)
+        }
+        return Date().timeIntervalSince(lastDisconnectedAt)
+        }}
+    /// Time interval between last connected at and last advert, this is used to estimate last period of continuous tracking, to priortise disconnections
+    var timeIntervalBetweenLastConnectedAndLastAdvert: TimeInterval { get {
+        guard let lastConnectedAt = lastConnectedAt, lastAdvertAt > lastConnectedAt else {
+            return TimeInterval(0)
+        }
+        return lastAdvertAt.timeIntervalSince(lastConnectedAt)
+        }}
+    
+    override var description: String { get {
         return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue)]"
         }}
     
