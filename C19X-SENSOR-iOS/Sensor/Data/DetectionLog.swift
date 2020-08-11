@@ -35,6 +35,9 @@ class DetectionLog: NSObject, SensorDelegate {
         var content = "\(csv(deviceName)),iOS,\(csv(deviceOS)),\(csv(payloadData.shortName))"
         var payloadList: [String] = []
         payloads.forEach() { payload in
+            guard payload != payloadData.shortName else {
+                return
+            }
             payloadList.append(payload)
         }
         payloadList.sort()

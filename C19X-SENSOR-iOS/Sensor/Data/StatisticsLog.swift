@@ -11,12 +11,14 @@ import Foundation
 /// CSV contact log for post event analysis and visualisation
 class StatisticsLog: NSObject, SensorDelegate {
     private let textFile: TextFile
+    private let payloadData: PayloadData
     private var identifierToPayload: [TargetIdentifier:String] = [:]
     private var payloadToTime: [String:Date] = [:]
     private var payloadToSample: [String:Sample] = [:]
     
-    init(filename: String) {
+    init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
+        self.payloadData = payloadData
     }
     
     private func csv(_ value: String) -> String {
@@ -49,6 +51,9 @@ class StatisticsLog: NSObject, SensorDelegate {
         var content = "payload,count,mean,sd,min,max\n"
         var payloadList: [String] = []
         payloadToSample.keys.forEach() { payload in
+            guard payload != payloadData.shortName else {
+                return
+            }
             payloadList.append(payload)
         }
         payloadList.sort()
