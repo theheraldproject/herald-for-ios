@@ -57,8 +57,8 @@ class SensorArray : NSObject, Sensor {
         
         // Loggers
         add(delegate: ContactLog(filename: "contacts.csv"))
-        add(delegate: StatisticsLog(filename: "statistics.csv"))
-        add(delegate: RScriptLog(filename: "rScriptLog.csv"))
+        add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
+        add(delegate: RScriptLog(filename: "rScriptLog.csv", payloadData: payloadData))
         add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
         logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
     }

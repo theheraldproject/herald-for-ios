@@ -12,13 +12,15 @@ import UIKit
 /// CSV contact log for post event analysis and visualisation
 class RScriptLog: NSObject, SensorDelegate {
     private let textFile: TextFile
+    private let payloadData: PayloadData
     private let dateFormatter = DateFormatter()
     private let deviceOS = UIDevice.current.systemVersion
     private let deviceName = UIDevice.current.name
     private var identifierToPayload: [String:String] = [:]
     
-    init(filename: String) {
+    init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
+        self.payloadData = payloadData
         if textFile.empty() {
             textFile.write("datetime,payload,devicename,os,osver")
         }
@@ -56,8 +58,11 @@ class RScriptLog: NSObject, SensorDelegate {
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let now = timestamp()
-        didShare.forEach() { payloadData in
-            textFile.write(now + "," + payloadData.shortName + "," + deviceName + ",iOS," + deviceOS)
+        didShare.forEach() { payload in
+            guard payload.shortName != payloadData.shortName else {
+                return
+            }
+            textFile.write(now + "," + payload.shortName + "," + deviceName + ",iOS," + deviceOS)
         }
     }
     
