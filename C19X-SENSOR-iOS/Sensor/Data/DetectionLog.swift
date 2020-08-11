@@ -32,15 +32,15 @@ class DetectionLog: NSObject, SensorDelegate {
     }
 
     private func write() {
-        let device = "\(deviceName) (iOS \(deviceOS))"
+        var content = "\(csv(deviceName)),iOS,\(csv(deviceOS)),\(csv(payloadData.shortName))"
         var payloadList: [String] = []
         payloads.forEach() { payload in
             payloadList.append(payload)
         }
         payloadList.sort()
-        var content = csv(device) + ",id=" + payloadData.shortName
         payloadList.forEach() { payload in
-            content.append("," + payload)
+            content.append(",")
+            content.append(csv(payload))
         }
         content.append("\n")
         textFile.overwrite(content)
