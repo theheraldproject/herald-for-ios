@@ -49,7 +49,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private var scanTimer: DispatchSourceTimer?
     /// Dedicated sequential queue for the shifting timer.
-    private let scanTimerQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLEReceiver.Timer")
+    private let scanTimerQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLEReceiver.ScanTimer")
+    private let scheduleScanQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLEReceiver.ScheduleScan")
     /// Track scan interval and up time statistics for the receiver, for debug purposes.
     private let statistics = TimeIntervalSample()
     
@@ -209,127 +210,175 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      Connect to devices and maintain concurrent connection quota
      */
     private func taskConnect() {
-        // Define fixed concurrent connection quota
-        let concurrentConnectionQuota = 5
-        // Get connection status
+        let (connected, disconnected) = taskConnectSeparateByConnectionState(database.devices())
+        let pending = taskConnectPendingDevices(disconnected: disconnected)
+        let (capacity, keepConnected) = taskConnectRequestConnectionCapacity(connected: connected, pending: pending)
+        taskConnectInitiateConnectionToPendingDevices(pending: pending, capacity: capacity)
+        taskConnectRefreshKeepConnectedDevices(keepConnected: keepConnected)
+    }
+    
+    /// Separate devices by current connection state
+    private func taskConnectSeparateByConnectionState(_ devices: [BLEDevice]) -> (connected: [BLEDevice], disconnected: [BLEDevice]) {
         var connected: [BLEDevice] = []
-        var connecting: [BLEDevice] = []
         var disconnected: [BLEDevice] = []
-        database.devices().forEach() { device in
+        devices.forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
-            switch peripheral.state {
-            case .connected:
+            if peripheral.state == .connected {
                 connected.append(device)
-            case .connecting:
-                connecting.append(device)
-            default:
+            } else if peripheral.state == .disconnected {
                 disconnected.append(device)
             }
         }
-        logger.debug("taskConnect status (connected=\(connected.count),connecting=\(connecting.count),disconnected=\(disconnected.count))")
+        logger.debug("taskConnect status summary (connected=\(connected.count),disconnected=\(disconnected.count))")
         connected.forEach() { device in
-            logger.debug("taskConnect connected (device=\(device.identifier),operatingSystem=\(device.operatingSystem.rawValue))")
+            logger.debug("taskConnect status connected (device=\(device),upTime=\(device.timeIntervalBetweenLastConnectedAndLastAdvert))")
         }
-        
-        // Establish connections to keep
-        // - Unknown or restored devices take highest priority to identify operating system
-        // - Android connections are short lived and should be left to complete
-        // - iOS connections for getting the payload data should be left to complete
-        var keep: [BLEDevice] = []
-        let keepUnknown = connected.filter({ $0.operatingSystem == .unknown })
-        let keepRestored = connected.filter({ $0.operatingSystem == .restored })
-        let keepAndroid = connected.filter({ $0.operatingSystem == .android })
-        let keepIosNew = connected.filter({ $0.operatingSystem == .ios && $0.payloadData == nil })
-        keep.append(contentsOf: keepUnknown)
-        keep.append(contentsOf: keepRestored)
-        keep.append(contentsOf: keepAndroid)
-        keep.append(contentsOf: keepIosNew)
-        logger.debug("taskConnect keep (unknown=\(keepUnknown.count),restored=\(keepRestored.count),android=\(keepAndroid.count),ios=\(keepIosNew.count))")
-        
-        // Establish connections to discard
-        // - iOS devices with payload data, sorted by last updated at timestamp (most recent first)
-        var discard: [BLEDevice] = []
-        let discardIos = connected.filter({ $0.operatingSystem == .ios && $0.payloadData != nil }).sorted(by: { $0.lastUpdatedAt > $1.lastUpdatedAt })
-        discard.append(contentsOf: discardIos)
-        
-        // Discard connections to meet quota
-        let capacity = concurrentConnectionQuota - connected.count
-        if capacity <= 0 {
-            logger.fault("taskConnect quota exceeded, suspending new connections (connected=\(connected.count),keep=\(keep.count),quota=\(concurrentConnectionQuota))")
-            // Keep most recently updated iOS devices first as devices that haven't been updated for a while may be going out of range
-            let surplusCapacity = concurrentConnectionQuota - keep.count
-            if surplusCapacity > 0 {
-                _ = discard.dropFirst(surplusCapacity)
-            }
-            discard.forEach() { device in
-                guard let peripheral = device.peripheral else {
-                    return
-                }
-                disconnect("taskConnect|discard", peripheral)
+        disconnected.forEach() { device in
+            logger.debug("taskConnect status disconnected (device=\(device),downTime=\(device.timeIntervalSinceLastDisconnectedAt))")
+        }
+        return (connected, disconnected)
+    }
+    
+    /// Separate devices by operating system
+    private func taskConnectSeparateByOperatingSystem(_ devices: [BLEDevice]) -> (ios: [BLEDevice], android: [BLEDevice], restored: [BLEDevice], unknown: [BLEDevice]) {
+        var android: [BLEDevice] = []
+        var ios: [BLEDevice] = []
+        var unknown: [BLEDevice] = []
+        var restored: [BLEDevice] = []
+        devices.forEach() { device in
+            switch device.operatingSystem {
+            case .ios:
+                ios.append(device)
+            case .android:
+                android.append(device)
+            case .restored:
+                restored.append(device)
+            default:
+                unknown.append(device)
             }
         }
-        
-        // Establish pending connections
-        // - New devices without payload data
-        // - Android devices sorted by last payload shared at timestamp (least recent first)
-        // - iOS devices sorted by last updated at timestamp (least recent first)
-        // - Alternate between Android and iOS for fairness
+        return (ios, android, restored, unknown)
+    }
+    
+    /// Establish pending connections for disconnected devices
+    private func taskConnectPendingDevices(disconnected: [BLEDevice]) -> [BLEDevice] {
         var pending: [BLEDevice] = []
-        let pendingNew = disconnected.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored || $0.payloadData == nil })
-        var pendingIos = disconnected.filter({ $0.operatingSystem == .ios }).sorted(by: { $0.lastUpdatedAt < $1.lastUpdatedAt })
-        var pendingAndroid = disconnected.filter({ $0.operatingSystem == .android && $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval }).sorted(by: { $0.payloadSharingDataLastUpdatedAt < $1.payloadSharingDataLastUpdatedAt })
-        logger.debug("taskConnect pending (unknown/restored=\(pendingNew.count),ios=\(pendingIos.count),android=\(pendingAndroid.count),capacity=\(capacity))")
-        var pendingAlternated: [BLEDevice] = []
-        while !(pendingIos.isEmpty && pendingAndroid.isEmpty) {
-            guard let iosDevice = pendingIos.first else {
-                pendingAlternated.append(contentsOf: pendingAndroid)
-                pendingAndroid.removeAll()
-                break
+        // 1. Resolve operating system
+        let os = disconnected.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored }).sorted(by: {
+            $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
+        })
+        pending.append(contentsOf: os)
+        // 2. Get payload
+        let payload = disconnected.filter({ !pending.contains($0) && $0.payloadData == nil }).sorted(by: {
+            $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
+        })
+        pending.append(contentsOf: payload)
+        // 3. Android takes priority as payload sharing only requires a transient connection
+        let android = disconnected.filter({ !pending.contains($0) && $0.operatingSystem == .android && $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval }).sorted(by: {
+            $0.timeIntervalSinceLastPayloadShared > $1.timeIntervalSinceLastPayloadShared
+        })
+        pending.append(contentsOf: android)
+        // 4. iOS has lowest priority as it requires a constant connection
+        let ios = disconnected.filter({ !pending.contains($0) && $0.operatingSystem == .ios }).sorted(by: {
+            $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
+        })
+        pending.append(contentsOf: ios)
+        if pending.count > 0 {
+            logger.debug("taskConnect pending summary (devices=\(pending.count))")
+            os.forEach() { device in
+                logger.debug("taskConnect pending, operating system (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
             }
-            guard let androidDevice = pendingAndroid.first else {
-                pendingAlternated.append(contentsOf: pendingIos)
-                pendingIos.removeAll()
-                break
+            payload.forEach() { device in
+                logger.debug("taskConnect pending, read payload (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
             }
-            pendingIos.remove(at: 0)
-            pendingAndroid.remove(at: 0)
-            if iosDevice.lastUpdatedAt < androidDevice.lastUpdatedAt {
-                pendingAlternated.append(iosDevice)
-                pendingAlternated.append(androidDevice)
-            } else {
-                pendingAlternated.append(androidDevice)
-                pendingAlternated.append(iosDevice)
+            android.forEach() { device in
+                logger.debug("taskConnect pending, Android payload sharing (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastPayloadShared))")
+            }
+            ios.forEach() { device in
+                logger.debug("taskConnect pending, iOS disconnected device (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
             }
         }
-        pending.append(contentsOf: pendingNew)
-        pending.append(contentsOf: pendingAlternated)
-        let pendingQueue = pending.map { $0.operatingSystem.rawValue + ":" + $0.timeIntervalSinceLastUpdate.description }
-        logger.debug("taskConnect pending (queue=\(pendingQueue))")
-        if pending.count > capacity {
-            _ = pending.dropLast(pending.count - capacity)
+        return pending
+    }
+    
+    /// Free connection capacity for pending devices if possible by disconnecting long running connections to iOS devices
+    func taskConnectRequestConnectionCapacity(connected: [BLEDevice], pending: [BLEDevice]) -> (capacity: Int, keepConnected: [BLEDevice]) {
+        let quota = 5
+        let capacityRequest = 1
+        guard pending.count > 0, (capacityRequest + connected.count) > quota else {
+            let capacity = quota - connected.count
+            return (capacity, connected)
         }
-        pending.forEach() { device in
+        let transient = connected.filter({ $0.operatingSystem != .ios })
+        logger.debug("taskConnect capacity summary (quota=\(quota),connected=\(connected.count),transient=\(transient.count),pending=\(pending.count))")
+        // Only disconnect iOS devices if there is no transient device that will naturally free up capacity in the near future
+        guard transient.count == 0 else {
+            logger.debug("taskConnect capacity, wait for disconnection by transient devices")
+            return (0, connected)
+        }
+        // Disconnect iOS devices only, because
+        // - Android decice connections are short lived, should be left to complete
+        // - Unknown and restored devices need to be resolved as soon as possible
+        let ios = connected.filter({ $0.operatingSystem == .ios })
+        // iOS device has been tracked for > 1 minute (up time)
+        let tracked = ios.filter({ $0.timeIntervalBetweenLastConnectedAndLastAdvert > TimeInterval.minute })
+        // Sort by up time to disconnect longest running connections
+        let candidates = tracked.sorted(by: { $0.timeIntervalBetweenLastConnectedAndLastAdvert > $1.timeIntervalBetweenLastConnectedAndLastAdvert })
+        // Disconnect devices to meet capacity request
+        var keepConnected: [BLEDevice] = []
+        var willDisconnect: [BLEDevice] = []
+        keepConnected.append(contentsOf: (capacityRequest >= candidates.count ? [] : candidates.dropFirst(capacityRequest)))
+        willDisconnect.append(contentsOf: (capacityRequest >= candidates.count ? candidates : candidates.dropLast(candidates.count - capacityRequest)))
+        logger.debug("taskConnect capacity, plan (willDisconnect=\(willDisconnect.count),keepConnected=\(keepConnected.count))")
+        willDisconnect.forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
+            logger.debug("taskConnect capacity, disconnect (device=\(device))")
+            disconnect("taskConnect|capacity", peripheral)
+
+        }
+        return (willDisconnect.count, keepConnected)
+    }
+    
+    /// Initiate connection to pending devices, up to maximum capacity
+    func taskConnectInitiateConnectionToPendingDevices(pending: [BLEDevice], capacity: Int) {
+        guard pending.count > 0 else {
+            return
+        }
+        guard capacity > 0 else {
+            return
+        }
+        let readyForConnection = pending.filter({ $0.peripheral != nil })
+        let devices = (readyForConnection.count <= capacity ? readyForConnection : readyForConnection.dropLast(readyForConnection.count - capacity))
+        logger.debug("taskConnect initiate connection summary (pending=\(pending.count),capacity=\(capacity),connectingTo=\(devices.count))")
+        devices.forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            logger.debug("taskConnect initiate connection, connect (device=\(device))")
             connect("taskConnect|pending", peripheral)
         }
-        
-        // Refresh existing connections
-        var refresh: [BLEDevice] = []
-        let refreshUnknown = connected.filter({ $0.operatingSystem == .unknown })
-        let refreshRestored = connected.filter({ $0.operatingSystem == .restored })
-        let refreshAndroid = connected.filter({ $0.operatingSystem == .android })
-        refresh.append(contentsOf: refreshUnknown)
-        refresh.append(contentsOf: refreshRestored)
-        refresh.append(contentsOf: refreshAndroid)
-        logger.debug("taskConnect refresh (unknown=\(refreshUnknown.count),restored=\(refreshRestored.count),android=\(refreshAndroid.count))")
-        refresh.forEach() { device in
+    }
+    
+    /// Refresh connection to connected non-iOS devices
+    func taskConnectRefreshKeepConnectedDevices(keepConnected: [BLEDevice]) {
+        let (_, android, restored, unknown) = taskConnectSeparateByOperatingSystem(keepConnected)
+        var devices: [BLEDevice] = []
+        devices.append(contentsOf: unknown)
+        devices.append(contentsOf: restored)
+        devices.append(contentsOf: android)
+        guard devices.count > 0 else {
+            return
+        }
+        logger.debug("taskConnect refresh connected summary (unknown=\(unknown.count),restored=\(restored.count),android=\(android.count))")
+        devices.forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
+            logger.debug("taskConnect refresh connected, connect (device=\(device))")
             connect("taskConnect|refresh", peripheral)
         }
     }
@@ -358,13 +407,15 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      devices repeatedly in both foreground and background states.
      */
     private func scheduleScan(_ source: String) {
-        scanTimer?.cancel()
-        scanTimer = DispatchSource.makeTimerSource(queue: scanTimerQueue)
-        scanTimer?.schedule(deadline: DispatchTime.now() + BLESensorConfiguration.notificationDelay)
-        scanTimer?.setEventHandler { [weak self] in
-            self?.scan("scheduleScan|"+source)
+        scheduleScanQueue.sync {
+            scanTimer?.cancel()
+            scanTimer = DispatchSource.makeTimerSource(queue: scanTimerQueue)
+            scanTimer?.schedule(deadline: DispatchTime.now() + BLESensorConfiguration.notificationDelay)
+            scanTimer?.setEventHandler { [weak self] in
+                self?.scan("scheduleScan|"+source)
+            }
+            scanTimer?.resume()
         }
-        scanTimer?.resume()
     }
     
     /// Initiate next action on peripheral based on current state and information available
@@ -406,14 +457,15 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      resumes, even if connect fails.
      */
     private func connect(_ source: String, _ peripheral: CBPeripheral) {
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("connect (source=\(source),peripheral=\(targetIdentifier))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("connect (source=\(source),device=\(device))")
         guard central.state == .poweredOn else {
-            logger.fault("connect denied, central not powered on (source=\(source),peripheral=\(targetIdentifier))")
+            logger.fault("connect denied, central not powered on (source=\(source),device=\(device))")
             return
         }
         queue.async {
-            self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach{
+            device.lastConnectRequestedAt = Date()
+            self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
                 self.central.connect($0)
             }
         }
@@ -569,26 +621,23 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        // Extract discovered data
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        let rssi = RSSI.intValue
-        let txPower = (advertisementData[CBAdvertisementDataTxPowerLevelKey] as? NSNumber)?.intValue
-        logger.debug("didDiscover (peripheral=\(targetIdentifier),rssi=\(rssi),txPower=\((String(describing: txPower))))")
-        
         // Populate device database
         let device = database.device(peripheral, delegate: self)
-        device.rssi = BLE_RSSI(rssi)
-        if txPower != nil {
-            device.txPower = BLE_TxPower(txPower!)
+        device.lastDiscoveredAt = Date()
+        device.rssi = BLE_RSSI(RSSI.intValue)
+        if let txPower = (advertisementData[CBAdvertisementDataTxPowerLevelKey] as? NSNumber)?.intValue {
+            device.txPower = BLE_TxPower(txPower)
         }
+        logger.debug("didDiscover (device=\(device),rssi=\((String(describing: device.rssi))),txPower=\((String(describing: device.txPower))))")
         // Schedule scan (actual connect is initiated from scan via prioritisation logic)
         scheduleScan("didDiscover")
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         // connect -> readRSSI -> discoverServices
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("didConnect (peripheral=\(targetIdentifier))")
+        let device = database.device(peripheral, delegate: self)
+        device.lastConnectedAt = Date()
+        logger.debug("didConnect (device=\(device))")
         taskInitiateNextAction("didConnect", peripheral: peripheral)
     }
     
@@ -597,11 +646,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Failure for peripherals advertising the beacon service should be transient, so try again.
         // This is also where iOS reports invalidated devices if connect is called after restore,
         // thus offers an opportunity for house keeping.
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("didFailToConnect (peripheral=\(targetIdentifier),error=\(String(describing: error)))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("didFailToConnect (device=\(device),error=\(String(describing: error)))")
         if String(describing: error).contains("Device is invalid") {
-            logger.debug("Unregister invalid device (peripheral=\(targetIdentifier))")
-            database.delete(targetIdentifier)
+            logger.debug("Unregister invalid device (device=\(device))")
+            database.delete(device.identifier)
         } else {
             connect("didFailToConnect", peripheral)
         }
@@ -610,9 +659,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         // Disconnected -> Connect if iOS
         // Keep connection only for iOS, not necessary for Android as they are always detectable
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("didDisconnectPeripheral (peripheral=\(targetIdentifier),error=\(String(describing: error)))")
         let device = database.device(peripheral, delegate: self)
+        device.lastDisconnectedAt = Date()
+        logger.debug("didDisconnectPeripheral (device=\(device),error=\(String(describing: error)))")
         if device.operatingSystem == .ios {
             // Invalidate characteristics
             device.signalCharacteristic = nil
@@ -630,25 +679,23 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // This is the primary loop for iOS after initial connection and subscription to
         // the notifying beacon characteristic. The loop is scan -> wakeTransmitter ->
         // didUpdateValueFor -> readRSSI -> notifyDelegates -> scheduleScan -> scan
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        let rssi = RSSI.intValue
-        logger.debug("didReadRSSI (peripheral=\(targetIdentifier),rssi=\(rssi),error=\(String(describing: error)))")
         let device = database.device(peripheral, delegate: self)
-        device.rssi = BLE_RSSI(rssi)
+        device.rssi = BLE_RSSI(RSSI.intValue)
+        logger.debug("didReadRSSI (device=\(device),rssi=\(String(describing: device.rssi)),error=\(String(describing: error)))")
         taskInitiateNextAction("didReadRSSI", peripheral: peripheral)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         // Discover services -> Discover characteristics | Disconnect
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("didDiscoverServices (peripheral=\(targetIdentifier),error=\(String(describing: error)))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("didDiscoverServices (device=\(device),error=\(String(describing: error)))")
         guard let services = peripheral.services else {
             disconnect("didDiscoverServices|serviceEmpty", peripheral)
             return
         }
         for service in services {
             if (service.uuid == BLESensorConfiguration.serviceUUID) {
-                logger.debug("didDiscoverServices, found sensor service (peripheral=\(targetIdentifier))")
+                logger.debug("didDiscoverServices, found sensor service (device=\(device))")
                 peripheral.discoverCharacteristics(nil, for: service)
                 return
             }
@@ -659,34 +706,33 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         // Discover characteristics -> Notify delegates -> Disconnect | Wake transmitter -> Scan again
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("didDiscoverCharacteristicsFor (peripheral=\(targetIdentifier),error=\(String(describing: error)))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("didDiscoverCharacteristicsFor (device=\(device),error=\(String(describing: error)))")
         guard let characteristics = service.characteristics else {
             disconnect("didDiscoverCharacteristicsFor|characteristicEmpty", peripheral)
             return
         }
-        let device = database.device(peripheral, delegate: self)
         for characteristic in characteristics {
             switch characteristic.uuid {
             case BLESensorConfiguration.androidSignalCharacteristicUUID:
                 device.operatingSystem = .android
                 device.signalCharacteristic = characteristic
-                logger.debug("didDiscoverCharacteristicsFor, found android signal characteristic (peripheral=\(targetIdentifier),os=android)")
+                logger.debug("didDiscoverCharacteristicsFor, found android signal characteristic (device=\(device))")
             case BLESensorConfiguration.iosSignalCharacteristicUUID:
                 let notify = characteristic.properties.contains(.notify)
                 let write = characteristic.properties.contains(.write)
                 device.operatingSystem = .ios
                 device.signalCharacteristic = characteristic
                 peripheral.setNotifyValue(true, for: characteristic)
-                logger.debug("didDiscoverCharacteristicsFor, found ios signal characteristic (peripheral=\(targetIdentifier),os=ios,notify=\(notify),write=\(write))")
+                logger.debug("didDiscoverCharacteristicsFor, found ios signal characteristic (device=\(device),notify=\(notify),write=\(write))")
             case BLESensorConfiguration.payloadCharacteristicUUID:
                 device.payloadCharacteristic = characteristic
-                logger.debug("didDiscoverCharacteristicsFor, found payload characteristic (peripheral=\(targetIdentifier))")
+                logger.debug("didDiscoverCharacteristicsFor, found payload characteristic (device=\(device))")
             case BLESensorConfiguration.payloadSharingCharacteristicUUID:
                 device.payloadSharingCharacteristic = characteristic
-                logger.debug("didDiscoverCharacteristicsFor, found payload sharing characteristic (peripheral=\(targetIdentifier))")
+                logger.debug("didDiscoverCharacteristicsFor, found payload sharing characteristic (device=\(device))")
             default:
-                logger.fault("didDiscoverCharacteristicsFor, found unknown characteristic (peripheral=\(targetIdentifier),characteristic=\(characteristic.uuid))")
+                logger.fault("didDiscoverCharacteristicsFor, found unknown characteristic (device=\(device),characteristic=\(characteristic.uuid))")
             }
         }
         // Android -> Read payload
@@ -707,8 +753,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         // Wrote characteristic -> Scan again
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("didWriteValueFor (peripheral=\(targetIdentifier),error=\(String(describing: error)))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("didWriteValueFor (device=\(device),error=\(String(describing: error)))")
         // For all situations, scheduleScan would have been made earlier in the chain of async calls.
         // It is called again here to extend the time interval between scans, as this is usually the
         // last call made in all paths to wake the transmitter.
@@ -720,7 +766,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Modified service -> Invalidate beacon -> Scan
         let device = database.device(peripheral, delegate: self)
         let characteristics = invalidatedServices.map { $0.characteristics }.count
-        logger.debug("didModifyServices (peripheral=\(device.identifier),characteristics=\(characteristics))")
+        logger.debug("didModifyServices (device=\(device),characteristics=\(characteristics))")
         guard characteristics == 0 else {
             return
         }
@@ -746,20 +792,20 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Process repeats to keep both iOS transmitters and receivers awake while maximising time interval between
         // bluetooth calls to minimise power usage.
         let device = database.device(peripheral, delegate: self)
-        logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")
+        logger.debug("didUpdateValueFor (device=\(device),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")
         switch characteristic.uuid {
         case BLESensorConfiguration.iosSignalCharacteristicUUID:
             // Wake up call from transmitter
-            logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=iosSignalCharacteristic,error=\(String(describing: error)))")
+            logger.debug("didUpdateValueFor (device=\(device),characteristic=iosSignalCharacteristic,error=\(String(describing: error)))")
             device.lastNotifiedAt = Date()
             readRSSI("didUpdateValueFor", peripheral)
             return
         case BLESensorConfiguration.androidSignalCharacteristicUUID:
             // Should not happen as Android signal is not notifying
-            logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=androidSignalCharacteristic,error=\(String(describing: error)))")
+            logger.fault("didUpdateValueFor (device=\(device),characteristic=androidSignalCharacteristic,error=\(String(describing: error)))")
         case BLESensorConfiguration.payloadCharacteristicUUID:
             // Read payload data
-            logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=payloadCharacteristic,error=\(String(describing: error)))")
+            logger.debug("didUpdateValueFor (device=\(device),characteristic=payloadCharacteristic,error=\(String(describing: error)))")
             if let data = characteristic.value {
                 device.payloadData = PayloadData(data)
             }
@@ -767,7 +813,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 disconnect("didUpdateValueFor|payload|android", peripheral)
             }
         case BLESensorConfiguration.payloadSharingCharacteristicUUID:
-            logger.debug("didUpdateValueFor (peripheral=\(device.identifier),characteristic=payloadSharingCharacteristic,error=\(String(describing: error)))")
+            logger.debug("didUpdateValueFor (device=\(device),characteristic=payloadSharingCharacteristic,error=\(String(describing: error)))")
             if let data = characteristic.value {
                 let payloads = payloadDataSupplier.payload(data)
                 payloads.forEach() { payload in
@@ -780,7 +826,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 disconnect("didUpdateValueFor|payloadSharing|android", peripheral)
             }
         default:
-            logger.fault("didUpdateValueFor, unknown characteristic (peripheral=\(device.identifier),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")
+            logger.fault("didUpdateValueFor, unknown characteristic (device=\(device),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")
         }
         scheduleScan("didUpdateValueFor")
         return
