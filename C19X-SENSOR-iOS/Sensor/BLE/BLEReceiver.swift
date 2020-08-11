@@ -162,6 +162,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 return
             }
             guard let duplicate = index[payloadData] else {
+                index[payloadData] = device
                 return
             }
             var keeping = device
@@ -169,7 +170,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 keeping = device
             } else if duplicate.peripheral != nil, device.peripheral == nil {
                 keeping = duplicate
-            } else if device.lastUpdatedAt > duplicate.lastUpdatedAt {
+            } else if device.payloadDataLastUpdatedAt > duplicate.payloadDataLastUpdatedAt {
                 keeping = device
             } else {
                 keeping = duplicate
