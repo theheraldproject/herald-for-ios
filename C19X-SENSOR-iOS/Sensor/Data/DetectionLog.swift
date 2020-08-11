@@ -42,9 +42,9 @@ class DetectionLog: NSObject, SensorDelegate {
             content.append(",")
             content.append(csv(payload))
         }
+        logger.debug("write (content=\(content))")
         content.append("\n")
         textFile.overwrite(content)
-        logger.debug("write (content=\(content))")
     }
     
     // MARK:- SensorDelegate
