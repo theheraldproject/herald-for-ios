@@ -114,7 +114,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             let targetIdentifier = TargetIdentifier(peripheral: peripheral)
             let device = database.device(targetIdentifier)
             if device.peripheral == nil || device.peripheral != peripheral {
-                logger.debug("taskRegisterConnectedPeripherals (identifier=\(targetIdentifier))")
+                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
                 _ = database.device(peripheral, delegate: self)
             }
         }
@@ -132,7 +132,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
             let peripherals = central.retrievePeripherals(withIdentifiers: [identifier])
             if let peripheral = peripherals.last {
-                logger.debug("taskResolveDevicePeripherals (resolved=\(device.identifier))")
+                logger.debug("taskResolveDevicePeripherals (resolved=\(device))")
                 _ = database.device(peripheral, delegate: self)
             }
         }
@@ -144,7 +144,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private func taskRemoveExpiredDevices() {
         let devicesToRemove = database.devices().filter { Date().timeIntervalSince($0.lastUpdatedAt) > TimeInterval.hour }
         devicesToRemove.forEach() { device in
-            logger.debug("taskRemoveExpiredDevices (removed=\(device.identifier))")
+            logger.debug("taskRemoveExpiredDevices (remove=\(device))")
             database.delete(device.identifier)
             if let peripheral = device.peripheral {
                 disconnect("taskRemoveExpiredDevices", peripheral)
@@ -319,7 +319,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return (0, connected)
         }
         // Disconnect iOS devices only, because
-        // - Android decice connections are short lived, should be left to complete
+        // - Android device connections are short lived, should be left to complete
         // - Unknown and restored devices need to be resolved as soon as possible
         let ios = connected.filter({ $0.operatingSystem == .ios })
         // iOS device has been tracked for > 1 minute (up time)
