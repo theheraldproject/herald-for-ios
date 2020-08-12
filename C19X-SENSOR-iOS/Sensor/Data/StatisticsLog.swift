@@ -22,10 +22,7 @@ class StatisticsLog: NSObject, SensorDelegate {
     }
     
     private func csv(_ value: String) -> String {
-        guard value.contains(",") else {
-            return value
-        }
-        return "\"" + value + "\""
+        return TextFile.csv(value)
     }
     
     private func add(identifier: TargetIdentifier) {

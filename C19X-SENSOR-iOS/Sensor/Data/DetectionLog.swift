@@ -25,10 +25,7 @@ class DetectionLog: NSObject, SensorDelegate {
     }
     
     private func csv(_ value: String) -> String {
-        guard value.contains(",") else {
-            return value
-        }
-        return "\"" + value + "\""
+        return TextFile.csv(value)
     }
 
     private func write() {

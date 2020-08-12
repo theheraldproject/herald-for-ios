@@ -54,4 +54,13 @@ class TextFile {
         }
         try? data.write(to: file, options: .atomicWrite)
     }
+    
+    /// Quote value for CSV output if required.
+    static func csv(_ value: String) -> String {
+        guard value.contains(",") || value.contains("\"") || value.contains("'") || value.contains("’") else {
+            return value
+        }
+        return "\"" + value + "\""
+
+    }
 }
