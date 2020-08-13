@@ -22,6 +22,8 @@ class DetectionLog: NSObject, SensorDelegate {
     init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
         self.payloadData = payloadData
+        super.init()
+        write()
     }
     
     private func csv(_ value: String) -> String {
