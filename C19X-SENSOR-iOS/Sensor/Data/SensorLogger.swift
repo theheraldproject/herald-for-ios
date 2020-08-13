@@ -43,8 +43,22 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
             log = nil
         }
     }
+    
+    private func suppress(_ level: SensorLoggerLevel) -> Bool {
+        switch level {
+        case .debug:
+            return (BLESensorConfiguration.logLevel == .info || BLESensorConfiguration.logLevel == .fault);
+        case .info:
+            return (BLESensorConfiguration.logLevel == .fault);
+        default:
+            return false;
+        }
+    }
 
     func log(_ level: SensorLoggerLevel, _ message: String) {
+        guard !suppress(level) else {
+            return
+        }
         // Write to unified os log if available, else print to console
         let timestamp = dateFormatter.string(from: Date())
         let csvMessage = message.replacingOccurrences(of: "\"", with: "'")
