@@ -14,6 +14,7 @@ protocol BLESensor : Sensor {
 
 /// Defines BLE sensor configuration data, e.g. service and characteristic UUIDs
 struct BLESensorConfiguration {
+    static let logLevel: SensorLoggerLevel = .fault;
     /**
     Service UUID for beacon service. This is a fixed UUID to enable iOS devices to find each other even
     in background mode. Android devices will need to find Apple devices first using the manufacturer code
