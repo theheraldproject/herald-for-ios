@@ -227,7 +227,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
             if peripheral.state == .connected {
                 connected.append(device)
-            } else if peripheral.state == .disconnected {
+            } else {
                 disconnected.append(device)
             }
         }

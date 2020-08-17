@@ -39,7 +39,7 @@ struct BLESensorConfiguration {
     /// Must be > payloadSharingTimeInterval to share pending payloads
     static let payloadSharingExpiryTimeInterval = TimeInterval.minute * 5
     /// Maximum number of concurrent BLE connections
-    static let concurrentConnectionQuota = 6
+    static let concurrentConnectionQuota = 4
 
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
     static let signalCharacteristicActionWritePayload = UInt8(1)
