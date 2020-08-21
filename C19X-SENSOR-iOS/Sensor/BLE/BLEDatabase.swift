@@ -253,7 +253,7 @@ class BLEDevice : NSObject {
         }}
     
     override var description: String { get {
-        return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue)]"
+        return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil")]"
         }}
     
     init(_ identifier: TargetIdentifier, delegate: BLEDeviceDelegate) {

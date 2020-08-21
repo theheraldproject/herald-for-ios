@@ -54,6 +54,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// Track scan interval and up time statistics for the receiver, for debug purposes.
     private let statistics = TimeIntervalSample()
     
+    private var scanResults: [BLEDevice] = []
+    
     
     required init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
         self.queue = queue
@@ -210,12 +212,85 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      Connect to devices and maintain concurrent connection quota
      */
     private func taskConnect() {
-        let (connected, disconnected) = taskConnectSeparateByConnectionState(database.devices())
-        let pending = taskConnectPendingDevices(candidates: disconnected)
-        let (capacity, keepConnected) = taskConnectRequestConnectionCapacity(connected: connected, pending: pending)
-        taskConnectInitiateConnectionToPendingDevices(pending: pending, capacity: capacity)
-        taskConnectRefreshKeepConnectedDevices(keepConnected: keepConnected)
+        let didDiscover = taskConnectScanResults()
+        let hasPendingTask = didDiscover.filter({ deviceHasPendingTask($0) })
+        let toBeRefreshed = database.devices().filter({ !hasPendingTask.contains($0) && $0.peripheral?.state == .connected })
+        hasPendingTask.forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            connect("taskConnect|hasPending", peripheral);
+        }
+        toBeRefreshed.forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            connect("taskConnect|refresh", peripheral);
+        }
     }
+    
+    /// Empty scan results to produce a list of recently discovered devices for connection and processing
+    private func taskConnectScanResults() -> [BLEDevice] {
+        var set: Set<BLEDevice> = []
+        var list: [BLEDevice] = []
+        while let device = scanResults.popLast() {
+            if set.insert(device).inserted, let peripheral = device.peripheral, peripheral.state != .connected {
+                list.append(device)
+                logger.debug("taskConnectScanResults, didDiscover (device=\(device))")
+            }
+        }
+        return list
+    }
+    
+    /// Check if device has pending task
+    private func deviceHasPendingTask(_ device: BLEDevice) -> Bool {
+        // Resolve operating system
+        if device.operatingSystem == .unknown || device.operatingSystem == .restored {
+            return true
+        }
+        // Read payload
+        if device.payloadData == nil {
+            return true
+        }
+        // Payload sharing
+        if device.operatingSystem == .android && device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval {
+            return true
+        }
+        // iOS should always be connected
+        if device.operatingSystem == .ios, let peripheral = device.peripheral, peripheral.state != .connected {
+            return true
+        }
+        return false
+    }
+    
+    /// Check if iOS device is waiting for connection and free capacity if required
+    private func taskIosMultiplex() {
+        // Identify iOS devices
+        let devices = database.devices().filter({ $0.operatingSystem == .ios && $0.peripheral != nil })
+        // Get a list of connected devices and uptime
+        let connected = devices.filter({ $0.peripheral?.state == .connected }).sorted(by: { $0.timeIntervalBetweenLastConnectedAndLastAdvert > $1.timeIntervalBetweenLastConnectedAndLastAdvert })
+        // Get a list of connecting devices
+        let pending = devices.filter({ $0.peripheral?.state != .connected }).sorted(by: { $0.lastConnectRequestedAt < $1.lastConnectRequestedAt })
+        logger.debug("taskIosMultiplex summary (connected=\(connected.count),pending=\(pending.count))")
+        connected.forEach() { device in
+            logger.debug("taskIosMultiplex, connected (device=\(device.description),upTime=\(device.timeIntervalBetweenLastConnectedAndLastAdvert))")
+        }
+        pending.forEach() { device in
+            logger.debug("taskIosMultiplex, pending (device=\(device.description),downTime=\(device.timeIntervalSinceLastConnectRequestedAt))")
+        }
+        guard connected.count > 2, pending.count > 0, let deviceToBeDisconnected = connected.first, let peripheralToBeDisconnected = deviceToBeDisconnected.peripheral else {
+            return
+        }
+        logger.debug("taskIosMultiplex, multiplexing (toBeDisconnected=\(deviceToBeDisconnected.description))")
+        disconnect("taskIosMultiplex", peripheralToBeDisconnected)
+        pending.forEach() { device in
+            guard let toBeConnected = device.peripheral else {
+                return
+            }
+            connect("taskIosMultiplex", toBeConnected);
+        }
+    }
+
     
     /// Separate devices by current connection state
     private func taskConnectSeparateByConnectionState(_ devices: [BLEDevice]) -> (connected: [BLEDevice], disconnected: [BLEDevice]) {
@@ -261,6 +336,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         return (ios, android, restored, unknown)
     }
+    
     
     /// Establish pending connections for disconnected devices
     private func taskConnectPendingDevices(candidates: [BLEDevice]) -> [BLEDevice] {
@@ -354,7 +430,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         let readyForConnection = pending.filter({ $0.peripheral != nil })
-        let devices = (readyForConnection.count <= capacity ? readyForConnection : readyForConnection.dropLast(readyForConnection.count - capacity))
+        let devices = readyForConnection
         logger.debug("taskConnect initiate connection summary (pending=\(pending.count),capacity=\(capacity),connectingTo=\(devices.count))")
         devices.forEach() { device in
             guard let peripheral = device.peripheral else {
@@ -363,6 +439,16 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.debug("taskConnect initiate connection, connect (device=\(device))")
             connect("taskConnect|pending", peripheral)
         }
+//        let readyForConnection = pending.filter({ $0.peripheral != nil })
+//        let devices = (readyForConnection.count <= capacity ? readyForConnection : readyForConnection.dropLast(readyForConnection.count - capacity))
+//        logger.debug("taskConnect initiate connection summary (pending=\(pending.count),capacity=\(capacity),connectingTo=\(devices.count))")
+//        devices.forEach() { device in
+//            guard let peripheral = device.peripheral else {
+//                return
+//            }
+//            logger.debug("taskConnect initiate connection, connect (device=\(device))")
+//            connect("taskConnect|pending", peripheral)
+//        }
     }
     
     /// Refresh connection to connected non-iOS devices
@@ -399,6 +485,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         queue.async { self.taskRemoveExpiredDevices() }
         queue.async { self.taskRemoveDuplicatePeripherals() }
         queue.async { self.taskWakeTransmitters() }
+        queue.async { self.taskIosMultiplex() }
         queue.async { self.taskConnect() }
         scheduleScan("scan")
     }
@@ -468,7 +555,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         queue.async {
             device.lastConnectRequestedAt = Date()
             self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
-                self.central.connect($0)
+                if $0.state != .connected {
+                    self.central.connect($0)
+                } else {
+                    self.taskInitiateNextAction("connect|" + source, peripheral: $0)
+                }
             }
         }
         scheduleScan("connect")
@@ -587,6 +678,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 if device.operatingSystem == .unknown {
                     device.operatingSystem = .restored
                 }
+                if peripheral.state == .connected {
+                    device.lastConnectedAt = Date()
+                }
                 logger.debug("willRestoreState (peripheral=\(targetIdentifier))")
             }
         }
@@ -630,6 +724,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if let txPower = (advertisementData[CBAdvertisementDataTxPowerLevelKey] as? NSNumber)?.intValue {
             device.txPower = BLE_TxPower(txPower)
         }
+        scanResults.append(device)
         logger.debug("didDiscover (device=\(device),rssi=\((String(describing: device.rssi))),txPower=\((String(describing: device.txPower))))")
         // Schedule scan (actual connect is initiated from scan via prioritisation logic)
         scheduleScan("didDiscover")
