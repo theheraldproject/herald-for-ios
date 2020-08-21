@@ -41,6 +41,7 @@ struct BLESensorConfiguration {
     /// Maximum number of concurrent BLE connections
     static let concurrentConnectionQuota = 4
 
+
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
     static let signalCharacteristicActionWritePayload = UInt8(1)
     /// Signal characteristic action code for write RSSI, expect 1 byte action code followed by 4 byte little-endian Int32 integer value for RSSI value

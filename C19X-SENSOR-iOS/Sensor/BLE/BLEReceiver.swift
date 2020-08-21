@@ -142,7 +142,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      Remove devices that have not been updated for over an hour, as the UUID is likely to have changed after being out of range for over 20 minutes, so it will require discovery.
      */
     private func taskRemoveExpiredDevices() {
-        let devicesToRemove = database.devices().filter { Date().timeIntervalSince($0.lastUpdatedAt) > TimeInterval.hour }
+        let devicesToRemove = database.devices().filter { Date().timeIntervalSince($0.lastUpdatedAt) > (20 * TimeInterval.minute) }
         devicesToRemove.forEach() { device in
             logger.debug("taskRemoveExpiredDevices (remove=\(device))")
             database.delete(device.identifier)
@@ -211,7 +211,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskConnect() {
         let (connected, disconnected) = taskConnectSeparateByConnectionState(database.devices())
-        let pending = taskConnectPendingDevices(disconnected: disconnected)
+        let pending = taskConnectPendingDevices(candidates: disconnected)
         let (capacity, keepConnected) = taskConnectRequestConnectionCapacity(connected: connected, pending: pending)
         taskConnectInitiateConnectionToPendingDevices(pending: pending, capacity: capacity)
         taskConnectRefreshKeepConnectedDevices(keepConnected: keepConnected)
@@ -263,25 +263,25 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     /// Establish pending connections for disconnected devices
-    private func taskConnectPendingDevices(disconnected: [BLEDevice]) -> [BLEDevice] {
+    private func taskConnectPendingDevices(candidates: [BLEDevice]) -> [BLEDevice] {
         var pending: [BLEDevice] = []
         // 1. Resolve operating system
-        let os = disconnected.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored }).sorted(by: {
+        let os = candidates.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored }).sorted(by: {
             $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
         })
         pending.append(contentsOf: os)
         // 2. Get payload
-        let payload = disconnected.filter({ !pending.contains($0) && $0.payloadData == nil }).sorted(by: {
+        let payload = candidates.filter({ !pending.contains($0) && $0.payloadData == nil }).sorted(by: {
             $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
         })
         pending.append(contentsOf: payload)
         // 3. Android takes priority as payload sharing only requires a transient connection
-        let android = disconnected.filter({ !pending.contains($0) && $0.operatingSystem == .android && $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval }).sorted(by: {
+        let android = candidates.filter({ !pending.contains($0) && $0.operatingSystem == .android && $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval }).sorted(by: {
             $0.timeIntervalSinceLastPayloadShared > $1.timeIntervalSinceLastPayloadShared
         })
         pending.append(contentsOf: android)
         // 4. iOS has lowest priority as it requires a constant connection
-        let ios = disconnected.filter({ !pending.contains($0) && $0.operatingSystem == .ios }).sorted(by: {
+        let ios = candidates.filter({ !pending.contains($0) && $0.operatingSystem == .ios }).sorted(by: {
             $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
         })
         pending.append(contentsOf: ios)
