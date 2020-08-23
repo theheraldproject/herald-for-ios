@@ -328,7 +328,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
                                 payloadSharingData.forEach() { payloadData in
                                     let sharedDevice = database.device(payloadData)
-                                    sharedDevice.operatingSystem = .shared
+                                    if sharedDevice.operatingSystem == .unknown {
+                                        sharedDevice.operatingSystem = .shared
+                                    }
                                     if let rssi = targetDevice.rssi {
                                         sharedDevice.rssi = rssi
                                     }
