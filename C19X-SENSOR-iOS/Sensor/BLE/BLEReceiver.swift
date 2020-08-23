@@ -724,8 +724,12 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if let txPower = (advertisementData[CBAdvertisementDataTxPowerLevelKey] as? NSNumber)?.intValue {
             device.txPower = BLE_TxPower(txPower)
         }
-        scanResults.append(device)
         logger.debug("didDiscover (device=\(device),rssi=\((String(describing: device.rssi))),txPower=\((String(describing: device.txPower))))")
+        if deviceHasPendingTask(device) {
+            connect("didDiscover", peripheral);
+        } else {
+            scanResults.append(device)
+        }
         // Schedule scan (actual connect is initiated from scan via prioritisation logic)
         scheduleScan("didDiscover")
     }
@@ -906,6 +910,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let data = characteristic.value {
                 device.payloadData = PayloadData(data)
             }
+            if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval, let payloadSharingCharacteristic = device.payloadSharingCharacteristic {
+                peripheral.readValue(for: payloadSharingCharacteristic)
+                return
+            }
             if device.operatingSystem == .android {
                 disconnect("didUpdateValueFor|payload|android", peripheral)
             }
@@ -913,10 +921,16 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.debug("didUpdateValueFor (device=\(device),characteristic=payloadSharingCharacteristic,error=\(String(describing: error)))")
             if let data = characteristic.value {
                 let payloads = payloadDataSupplier.payload(data)
-                payloads.forEach() { payload in
-                    _ = database.device(payload)
-                }
                 delegates.forEach { $0.sensor(.BLE, didShare: payloads, fromTarget: device.identifier)}
+                payloads.forEach() { payload in
+                    let sharedDevice = database.device(payload)
+                    if sharedDevice.operatingSystem == .unknown {
+                        sharedDevice.operatingSystem = .shared
+                    }
+                    if let rssi = device.rssi {
+                        sharedDevice.rssi = rssi
+                    }
+                }
             }
             device.payloadSharingDataLastUpdatedAt = Date()
             if device.operatingSystem == .android {
