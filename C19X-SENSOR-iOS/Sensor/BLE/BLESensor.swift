@@ -32,7 +32,7 @@ struct BLESensorConfiguration {
     /// Time delay between notifications for subscribers.
     static let notificationDelay = DispatchTimeInterval.seconds(2)
     /// Time delay between advert restart
-    static let advertRestartTimeInterval = TimeInterval.minute
+    static let advertRestartTimeInterval = TimeInterval.hour
     /// Time delay between payload sharing
     static let payloadSharingTimeInterval = TimeInterval.minute
     /// Expiry time for shared payloads, to ensure only recently seen payloads are shared
