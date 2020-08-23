@@ -273,7 +273,7 @@ enum BLEDeviceAttribute : String {
 }
 
 enum BLEDeviceOperatingSystem : String {
-    case android, ios, restored, unknown
+    case android, ios, restored, unknown, shared
 }
 
 /// RSSI in dBm.

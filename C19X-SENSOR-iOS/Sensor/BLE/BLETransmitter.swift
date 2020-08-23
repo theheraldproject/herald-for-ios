@@ -293,7 +293,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 targetDevice.operatingSystem = .android
                                 targetDevice.receiveOnly = true
                                 targetDevice.payloadData = payloadData
-                                delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: targetIdentifier) }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
                             }
@@ -310,7 +309,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
                             targetDevice.operatingSystem = .android
                             targetDevice.receiveOnly = true
-                            delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: targetIdentifier) }
+                            targetDevice.rssi = BLE_RSSI(rssi)
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writeRSSI)")
                         }
@@ -327,6 +326,13 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 targetDevice.operatingSystem = .android
                                 targetDevice.receiveOnly = true
                                 delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
+                                payloadSharingData.forEach() { payloadData in
+                                    let sharedDevice = database.device(payloadData)
+                                    sharedDevice.operatingSystem = .shared
+                                    if let rssi = targetDevice.rssi {
+                                        sharedDevice.rssi = rssi
+                                    }
+                                }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayloadSharing)")
                             }
