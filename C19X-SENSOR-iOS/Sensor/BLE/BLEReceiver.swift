@@ -50,13 +50,17 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private var scanTimer: DispatchSourceTimer?
     /// Dedicated sequential queue for the shifting timer.
     private let scanTimerQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLEReceiver.ScanTimer")
+    /// Dedicated sequential queue for the actual scan call.
     private let scheduleScanQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLEReceiver.ScheduleScan")
     /// Track scan interval and up time statistics for the receiver, for debug purposes.
     private let statistics = TimeIntervalSample()
-    
+    /// Scan result queue for recording discovered devices with no immediate pending action.
     private var scanResults: [BLEDevice] = []
     
-    
+    /// Create a BLE receiver that shares the same sequential dispatch queue as the transmitter because concurrent transmit and receive
+    /// operations impacts CoreBluetooth stability. The receiver and transmitter share a common database of devices to enable the transmitter
+    /// to register centrals for resolution by the receiver as peripherals to create symmetric connections. The payload data supplier provides
+    /// the actual payload data to be transmitted and received via BLE.
     required init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
         self.queue = queue
         self.database = database
@@ -64,6 +68,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         super.init()
         self.central = CBCentralManager(delegate: self, queue: queue, options: [
             CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
+            // Set this to false to stop iOS from displaying an alert if the app is opened while bluetooth is off.
             CBCentralManagerOptionShowPowerAlertKey : true])
         database.add(delegate: self)
     }
@@ -95,6 +100,104 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let peripheral = device.peripheral, peripheral.state != .disconnected {
                 disconnect("stop", peripheral)
             }
+        }
+    }
+    
+    // MARK:- Scan for peripherals and initiate connection if required
+    
+    /// All work starts from scan loop.
+    func scan(_ source: String) {
+        statistics.add()
+        logger.debug("scan (source=\(source),statistics={\(statistics.description)})")
+        guard central.state == .poweredOn else {
+            logger.fault("scan failed, bluetooth is not powered on")
+            return
+        }
+        // Scan for periperals advertising the sensor service.
+        // This will find all Android and iOS foreground adverts
+        // but it will miss the iOS background adverts unless
+        // location has been enabled and screen is on for a moment.
+        queue.async { self.taskScanForPeripherals() }
+        // Register connected peripherals that are advertising the
+        // sensor service. This catches the orphan peripherals that
+        // may have been missed by CoreBluetooth during state
+        // restoration or internal errors.
+        queue.async { self.taskRegisterConnectedPeripherals() }
+        // Resolve peripherals by device identifier obtained via
+        // the transmitter. When an iOS central connects to this
+        // peripheral, the transmitter code registers the central's
+        // address as a new device pending resolution here to
+        // establish a symmetric connection. This enables either
+        // device to detect the other (e.g. with screen on)
+        // and triggering both devices to detect each other.
+        queue.async { self.taskResolveDevicePeripherals() }
+        // Remove devices that have not been seen for a while as
+        // the identifier would have changed after about 20 mins,
+        // thus it is wasteful to maintain a reference.
+        queue.async { self.taskRemoveExpiredDevices() }
+        // Remove duplicate devices with the same payload but
+        // different identifiers. This happens frequently as
+        // device address changes at regular intervals as part
+        // of the Bluetooth privacy feature, thus it looks like
+        // a new device but is actually associated with the same
+        // payload. All references to the duplicate will be
+        // removed but the actual connection will be terminated
+        // by CoreBluetooth, often showing an API misuse warning
+        // which can be ignored.
+        queue.async { self.taskRemoveDuplicatePeripherals() }
+        // iOS devices are kept in background state indefinitely
+        // (instead of dropping into suspended or terminated state)
+        // by a series of time delayed BLE operations. While this
+        // device is awake, it will write data to other iOS devices
+        // to keep them awake, and vice versa.
+        queue.async { self.taskWakeTransmitters() }
+        // All devices have an upper limit on the number of concurrent
+        // BLE connections it can maintain. For iOS, it is usually 12
+        // or above. iOS devices maintain an active connection with
+        // other iOS devices to keep awake and obtain regular RSSI
+        // measurements, thus it can track up to 12 iOS devices at any
+        // moment in time. Above this figure, this device will need
+        // to rotate (disconnect/connect) connections to multiplex
+        // between the iOS devices for coverage. This is unnecessary
+        // for tracking Android devices as they are tracked by scan
+        // only. A connection to Android is only required for reading
+        // its payload upon discovery.
+        queue.async { self.taskIosMultiplex() }
+        // Connect to discovered devices if the device has pending tasks.
+        // The vast majority of devices will be connected immediately upon
+        // discovery, if they have a pending task (e.g. to establish its
+        // operating system or read its payload). Devices may be discovered
+        // but not have a pending task if they have already been fully
+        // resolved (e.g. has operating system, payload and recent RSSI
+        // measuremnet), these are placed in the scan results queue for
+        // regular checking by this connect task (e.g. to read RSSI if
+        // the existing value is now out of date).
+        queue.async { self.taskConnect() }
+        // Schedule this scan call again for execution in at least 8 seconds
+        // time to repeat the scan loop. The actual call may be delayed beyond
+        // the 8 second delay from this point because all terminating operations
+        // (i.e. events that will eventually lead the app to enter suspended
+        // state if nothing else happens) calls this function to keep the loop
+        // running indefinitely. The 8 or less seconds delay was chosen to
+        // ensure the scan call is activated before the app naturally enters
+        // suspended state, but not so soon the loop runs too often.
+        scheduleScan("scan")
+    }
+    
+    /**
+     Schedule scan for beacons after a delay of 8 seconds to start scan again just before
+     state change from background to suspended. Scan is sufficient for finding Android
+     devices repeatedly in both foreground and background states.
+     */
+    private func scheduleScan(_ source: String) {
+        scheduleScanQueue.sync {
+            scanTimer?.cancel()
+            scanTimer = DispatchSource.makeTimerSource(queue: scanTimerQueue)
+            scanTimer?.schedule(deadline: DispatchTime.now() + BLESensorConfiguration.notificationDelay)
+            scanTimer?.setEventHandler { [weak self] in
+                self?.scan("scheduleScan|"+source)
+            }
+            scanTimer?.resume()
         }
     }
     
@@ -286,214 +389,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             connect("taskIosMultiplex", toBeConnected);
         }
     }
-
-    
-    /// Separate devices by current connection state
-    private func taskConnectSeparateByConnectionState(_ devices: [BLEDevice]) -> (connected: [BLEDevice], disconnected: [BLEDevice]) {
-        var connected: [BLEDevice] = []
-        var disconnected: [BLEDevice] = []
-        devices.forEach() { device in
-            guard let peripheral = device.peripheral else {
-                return
-            }
-            if peripheral.state == .connected {
-                connected.append(device)
-            } else {
-                disconnected.append(device)
-            }
-        }
-        logger.debug("taskConnect status summary (connected=\(connected.count),disconnected=\(disconnected.count))")
-        connected.forEach() { device in
-            logger.debug("taskConnect status connected (device=\(device),upTime=\(device.timeIntervalBetweenLastConnectedAndLastAdvert))")
-        }
-        disconnected.forEach() { device in
-            logger.debug("taskConnect status disconnected (device=\(device),downTime=\(device.timeIntervalSinceLastDisconnectedAt))")
-        }
-        return (connected, disconnected)
-    }
-    
-    /// Separate devices by operating system
-    private func taskConnectSeparateByOperatingSystem(_ devices: [BLEDevice]) -> (ios: [BLEDevice], android: [BLEDevice], restored: [BLEDevice], unknown: [BLEDevice]) {
-        var android: [BLEDevice] = []
-        var ios: [BLEDevice] = []
-        var unknown: [BLEDevice] = []
-        var restored: [BLEDevice] = []
-        devices.forEach() { device in
-            switch device.operatingSystem {
-            case .ios:
-                ios.append(device)
-            case .android:
-                android.append(device)
-            case .restored:
-                restored.append(device)
-            default:
-                unknown.append(device)
-            }
-        }
-        return (ios, android, restored, unknown)
-    }
-    
-    
-    /// Establish pending connections for disconnected devices
-    private func taskConnectPendingDevices(candidates: [BLEDevice]) -> [BLEDevice] {
-        var pending: [BLEDevice] = []
-        // 1. Resolve operating system
-        let os = candidates.filter({ $0.operatingSystem == .unknown || $0.operatingSystem == .restored }).sorted(by: {
-            $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
-        })
-        pending.append(contentsOf: os)
-        // 2. Get payload
-        let payload = candidates.filter({ !pending.contains($0) && $0.payloadData == nil }).sorted(by: {
-            $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
-        })
-        pending.append(contentsOf: payload)
-        // 4. iOS has lowest priority as it requires a constant connection
-        let ios = candidates.filter({ !pending.contains($0) && $0.operatingSystem == .ios }).sorted(by: {
-            $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
-        })
-        pending.append(contentsOf: ios)
-        if pending.count > 0 {
-            logger.debug("taskConnect pending summary (devices=\(pending.count))")
-            os.forEach() { device in
-                logger.debug("taskConnect pending, operating system (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
-            }
-            payload.forEach() { device in
-                logger.debug("taskConnect pending, read payload (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
-            }
-            ios.forEach() { device in
-                logger.debug("taskConnect pending, iOS disconnected device (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
-            }
-        }
-        return pending
-    }
-    
-    /// Free connection capacity for pending devices if possible by disconnecting long running connections to iOS devices
-    func taskConnectRequestConnectionCapacity(connected: [BLEDevice], pending: [BLEDevice]) -> (capacity: Int, keepConnected: [BLEDevice]) {
-        let quota = BLESensorConfiguration.concurrentConnectionQuota
-        let capacityRequest = 1
-        guard pending.count > 0, (capacityRequest + connected.count) > quota else {
-            let capacity = quota - connected.count
-            return (capacity, connected)
-        }
-        let transient = connected.filter({ $0.operatingSystem != .ios })
-        logger.debug("taskConnect capacity summary (quota=\(quota),connected=\(connected.count),transient=\(transient.count),pending=\(pending.count))")
-        // Only disconnect iOS devices if there is no transient device that will naturally free up capacity in the near future
-        guard transient.count == 0 else {
-            logger.debug("taskConnect capacity, wait for disconnection by transient devices")
-            return (0, connected)
-        }
-        // Disconnect iOS devices only, because
-        // - Android device connections are short lived, should be left to complete
-        // - Unknown and restored devices need to be resolved as soon as possible
-        let ios = connected.filter({ $0.operatingSystem == .ios })
-        // iOS device has been tracked for > 1 minute (up time)
-        let tracked = ios.filter({ $0.timeIntervalBetweenLastConnectedAndLastAdvert > TimeInterval.minute })
-        // Sort by up time to disconnect longest running connections
-        let candidates = tracked.sorted(by: { $0.timeIntervalBetweenLastConnectedAndLastAdvert > $1.timeIntervalBetweenLastConnectedAndLastAdvert })
-        let candidateList = candidates.map({ $0.description + ":" + $0.timeIntervalBetweenLastConnectedAndLastAdvert.description }).joined(separator: ",")
-        logger.debug("taskConnect capacity, candidates (devices=\(candidateList))")
-        // Disconnect devices to meet capacity request
-        var keepConnected: [BLEDevice] = []
-        var willDisconnect: [BLEDevice] = []
-        keepConnected.append(contentsOf: (capacityRequest >= candidates.count ? [] : candidates.dropFirst(capacityRequest)))
-        willDisconnect.append(contentsOf: (capacityRequest >= candidates.count ? candidates : candidates.dropLast(candidates.count - capacityRequest)))
-        logger.debug("taskConnect capacity, plan (willDisconnect=\(willDisconnect.count),keepConnected=\(keepConnected.count))")
-        willDisconnect.forEach() { device in
-            guard let peripheral = device.peripheral else {
-                return
-            }
-            logger.debug("taskConnect capacity, disconnect (device=\(device))")
-            disconnect("taskConnect|capacity", peripheral)
-
-        }
-        return (willDisconnect.count, keepConnected)
-    }
-    
-    /// Initiate connection to pending devices, up to maximum capacity
-    func taskConnectInitiateConnectionToPendingDevices(pending: [BLEDevice], capacity: Int) {
-        guard pending.count > 0 else {
-            return
-        }
-        guard capacity > 0 else {
-            return
-        }
-        let readyForConnection = pending.filter({ $0.peripheral != nil })
-        let devices = readyForConnection
-        logger.debug("taskConnect initiate connection summary (pending=\(pending.count),capacity=\(capacity),connectingTo=\(devices.count))")
-        devices.forEach() { device in
-            guard let peripheral = device.peripheral else {
-                return
-            }
-            logger.debug("taskConnect initiate connection, connect (device=\(device))")
-            connect("taskConnect|pending", peripheral)
-        }
-//        let readyForConnection = pending.filter({ $0.peripheral != nil })
-//        let devices = (readyForConnection.count <= capacity ? readyForConnection : readyForConnection.dropLast(readyForConnection.count - capacity))
-//        logger.debug("taskConnect initiate connection summary (pending=\(pending.count),capacity=\(capacity),connectingTo=\(devices.count))")
-//        devices.forEach() { device in
-//            guard let peripheral = device.peripheral else {
-//                return
-//            }
-//            logger.debug("taskConnect initiate connection, connect (device=\(device))")
-//            connect("taskConnect|pending", peripheral)
-//        }
-    }
-    
-    /// Refresh connection to connected non-iOS devices
-    func taskConnectRefreshKeepConnectedDevices(keepConnected: [BLEDevice]) {
-        let (_, android, restored, unknown) = taskConnectSeparateByOperatingSystem(keepConnected)
-        var devices: [BLEDevice] = []
-        devices.append(contentsOf: unknown)
-        devices.append(contentsOf: restored)
-        devices.append(contentsOf: android)
-        guard devices.count > 0 else {
-            return
-        }
-        logger.debug("taskConnect refresh connected summary (unknown=\(unknown.count),restored=\(restored.count),android=\(android.count))")
-        devices.forEach() { device in
-            guard let peripheral = device.peripheral else {
-                return
-            }
-            logger.debug("taskConnect refresh connected, connect (device=\(device))")
-            connect("taskConnect|refresh", peripheral)
-        }
-    }
-    
-    /// All work starts from scan loop.
-    func scan(_ source: String) {
-        statistics.add()
-        logger.debug("scan (source=\(source),statistics={\(statistics.description)})")
-        guard central.state == .poweredOn else {
-            logger.fault("scan failed, bluetooth is not powered on")
-            return
-        }
-        queue.async { self.taskScanForPeripherals() }
-        queue.async { self.taskRegisterConnectedPeripherals() }
-        queue.async { self.taskResolveDevicePeripherals() }
-        queue.async { self.taskRemoveExpiredDevices() }
-        queue.async { self.taskRemoveDuplicatePeripherals() }
-        queue.async { self.taskWakeTransmitters() }
-        queue.async { self.taskIosMultiplex() }
-        queue.async { self.taskConnect() }
-        scheduleScan("scan")
-    }
-    
-    /**
-     Schedule scan for beacons after a delay of 8 seconds to start scan again just before
-     state change from background to suspended. Scan is sufficient for finding Android
-     devices repeatedly in both foreground and background states.
-     */
-    private func scheduleScan(_ source: String) {
-        scheduleScanQueue.sync {
-            scanTimer?.cancel()
-            scanTimer = DispatchSource.makeTimerSource(queue: scanTimerQueue)
-            scanTimer?.schedule(deadline: DispatchTime.now() + BLESensorConfiguration.notificationDelay)
-            scanTimer?.setEventHandler { [weak self] in
-                self?.scan("scheduleScan|"+source)
-            }
-            scanTimer?.resume()
-        }
-    }
     
     /// Initiate next action on peripheral based on current state and information available
     private func taskInitiateNextAction(_ source: String, peripheral: CBPeripheral) {
@@ -521,8 +416,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             scheduleScan("taskInitiateNextAction|" + source)
         }
     }
-    
-
     
     /**
      Connect peripheral. Scanning is stopped temporarily, as recommended by Apple documentation, before initiating connect, otherwise
@@ -589,6 +482,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         queue.async { peripheral.discoverServices([BLESensorConfiguration.serviceUUID]) }
     }
     
+    /// Read payload data from device
     private func readPayload(_ source: String, _ device: BLEDevice) {
         logger.debug("readPayload (source=\(source),peripheral=\(device.identifier))")
         guard let peripheral = device.peripheral, peripheral.state == .connected else {
@@ -604,24 +498,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             discoverServices("readPayload|android", peripheral)
         } else {
             peripheral.readValue(for: payloadCharacteristic)
-        }
-    }
-
-    private func readPayloadSharing(_ source: String, _ device: BLEDevice) {
-        logger.debug("readPayloadSharing (source=\(source),peripheral=\(device.identifier))")
-        guard let peripheral = device.peripheral, peripheral.state == .connected else {
-            logger.fault("readPayloadSharing denied, peripheral not connected (source=\(source),peripheral=\(device.identifier))")
-            return
-        }
-        guard let payloadSharingCharacteristic = device.payloadSharingCharacteristic else {
-            logger.fault("readPayload denied, device missing payload sharing characteristic (source=\(source),peripheral=\(device.identifier))")
-            discoverServices("readPayloadSharing", peripheral)
-            return
-        }
-        if device.operatingSystem == .android, let peripheral = device.peripheral {
-            discoverServices("readPayloadSharing|android", peripheral)
-        } else {
-            peripheral.readValue(for: payloadSharingCharacteristic)
         }
     }
 
@@ -650,6 +526,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     // MARK:- CBCentralManagerDelegate
     
+    /// Reinstate devices following state restoration
     func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
         // Restore -> Populate database
         logger.debug("willRestoreState")
@@ -671,6 +548,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Reconnection check performed in scan following centralManagerDidUpdateState:central.state == .powerOn
     }
     
+    /// Start scan when bluetooth is on.
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         // Bluetooth on -> Scan
         if (central.state == .poweredOn) {
@@ -680,6 +558,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if #available(iOS 10.0, *) {
                 logger.debug("Update state (state=\(central.state.description))")
             } else {
+                // Required for compatibility with iOS 9.3
                 switch central.state {
                     case .poweredOff:
                         logger.debug("Update state (state=poweredOff)")
@@ -700,6 +579,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
+    /// Device discovery will trigger connection to resolve operating system and read payload for iOS and Android devices.
+    /// Connection is kept active for iOS devices for on-going RSSI measurements, and closed for Android devices, as this
+    /// iOS device can rely on this discovery callback (triggered by regular scan calls) for on-going RSSI and TX power
+    /// updates, thus eliminating the need to keep connections open for Android devices that can cause stability issues for
+    /// Android devices.
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         // Populate device database
         let device = database.device(peripheral, delegate: self)
@@ -718,6 +602,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         scheduleScan("didDiscover")
     }
     
+    /// Successful connection to a device will initate the next pending action.
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         // connect -> readRSSI -> discoverServices
         let device = database.device(peripheral, delegate: self)
@@ -726,6 +611,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         taskInitiateNextAction("didConnect", peripheral: peripheral)
     }
     
+    /// Failure to connect to a device will result in de-registration for invalid devices or reconnection attempt otherwise.
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         // Connect fail -> Delete | Connect
         // Failure for peripherals advertising the beacon service should be transient, so try again.
@@ -741,6 +627,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
+    /// Graceful disconnection is usually caused by device going out of range or device changing identity, thus a reconnection call is initiated
+    /// here for iOS devices to resume connection where possible. This is unnecessary for Android devices as they can be rediscovered by
+    /// the regular scan calls. Please note, reconnection to iOS devices is likely to fail following prolonged period of being out of range as
+    /// the target device is likely to have changed identity after about 20 minutes. This requires rediscovery which is impossible if the iOS device
+    /// is in background state, hence the need for enabling location and screen on to trigger rediscovery (yes, its weird, but it works).
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         // Disconnected -> Connect if iOS
         // Keep connection only for iOS, not necessary for Android as they are always detectable
@@ -758,6 +649,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     // MARK: - CBPeripheralDelegate
     
+    /// Read RSSI for proximity estimation.
     func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
         // Read RSSI -> Read Code | Notify delegates -> Scan again
         // This is the primary loop for iOS after initial connection and subscription to
@@ -769,6 +661,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         taskInitiateNextAction("didReadRSSI", peripheral: peripheral)
     }
     
+    /// Service discovery triggers characteristic discovery.
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         // Discover services -> Discover characteristics | Disconnect
         let device = database.device(peripheral, delegate: self)
@@ -788,6 +681,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // The disconnect calls here shall be handled by didDisconnect which determines whether to retry for iOS or stop for Android
     }
     
+    /// Characteristic discovery provides definitive classification and confirmation of device operating system to inform next actions.
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         // Discover characteristics -> Notify delegates -> Disconnect | Wake transmitter -> Scan again
         let device = database.device(peripheral, delegate: self)
@@ -803,6 +697,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 device.signalCharacteristic = characteristic
                 logger.debug("didDiscoverCharacteristicsFor, found android signal characteristic (device=\(device))")
             case BLESensorConfiguration.iosSignalCharacteristicUUID:
+                // Maintain connection with iOS devices for keep awake
                 let notify = characteristic.properties.contains(.notify)
                 let write = characteristic.properties.contains(.write)
                 device.operatingSystem = .ios
@@ -830,6 +725,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         scheduleScan("didDiscoverCharacteristicsFor")
     }
     
+    /// This iOS device will write to connected iOS devices to keep them awake, and this call back provides a backup mechanism for keeping this
+    /// device awake for longer in the event that other devices are no longer responding or in range.
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         // Wrote characteristic -> Scan again
         let device = database.device(peripheral, delegate: self)
@@ -840,6 +737,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         scheduleScan("didWriteValueFor")
     }
     
+    /// Other iOS devices may refresh (stop/restart) their adverts at regular intervals, thus triggering this service modification callback
+    /// to invalidate existing characteristics and reconnect to refresh the device data.
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
         // iOS only
         // Modified service -> Invalidate beacon -> Scan
@@ -858,9 +757,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
+    /// All read characteristic requests will trigger this call back to handle the response.
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        // iOS only
-        // Updated value -> Read RSSI
+        // Updated value -> Read RSSI | Read Payload
         // Beacon characteristic is writable, primarily to enable non-transmitting Android devices to submit their
         // beacon code and RSSI as data to the transmitter via GATT write. The characteristic is also notifying on
         // iOS devices, to offer a mechanism for waking receivers. The process works as follows, (1) receiver writes
