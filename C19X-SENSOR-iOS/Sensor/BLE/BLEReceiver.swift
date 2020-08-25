@@ -252,10 +252,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if device.payloadData == nil {
             return true
         }
-        // Payload sharing
-        if device.operatingSystem == .android && device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval {
-            return true
-        }
         // iOS should always be connected
         if device.operatingSystem == .ios, let peripheral = device.peripheral, peripheral.state != .connected {
             return true
@@ -351,11 +347,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
         })
         pending.append(contentsOf: payload)
-        // 3. Android takes priority as payload sharing only requires a transient connection
-        let android = candidates.filter({ !pending.contains($0) && $0.operatingSystem == .android && $0.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval }).sorted(by: {
-            $0.timeIntervalSinceLastPayloadShared > $1.timeIntervalSinceLastPayloadShared
-        })
-        pending.append(contentsOf: android)
         // 4. iOS has lowest priority as it requires a constant connection
         let ios = candidates.filter({ !pending.contains($0) && $0.operatingSystem == .ios }).sorted(by: {
             $0.timeIntervalSinceLastConnectRequestedAt > $1.timeIntervalSinceLastConnectRequestedAt
@@ -368,9 +359,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
             payload.forEach() { device in
                 logger.debug("taskConnect pending, read payload (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
-            }
-            android.forEach() { device in
-                logger.debug("taskConnect pending, Android payload sharing (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastPayloadShared))")
             }
             ios.forEach() { device in
                 logger.debug("taskConnect pending, iOS disconnected device (device=\(device),timeSinceLastRequest=\(device.timeIntervalSinceLastConnectRequestedAt))")
@@ -515,7 +503,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 1. RSSI
             logger.debug("taskInitiateNextAction (goal=rssi,peripheral=\(targetIdentifier))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
-        } else if device.signalCharacteristic == nil || device.payloadCharacteristic == nil || device.payloadSharingCharacteristic == nil {
+        } else if device.signalCharacteristic == nil || device.payloadCharacteristic == nil {
             // 2. Characteristics
             logger.debug("taskInitiateNextAction (goal=characteristics,peripheral=\(targetIdentifier))")
             discoverServices("taskInitiateNextAction|" + source, peripheral)
@@ -523,10 +511,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 3. Payload
             logger.debug("taskInitiateNextAction (goal=payload,peripheral=\(targetIdentifier))")
             readPayload("taskInitiateNextAction|" + source, device)
-        } else if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval {
-            // 4. Payload sharing
-            logger.debug("taskInitiateNextAction (goal=payloadSharing|\(device.timeIntervalSinceLastPayloadShared.description),peripheral=\(targetIdentifier))")
-            readPayloadSharing("taskInitiateNextAction|" + source, device)
         } else if device.operatingSystem != .ios {
             // 5. Disconnect Android
             logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),peripheral=\(targetIdentifier))")
@@ -767,7 +751,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // Invalidate characteristics
             device.signalCharacteristic = nil
             device.payloadCharacteristic = nil
-            device.payloadSharingCharacteristic = nil
             // Reconnect
             connect("didDisconnectPeripheral", peripheral)
         }
@@ -829,9 +812,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             case BLESensorConfiguration.payloadCharacteristicUUID:
                 device.payloadCharacteristic = characteristic
                 logger.debug("didDiscoverCharacteristicsFor, found payload characteristic (device=\(device))")
-            case BLESensorConfiguration.payloadSharingCharacteristicUUID:
-                device.payloadSharingCharacteristic = characteristic
-                logger.debug("didDiscoverCharacteristicsFor, found payload sharing characteristic (device=\(device))")
             default:
                 logger.fault("didDiscoverCharacteristicsFor, found unknown characteristic (device=\(device),characteristic=\(characteristic.uuid))")
             }
@@ -840,8 +820,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if device.operatingSystem == .android {
             if device.payloadData == nil, let payloadCharacteristic = device.payloadCharacteristic {
                 peripheral.readValue(for: payloadCharacteristic)
-            } else if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval, let payloadSharingCharacteristic = device.payloadSharingCharacteristic {
-                peripheral.readValue(for: payloadSharingCharacteristic)
             } else {
                 disconnect("didDiscoverCharacteristicsFor|android", peripheral)
             }
@@ -873,7 +851,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         device.signalCharacteristic = nil
         device.payloadCharacteristic = nil
-        device.payloadSharingCharacteristic = nil
         if peripheral.state == .connected {
             discoverServices("didModifyServices", peripheral)
         } else if peripheral.state != .connecting {
@@ -910,31 +887,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let data = characteristic.value {
                 device.payloadData = PayloadData(data)
             }
-            if device.timeIntervalSinceLastPayloadShared > BLESensorConfiguration.payloadSharingTimeInterval, let payloadSharingCharacteristic = device.payloadSharingCharacteristic {
-                peripheral.readValue(for: payloadSharingCharacteristic)
-                return
-            }
             if device.operatingSystem == .android {
                 disconnect("didUpdateValueFor|payload|android", peripheral)
-            }
-        case BLESensorConfiguration.payloadSharingCharacteristicUUID:
-            logger.debug("didUpdateValueFor (device=\(device),characteristic=payloadSharingCharacteristic,error=\(String(describing: error)))")
-            if let data = characteristic.value {
-                let payloads = payloadDataSupplier.payload(data)
-                delegates.forEach { $0.sensor(.BLE, didShare: payloads, fromTarget: device.identifier)}
-                payloads.forEach() { payload in
-                    let sharedDevice = database.device(payload)
-                    if sharedDevice.operatingSystem == .unknown {
-                        sharedDevice.operatingSystem = .shared
-                    }
-                    if let rssi = device.rssi {
-                        sharedDevice.rssi = rssi
-                    }
-                }
-            }
-            device.payloadSharingDataLastUpdatedAt = Date()
-            if device.operatingSystem == .android {
-                disconnect("didUpdateValueFor|payloadSharing|android", peripheral)
             }
         default:
             logger.fault("didUpdateValueFor, unknown characteristic (device=\(device),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")

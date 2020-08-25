@@ -53,7 +53,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     /// Beacon service and characteristics being broadcasted by the transmitter.
     private var signalCharacteristic: CBMutableCharacteristic?
     private var payloadCharacteristic: CBMutableCharacteristic?
-    private var payloadSharingCharacteristic: CBMutableCharacteristic?
     private var advertisingStartedAt: Date = Date.distantPast
     /// Dummy data for writing to the receivers to trigger state restoration or resume from suspend state to background state.
     private let emptyData = Data(repeating: 0, count: 0)
@@ -91,7 +90,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.fault("start denied, not powered on")
             return
         }
-        if signalCharacteristic != nil, payloadCharacteristic != nil, payloadSharingCharacteristic != nil {
+        if signalCharacteristic != nil, payloadCharacteristic != nil {
             logger.debug("starting advert with existing characteristics")
             if !peripheral.isAdvertising {
                 startAdvertising(withNewCharacteristics: false)
@@ -124,13 +123,14 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     private func startAdvertising(withNewCharacteristics: Bool) {
         logger.debug("startAdvertising (withNewCharacteristics=\(withNewCharacteristics))")
-        if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil || payloadSharingCharacteristic == nil{
+        if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil {
             signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
-            payloadSharingCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadSharingCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
         }
         let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
-        service.characteristics = [signalCharacteristic!, payloadCharacteristic!, payloadSharingCharacteristic!]
+        signalCharacteristic?.value = nil
+        payloadCharacteristic?.value = nil
+        service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
         queue.async {
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
@@ -206,13 +206,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 logger.debug("willRestoreState (payloadCharacteristic=\(characteristic.uuid.uuidString))")
                             } else {
                                 logger.fault("willRestoreState characteristic not mutable (payloadCharacteristic=\(characteristic.uuid.uuidString))")
-                            }
-                        case BLESensorConfiguration.payloadSharingCharacteristicUUID:
-                            if let mutableCharacteristic = characteristic as? CBMutableCharacteristic {
-                                payloadSharingCharacteristic = mutableCharacteristic
-                                logger.debug("willRestoreState (payloadSharingCharacteristic=\(characteristic.uuid.uuidString))")
-                            } else {
-                                logger.fault("willRestoreState characteristic not mutable (payloadSharingCharacteristic=\(characteristic.uuid.uuidString))")
                             }
                         default:
                             logger.debug("willRestoreState (unknownCharacteristic=\(characteristic.uuid.uuidString))")
@@ -317,23 +310,22 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writePayloadSharing)")
                         // writePayloadSharing data format
                         // 0-0 : actionCode
-                        // 1-2 : payload sharing data count in bytes (Int16)
-                        // 3.. : payload sharing data (to be parsed by payload data supplier)
-                        if let payloadDataCount = data.int16(1) {
-                            if data.count == (3 + payloadDataCount) {
-                                let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 3..<data.count))
+                        // 1-2 : rssi value (Int16)
+                        // 3-4 : payload sharing data count in bytes (Int16)
+                        // 5.. : payload sharing data (to be parsed by payload data supplier)
+                        if let rssi = data.int16(1), let payloadDataCount = data.int16(3) {
+                            if data.count == (5 + payloadDataCount) {
+                                let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 5..<data.count))
                                 logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
-                                targetDevice.operatingSystem = .android
-                                targetDevice.receiveOnly = true
                                 delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
+                                targetDevice.operatingSystem = .android
+                                targetDevice.rssi = BLE_RSSI(rssi)
                                 payloadSharingData.forEach() { payloadData in
                                     let sharedDevice = database.device(payloadData)
                                     if sharedDevice.operatingSystem == .unknown {
                                         sharedDevice.operatingSystem = .shared
                                     }
-                                    if let rssi = targetDevice.rssi {
-                                        sharedDevice.rssi = rssi
-                                    }
+                                    sharedDevice.rssi = BLE_RSSI(rssi)
                                 }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayloadSharing)")
@@ -413,20 +405,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             let data = payloadDataSupplier.payload(PayloadTimestamp())
             guard request.offset < data.count else {
                 logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.count))")
-                peripheral.respond(to: request, withResult: .invalidOffset)
-                return
-            }
-            request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
-            peripheral.respond(to: request, withResult: .success)
-        case BLESensorConfiguration.payloadSharingCharacteristicUUID:
-            let (identifiers, data) = payloadSharingData(request.central)
-            logger.debug("Read (central=\(central.description),characteristic=payloadSharing,offset=\(request.offset),shared=\(identifiers))")
-            guard identifiers.count > 0, data.count > 0 else {
-                peripheral.respond(to: request, withResult: .success)
-                return
-            }
-            guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payloadSharing,offset=\(request.offset),data=\(data.count))")
                 peripheral.respond(to: request, withResult: .invalidOffset)
                 return
             }
