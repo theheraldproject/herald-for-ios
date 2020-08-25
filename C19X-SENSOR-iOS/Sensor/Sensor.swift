@@ -50,7 +50,7 @@ class SensorArray : NSObject, Sensor {
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
-        sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        //sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
         payloadData = payloadDataSupplier.payload(PayloadTimestamp())
         super.init()

@@ -27,19 +27,15 @@ struct BLESensorConfiguration {
     static let iosSignalCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000002")
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     static let payloadCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000003")
-    /// Secondary payload characteristic (read) for sharing payload data acquired by this central, e.g. identity data of other peripherals in the vincinity
-    static let payloadSharingCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000004")
     /// Time delay between notifications for subscribers.
     static let notificationDelay = DispatchTimeInterval.seconds(2)
     /// Time delay between advert restart
     static let advertRestartTimeInterval = TimeInterval.hour
-    /// Time delay between payload sharing
-    static let payloadSharingTimeInterval = TimeInterval(25)
     /// Expiry time for shared payloads, to ensure only recently seen payloads are shared
     /// Must be > payloadSharingTimeInterval to share pending payloads
     static let payloadSharingExpiryTimeInterval = TimeInterval.minute * 5
     /// Maximum number of concurrent BLE connections
-    static let concurrentConnectionQuota = 4
+    static let concurrentConnectionQuota = 12
 
 
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data

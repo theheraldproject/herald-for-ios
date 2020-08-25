@@ -159,12 +159,6 @@ class BLEDevice : NSObject {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .payloadCharacteristic)
         }}
-    /// Service characteristic for reading payload sharing data, e.g.  beacon code or Sonar encrypted identifier recently acquired by this device
-    var payloadSharingCharacteristic: CBCharacteristic? {
-        didSet {
-            lastUpdatedAt = Date()
-            delegate.device(self, didUpdate: .payloadSharingCharacteristic)
-        }}
     /// Device operating system, this is necessary for selecting different interaction procedures for each platform.
     var operatingSystem: BLEDeviceOperatingSystem = .unknown {
         didSet {
@@ -187,8 +181,6 @@ class BLEDevice : NSObject {
     var payloadDataLastUpdatedAt: Date = Date.distantPast
     /// Payload data already shared with this peer
     var payloadSharingData: [PayloadData] = []
-    /// Payload sharing last update timestamp (successful read of payload sharing data from this peer), this is used to throttle read payload sharing calls
-    var payloadSharingDataLastUpdatedAt: Date = Date.distantPast
     /// Most recent RSSI measurement taken by readRSSI or didDiscover.
     var rssi: BLE_RSSI? {
         didSet {
@@ -218,16 +210,12 @@ class BLEDevice : NSObject {
     var lastDisconnectedAt: Date?
     /// Last advert timestamp, inferred from payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt
     var lastAdvertAt: Date { get {
-            max(createdAt, lastDiscoveredAt, payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt)
+            max(createdAt, lastDiscoveredAt, payloadDataLastUpdatedAt, rssiLastUpdatedAt)
         }}
     
     /// Time interval since last attribute value update, this is used to identify devices that may have expired and should be removed from the database.
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
-        }}
-    /// Time interval since last payload sharing value update, this is used to throttle read payload sharing calls
-    var timeIntervalSinceLastPayloadShared: TimeInterval { get {
-            Date().timeIntervalSince(payloadSharingDataLastUpdatedAt)
         }}
     /// Time interval since last advert detected, this is used to detect concurrent connection quota and prioritise disconnections
     var timeIntervalSinceLastAdvert: TimeInterval { get {
