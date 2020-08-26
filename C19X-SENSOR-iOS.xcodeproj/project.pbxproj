@@ -31,6 +31,7 @@
 		B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD724CC30D300F45AEE /* BLEUtilities.swift */; };
 		B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADB24CD936B00F45AEE /* BLEDatabase.swift */; };
 		B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADD24CF2B1400F45AEE /* TextFile.swift */; };
+		B6F9F6AF24F6B1FC006F39A0 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		B692CAD724CC30D300F45AEE /* BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
 		B692CADB24CD936B00F45AEE /* BLEDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
 		B692CADD24CF2B1400F45AEE /* TextFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
+		B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryLog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 				B6845AD424D8983B004B8E5C /* RScriptLog.swift */,
 				B6845AD624D8D746004B8E5C /* DetectionLog.swift */,
 				B68645E024E3570200E71658 /* StatisticsLog.swift */,
+				B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -264,6 +267,7 @@
 				B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */,
 				B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */,
 				B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */,
+				B6F9F6AF24F6B1FC006F39A0 /* BatteryLog.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
 				B692CAC824CC27BC00F45AEE /* BLETransmitter.swift in Sources */,
 				B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */,
