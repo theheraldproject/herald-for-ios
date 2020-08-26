@@ -20,19 +20,18 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Detect close contacts with other users to trace direct disease transmissions</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Detect close contacts with other users to trace direct disease transmissions</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Detect recently visited places and areas to trace indirect disease transmissions</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Detect recently visited places and areas to trace indirect disease transmissions</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Detect close contacts with other users to trace direct disease transmissions</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Detect close contacts with other users to trace direct disease transmissions</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Detect close contacts with other users to trace direct disease transmissions</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>audio</string>
 		<string>bluetooth-central</string>
 		<string>bluetooth-peripheral</string>
 		<string>location</string>

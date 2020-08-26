@@ -18,11 +18,10 @@ protocol BLETransmitter : Sensor {
 }
 
 /**
- Transmitter offers three services:
+ Transmitter offers two services:
  1. Signal characteristic for maintaining connection between iOS devices and also enable non-transmitting Android devices (receive only,
  like the Samsung J6) to make their presence known by writing their beacon code and RSSI as data to this characteristic.
  2. Payload characteristic for publishing beacon identity data.
- 3. Payload sharing characteristic for publishing beacon identity data recently acquired by this beacon.
  
  Keeping the transmitter and receiver working in iOS background mode is a major challenge, in particular when both
  iOS devices are in background mode. The transmitter on iOS offers a notifying beacon characteristic that is triggered
@@ -175,6 +174,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     // MARK:- CBPeripheralManagerDelegate
     
+    /// Restore advert and reinstate advertised characteristics.
     func peripheralManager(_ peripheral: CBPeripheralManager, willRestoreState dict: [String : Any]) {
         logger.debug("willRestoreState")
         self.peripheral = peripheral
@@ -216,6 +216,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         }
     }
 
+    /// Start advertising on bluetooth power on.
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         // Bluetooth on -> Advertise
         if (peripheral.state == .poweredOn) {
@@ -225,6 +226,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             if #available(iOS 10.0, *) {
                 logger.debug("Update state (state=\(peripheral.state.description))")
             } else {
+                // Required to support iOS 9.3
                 switch peripheral.state {
                     case .poweredOff:
                         logger.debug("Update state (state=poweredOff)")
@@ -256,7 +258,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
      Write request offers a mechanism for non-transmitting BLE devices (e.g. Samsung J6 can only receive) to make
      its presence known by submitting its beacon code and RSSI as data. This also offers a mechanism for iOS to
      write blank data to transmitter to keep bringing it back from suspended state to background state which increases
-     its chance of background scanning over a long period without being killed off.
+     its chance of background scanning over a long period without being killed off. Payload sharing is also based on
+     write characteristic to enable Android peers to act as a bridge for sharing iOS device payloads, thus enabling
+     iOS - iOS background detection without location permission or screen on, as background detection and tracking method.
      */
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         // Write -> Notify delegates -> Write response -> Notify subscribers
@@ -272,6 +276,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                 } else if let actionCode = data.uint8(0) {
                     switch actionCode {
                     case BLESensorConfiguration.signalCharacteristicActionWritePayload:
+                        // Receive-only Android device writing its payload to make its presence known
                         logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writePayload)")
                         // writePayload data format
                         // 0-0 : actionCode
@@ -293,6 +298,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writePayload)")
                         }
                     case BLESensorConfiguration.signalCharacteristicActionWriteRSSI:
+                        // Receive-only Android device writing its RSSI to make its proximity known
                         logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writeRSSI)")
                         // writeRSSI data format
                         // 0-0 : actionCode
@@ -307,6 +313,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writeRSSI)")
                         }
                     case BLESensorConfiguration.signalCharacteristicActionWritePayloadSharing:
+                        // Android device sharing detected iOS devices with this iOS device to enable background detection
                         logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writePayloadSharing)")
                         // writePayloadSharing data format
                         // 0-0 : actionCode
@@ -345,57 +352,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         notifySubscribers("didReceiveWrite")
     }
     
-    /// Determine what payload data to share with peer
-    private func payloadSharingData(_ central: CBCentral) -> (identifiers: [TargetIdentifier], data: Data) {
-        let peer = database.device(central.identifier.uuidString)
-        // Get other devices that were seen recently by this device
-        var unknownDevices: [BLEDevice] = []
-        var knownDevices: [BLEDevice] = []
-        database.devices().forEach() { device in
-            // Device was seen recently, need multiplier to ensure sharing
-            guard device.timeIntervalSinceLastUpdate < BLESensorConfiguration.payloadSharingExpiryTimeInterval else {
-                return
-            }
-            // Device has payload
-            guard let payload = device.payloadData else {
-                return
-            }
-            // Device is iOS or receive only (Samsung J6)
-            guard device.operatingSystem == .ios || device.receiveOnly else {
-                return
-            }
-            // Payload is new to peer
-            if peer.payloadSharingData.contains(payload) {
-                knownDevices.append(device)
-            } else {
-                unknownDevices.append(device)
-            }
-        }
-        // Most recently seen unknown devices first
-        var devices: [BLEDevice] = []
-        unknownDevices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
-        knownDevices.sort { $1.lastUpdatedAt > $0.lastUpdatedAt }
-        devices.append(contentsOf: unknownDevices)
-        devices.append(contentsOf: knownDevices)
-        let pending = devices.map { $0.description }
-        // Limit how much to share to avoid oversized data transfers over BLE (512 bytes limit according to spec, 510 with response, iOS requires response)
-        var identifiers: [TargetIdentifier] = []
-        var data = Data()
-        devices.forEach() { device in
-            guard let payload = device.payloadData else {
-                return
-            }
-            guard data.count + payload.count < (2 * 129) else {
-                return
-            }
-            identifiers.append(device.identifier)
-            data.append(payload)
-            device.payloadSharingData.append(payload) 
-        }
-        logger.debug("payloadSharingData (peer=\(peer.description),pending=\(pending.description),sharing=\(identifiers))")
-        return (identifiers, data)
-    }
-    
+    /// Read request from central for obtaining payload data from this peripheral.
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
         // Read -> Notify subscribers
         let central = database.device(TargetIdentifier(request.central.identifier.uuidString))
@@ -417,6 +374,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         notifySubscribers("didReceiveRead")
     }
     
+    /// Another iOS central has subscribed to this iOS peripheral, implying the central is also a peripheral for this device to connect to.
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
         // Subscribe -> Notify subscribers
         // iOS receiver subscribes to the signal characteristic on first contact. This ensures the first call keeps

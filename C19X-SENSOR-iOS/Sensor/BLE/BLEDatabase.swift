@@ -9,7 +9,7 @@
 import Foundation
 import CoreBluetooth
 
-/// Registry for collating sniplets of information from asynchronous BLE operations.
+/// Registry for collating fragments of information from asynchronous BLE operations.
 protocol BLEDatabase {
     
     /// Add delegate for handling database events
@@ -27,7 +27,7 @@ protocol BLEDatabase {
     /// Get all devices
     func devices() -> [BLEDevice]
     
-    /// Delete
+    /// Delete device from database
     func delete(_ identifier: TargetIdentifier)
 }
 
