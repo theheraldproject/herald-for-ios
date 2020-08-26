@@ -50,8 +50,11 @@ class SensorArray : NSObject, Sensor {
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
-        //sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        // Location sensor is necessary for enabling background BLE advert detection
+        sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        // BLE sensor for detecting and tracking proximity
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
+        // Payload data at initiation time for identifying this device in the logs
         payloadData = payloadDataSupplier.payload(PayloadTimestamp())
         super.init()
         
