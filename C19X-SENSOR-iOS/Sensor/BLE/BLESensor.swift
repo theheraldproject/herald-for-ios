@@ -28,7 +28,7 @@ struct BLESensorConfiguration {
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     static let payloadCharacteristicUUID = CBUUID(string: "FFFFFFFF-EEEE-DDDD-0000-000000000003")
     /// Time delay between notifications for subscribers.
-    static let notificationDelay = DispatchTimeInterval.seconds(2)
+    static let notificationDelay = DispatchTimeInterval.seconds(4)
     /// Time delay between advert restart
     static let advertRestartTimeInterval = TimeInterval.hour
     /// Expiry time for shared payloads, to ensure only recently seen payloads are shared
