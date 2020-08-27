@@ -15,6 +15,7 @@ class BatteryLog {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "BatteryLog")
     private let textFile: TextFile
     private let dateFormatter = DateFormatter()
+    private let updateInterval = TimeInterval(30)
 
     init(filename: String) {
         textFile = TextFile(filename: filename)
@@ -25,7 +26,7 @@ class BatteryLog {
         UIDevice.current.isBatteryMonitoringEnabled = true
         NotificationCenter.default.addObserver(self, selector: #selector(batteryLevelDidChange), name: UIDevice.batteryLevelDidChangeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(batteryStateDidChange), name: UIDevice.batteryStateDidChangeNotification, object: nil)
-        update()
+        let _ = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
     }
     
     private func timestamp() -> String {
@@ -33,7 +34,7 @@ class BatteryLog {
         return timestamp
     }
 
-    private func update() {
+    @objc func update() {
         let powerSource = (UIDevice.current.batteryState == .unplugged ? "battery" : "external")
         let batteryLevel = Float(UIDevice.current.batteryLevel * 100).description
         textFile.write(timestamp() + "," + powerSource + "," + batteryLevel)
