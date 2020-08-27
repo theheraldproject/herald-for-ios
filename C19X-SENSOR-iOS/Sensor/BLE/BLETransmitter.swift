@@ -289,6 +289,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 let payloadData = PayloadData(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didRead=\(payloadData.shortName),fromTarget=\(targetIdentifier)")
                                 targetDevice.operatingSystem = .android
+                                targetDevice.receiveOnly = true
                                 targetDevice.payloadData = payloadData
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
