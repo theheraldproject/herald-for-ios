@@ -139,6 +139,11 @@ class BLEDevice : NSObject {
     var lastNotifiedAt: Date = Date.distantPast
     /// Ephemeral device identifier, e.g. peripheral identifier UUID
     let identifier: TargetIdentifier
+    /// Pseudo device address for tracking devices that change device identifier constantly like the Samsung A10, A20 and Note 8
+    var pseudoDeviceAddress: BLEPseudoDeviceAddress? {
+        didSet {
+            lastUpdatedAt = Date()
+        }}
     /// Delegate for listening to attribute updates events.
     let delegate: BLEDeviceDelegate
     /// CoreBluetooth peripheral object for interacting with this device.
@@ -213,6 +218,10 @@ class BLEDevice : NSObject {
             max(createdAt, lastDiscoveredAt, payloadDataLastUpdatedAt, rssiLastUpdatedAt)
         }}
     
+    /// Time interval since created at timestamp
+    var timeIntervalSinceCreated: TimeInterval { get {
+            Date().timeIntervalSince(createdAt)
+        }}
     /// Time interval since last attribute value update, this is used to identify devices that may have expired and should be removed from the database.
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
@@ -241,7 +250,7 @@ class BLEDevice : NSObject {
         }}
     
     override var description: String { get {
-        return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil")]"
+        return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil"),address=\(pseudoDeviceAddress?.data.base64EncodedString() ?? "nil")]"
         }}
     
     init(_ identifier: TargetIdentifier, delegate: BLEDeviceDelegate) {
@@ -268,3 +277,30 @@ enum BLEDeviceOperatingSystem : String {
 typealias BLE_RSSI = Int
 
 typealias BLE_TxPower = Int
+
+class BLEPseudoDeviceAddress {
+    let address: Int
+    let data: Data
+    var description: String { get {
+        return "BLEPseudoDeviceAddress(address=\(address),data=\(data.base64EncodedString()))"
+        }}
+    
+    init?(fromAdvertisementData: [String: Any]) {
+        guard let manufacturerData = fromAdvertisementData["kCBAdvDataManufacturerData"] as? Data else {
+            return nil
+        }
+        guard let manufacturerId = manufacturerData.uint16(0), manufacturerId == BLESensorConfiguration.manufacturerIdForSensor else {
+            return nil
+        }
+        guard manufacturerData.count == 8 else {
+            return nil
+        }
+        data = Data(manufacturerData.subdata(in: 2..<8))
+        var longValueData = Data(repeating: 0, count: 2)
+        longValueData.append(data)
+        guard let longValue = longValueData.int64(0) else {
+            return nil
+        }
+        address = Int(longValue)
+    }
+}
