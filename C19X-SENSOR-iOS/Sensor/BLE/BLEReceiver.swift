@@ -579,6 +579,34 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
+    /// Share payload data across devices with the same pseudo device address
+    private func shareDataAcrossDevices(_ pseudoDeviceAddress: BLEPseudoDeviceAddress) {
+        // Get devices with the same pseudo address created recently
+        let devicesWithSamePseudoAddress = database.devices().filter({ pseudoDeviceAddress.address == $0.pseudoDeviceAddress?.address && $0.timeIntervalSinceCreated <= BLESensorConfiguration.androidAdvertRefreshTimeInterval })
+        // Get device with most recent version of payload amongst these devices
+        guard let mostRecentDevice = devicesWithSamePseudoAddress.filter({ $0.payloadData != nil }).sorted(by: { $0.payloadDataLastUpdatedAt > $1.payloadDataLastUpdatedAt }).first, let payloadData = mostRecentDevice.payloadData else {
+            return
+        }
+        // Copy data to all devices with the same pseudo address
+        let devicesToCopyPayload = devicesWithSamePseudoAddress.filter({ $0.payloadData == nil })
+        devicesToCopyPayload.forEach({
+            $0.signalCharacteristic = mostRecentDevice.signalCharacteristic
+            $0.payloadCharacteristic = mostRecentDevice.payloadCharacteristic
+            // Only Android devices have a pseudo address
+            $0.operatingSystem = .android
+            $0.payloadData = payloadData
+            logger.debug("shareDataAcrossDevices, copied payload data (from=\(mostRecentDevice.description),to=\($0.description))")
+        })
+        // Get devices with the same payload
+        let devicesWithSamePayload = database.devices().filter({ payloadData == $0.payloadData })
+        // Copy pseudo address to all devices with the same payload
+        let devicesToCopyAddress = devicesWithSamePayload.filter({ $0.pseudoDeviceAddress == nil })
+        devicesToCopyAddress.forEach({
+            $0.pseudoDeviceAddress = pseudoDeviceAddress
+            logger.debug("shareDataAcrossDevices, copied pseudo address (payloadData=\(payloadData.shortName),to=\($0.description))")
+        })
+    }
+    
     /// Device discovery will trigger connection to resolve operating system and read payload for iOS and Android devices.
     /// Connection is kept active for iOS devices for on-going RSSI measurements, and closed for Android devices, as this
     /// iOS device can rely on this discovery callback (triggered by regular scan calls) for on-going RSSI and TX power
@@ -589,6 +617,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let device = database.device(peripheral, delegate: self)
         device.lastDiscoveredAt = Date()
         device.rssi = BLE_RSSI(RSSI.intValue)
+        if let pseudoDeviceAddress = BLEPseudoDeviceAddress(fromAdvertisementData: advertisementData) {
+            device.pseudoDeviceAddress = pseudoDeviceAddress
+            shareDataAcrossDevices(pseudoDeviceAddress)
+        }
         if let txPower = (advertisementData[CBAdvertisementDataTxPowerLevelKey] as? NSNumber)?.intValue {
             device.txPower = BLE_TxPower(txPower)
         }

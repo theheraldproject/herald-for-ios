@@ -144,6 +144,7 @@ class ViewController: UIViewController, SensorDelegate {
         }
         DispatchQueue.main.async {
             self.labelDidMeasure.text = "didMeasure: \(self.didMeasure) (\(self.timestamp()))"
+            self.updateDetection()
         }
     }
 
