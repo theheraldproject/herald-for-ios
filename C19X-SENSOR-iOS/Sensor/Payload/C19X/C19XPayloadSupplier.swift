@@ -1,14 +1,12 @@
 //
 //  PayloadSupplier.swift
-//  
 //
-//  Created  on 25/07/2020.
 //  Copyright © 2020 . All rights reserved.
 //
 
 import Foundation
 
-///  payload supplier for integration with .
+///  payload supplier for integration with  backend
 protocol PayloadDataSupplier : PayloadDataSupplier {
 }
 
@@ -37,8 +35,8 @@ class ConcretePayloadSupplier : PayloadDataSupplier {
         while indexEnd <= data.count {
             let payload = PayloadData(data.subdata(in: indexStart..<indexEnd))
             payloads.append(payload)
-            indexStart += MockSonarPayloadSupplier.length
-            indexEnd += MockSonarPayloadSupplier.length
+            indexStart += ConcretePayloadSupplier.length
+            indexEnd += ConcretePayloadSupplier.length
         }
         return payloads
     }

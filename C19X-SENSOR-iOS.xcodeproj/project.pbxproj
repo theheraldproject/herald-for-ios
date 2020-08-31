@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B6374DC524D00228005985BC /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6374DC424D00228005985BC /* ContactLog.swift */; };
-		B6845AD524D8983B004B8E5C /* RScriptLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD424D8983B004B8E5C /* RScriptLog.swift */; };
 		B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD624D8D746004B8E5C /* DetectionLog.swift */; };
 		B68645E124E3570200E71658 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68645E024E3570200E71658 /* StatisticsLog.swift */; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
@@ -36,7 +35,6 @@
 
 /* Begin PBXFileReference section */
 		B6374DC424D00228005985BC /* ContactLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
-		B6845AD424D8983B004B8E5C /* RScriptLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RScriptLog.swift; sourceTree = "<group>"; };
 		B6845AD624D8D746004B8E5C /* DetectionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
 		B68645E024E3570200E71658 /* StatisticsLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ".app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,7 +109,6 @@
 				B692CADD24CF2B1400F45AEE /* TextFile.swift */,
 				B692CAAD24CADE7300F45AEE /* SensorLogger.swift */,
 				B6374DC424D00228005985BC /* ContactLog.swift */,
-				B6845AD424D8983B004B8E5C /* RScriptLog.swift */,
 				B6845AD624D8D746004B8E5C /* DetectionLog.swift */,
 				B68645E024E3570200E71658 /* StatisticsLog.swift */,
 				B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */,
@@ -255,7 +252,6 @@
 				B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */,
 				B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */,
 				B692CAAE24CADE7300F45AEE /* SensorLogger.swift in Sources */,
-				B6845AD524D8983B004B8E5C /* RScriptLog.swift in Sources */,
 				B692CAB524CB096300F45AEE /* Sensor.swift in Sources */,
 				B692CACE24CC27F400F45AEE /* DayCodes.swift in Sources */,
 				B692CACC24CC27ED00F45AEE /* BeaconCodes.swift in Sources */,

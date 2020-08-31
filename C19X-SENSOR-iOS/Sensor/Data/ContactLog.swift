@@ -1,8 +1,6 @@
 //
 //  ContactLog.swift
-//  
 //
-//  Created  on 28/07/2020.
 //  Copyright © 2020 . All rights reserved.
 //
 

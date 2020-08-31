@@ -1,8 +1,6 @@
 //
 //  Sensor.swift
-//  
 //
-//  Created  on 24/07/2020.
 //  Copyright © 2020 . All rights reserved.
 //
 
@@ -61,7 +59,6 @@ class SensorArray : NSObject, Sensor {
         // Loggers
         add(delegate: ContactLog(filename: "contacts.csv"))
         add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
-        add(delegate: RScriptLog(filename: "rScriptLog.csv", payloadData: payloadData))
         add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
         _ = BatteryLog(filename: "battery.csv")
         logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")

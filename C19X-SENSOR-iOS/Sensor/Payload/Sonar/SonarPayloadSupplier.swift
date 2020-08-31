@@ -1,8 +1,6 @@
 //
 //  SonarPayloadSupplier.swift
-//  
 //
-//  Created  on 24/07/2020.
 //  Copyright © 2020 . All rights reserved.
 //
 
@@ -28,10 +26,10 @@ class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
     
     func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
         var payloadData = PayloadData()
+        // First 3 bytes are reserved in SONAR
         payloadData.append(Data(repeating: 0, count: 3))
         payloadData.append(networkByteOrderData(identifier))
-        //payloadData.append(Int32(timestamp.timeIntervalSince1970).networkByteOrderData)
-        // Fill with blank data to make payload the same size as that in Sonar
+        // Fill with blank data to make payload the same size as that in SONAR
         payloadData.append(Data(repeating: 0, count: MockSonarPayloadSupplier.length - payloadData.count))
         return payloadData
     }

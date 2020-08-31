@@ -64,7 +64,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="PAYLOADS" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TdI-fU-QMV" userLabel="payloads">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="PAYLOADS" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TdI-fU-QMV" userLabel="payloads">
                                 <rect key="frame" x="20" y="294" width="374" height="510"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>

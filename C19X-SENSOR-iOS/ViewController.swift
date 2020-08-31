@@ -1,8 +1,6 @@
 //
 //  ViewController.swift
-//  
 //
-//  Created  on 24/07/2020.
 //  Copyright © 2020 . All rights reserved.
 //
 
