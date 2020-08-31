@@ -1,16 +1,16 @@
 //
 //  SonarPayloadSupplier.swift
 //
-//  Copyright © 2020 . All rights reserved.
+//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
 //
 
 import Foundation
 
-/// SONAR payload supplier for integration with Sonar
+/// SONAR payload supplier for integration with SONAR protocol
 protocol SonarPayloadDataSupplier : PayloadDataSupplier {
 }
 
-/// Mock SONAR payload supplier for simulating payload transfer of the same size to test -SENSOR
+/// Mock SONAR payload supplier for simulating payload transfer of the same size
 class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
     static let length: Int = 129
     let identifier: Int32

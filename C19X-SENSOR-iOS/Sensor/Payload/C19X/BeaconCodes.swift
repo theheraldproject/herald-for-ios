@@ -1,7 +1,7 @@
 //
 //  BeaconCodes.swift
 //
-//  Copyright © 2020 . All rights reserved.
+//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
 //
 
 import Foundation
@@ -24,7 +24,7 @@ protocol BeaconCodes {
 typealias BeaconCode = Int64
 
 class ConcreteBeaconCodes : BeaconCodes {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload..ConcreteBeaconCodes")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteBeaconCodes")
     static let codesPerDay = 240
     private var dayCodes: DayCodes
     private var seed: BeaconCodeSeed?

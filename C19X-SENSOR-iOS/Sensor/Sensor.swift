@@ -1,7 +1,7 @@
 //
 //  Sensor.swift
 //
-//  Copyright © 2020 . All rights reserved.
+//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
 //
 
 import Foundation
@@ -98,9 +98,9 @@ typealias TargetIdentifier = String
 
 // MARK:- Payload data
 
-/// Payload data supplier, e.g. BeaconCodes in  and BroadcastPayloadSupplier in Sonar.
+/// Payload data supplier
 protocol PayloadDataSupplier {
-    /// Get payload for given timestamp. Use this for integration with any payload generator, e.g. BeaconCodes or SonarBroadcastPayloadService
+    /// Get payload for given timestamp. Use this for integration with any payload generator.
     func payload(_ timestamp: PayloadTimestamp) -> PayloadData
     /// Parse raw data into payloads
     func payload(_ data: Data) -> [PayloadData]

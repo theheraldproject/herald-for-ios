@@ -1,7 +1,7 @@
 //
 //  DayCodes.swift
 //
-//  Copyright © 2020 . All rights reserved.
+//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
 //
 
 import Foundation
@@ -26,7 +26,7 @@ typealias BeaconCodeSeed = Int64
 typealias Timestamp = Date
 
 class ConcreteDayCodes : DayCodes {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload..ConcreteDayCodes")
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteDayCodes")
     private let epoch = ConcreteDayCodes.timeIntervalSince1970("2020-01-01T00:00:00+0000")!
     private var values:[DayCode]
     

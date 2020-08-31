@@ -1,7 +1,7 @@
 //
 //  BLEDatabase.swift
 //
-//  Copyright © 2020 . All rights reserved.
+//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
 //
 
 import Foundation
@@ -156,7 +156,7 @@ class BLEDevice : NSObject {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .signalCharacteristic)
         }}
-    /// Service characteristic for reading payload data, e.g.  beacon code or Sonar encrypted identifier
+    /// Service characteristic for reading payload data
     var payloadCharacteristic: CBCharacteristic? {
         didSet {
             lastUpdatedAt = Date()
@@ -173,7 +173,7 @@ class BLEDevice : NSObject {
         didSet {
             lastUpdatedAt = Date()
         }}
-    /// Payload data acquired from the device via payloadCharacteristic read, e.g.  beacon code or Sonar encrypted identifier
+    /// Payload data acquired from the device via payloadCharacteristic read
     var payloadData: PayloadData? {
         didSet {
             payloadDataLastUpdatedAt = Date()
