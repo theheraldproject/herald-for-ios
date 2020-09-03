@@ -151,7 +151,7 @@ The proximity detection solution has been integrated into a standalone test app 
 5. Expect a list of log files (e.g. *contacts.csv*).
 6. Drag and drop to copy log files to computer for analysis.
 
-## References
+## References
 
 Ferretti, L., Wymant, C., Kendall, M., Zhao, L., Nurtay, A., Abeler-Dörner, L., Parker, M., Bonsall, D., and Fraser, C. (2020) "Quantifying SARS-CoV-2 transmission suggests epidemic control with digital contact tracing", *Science*, vol. 368, no. 6491, New York.
 
