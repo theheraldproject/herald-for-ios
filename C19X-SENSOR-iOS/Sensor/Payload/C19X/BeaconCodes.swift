@@ -16,23 +16,23 @@ import Foundation
  on-device matching is possible, once the beacon code seed is provided by the server.
  */
 protocol BeaconCodes {
+    /// Get beacon code for given timestamp. This will be transmitted as clear text to other devices.
     func get(_ timestamp: Timestamp) -> BeaconCode?
-    
-    func get() -> BeaconCode?
 }
 
+/// Beacon code for identifying a device. This is derived from the shared secret.
 typealias BeaconCode = Int64
 
 class ConcreteBeaconCodes : BeaconCodes {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteBeaconCodes")
-    static let codesPerDay = 240
+    private static let codesPerDay = 240
     private var dayCodes: DayCodes
-    private var seed: BeaconCodeSeed?
-    private var values:[BeaconCode]?
+    // Cached beacon codes to avoid regeneration for every get request
+    private var beaconCodeSeed: BeaconCodeSeed?
+    private var beaconCodes: [BeaconCode]?
     
     init(_ dayCodes: DayCodes) {
         self.dayCodes = dayCodes
-        let _ = get()
     }
     
     func get(_ timestamp: Timestamp) -> BeaconCode? {
@@ -40,35 +40,15 @@ class ConcreteBeaconCodes : BeaconCodes {
             logger.fault("No seed code available")
             return nil
         }
-        let beaconCodes = ConcreteBeaconCodes.beaconCodes(seed, count: ConcreteBeaconCodes.codesPerDay)
+        if seed != beaconCodeSeed {
+            beaconCodes = ConcreteBeaconCodes.beaconCodes(seed, count: ConcreteBeaconCodes.codesPerDay)
+        }
+        guard let beaconCodes = beaconCodes else {
+            return nil
+        }
         let (daySecond, _) = UInt64(NSDate(timeIntervalSince1970: timestamp.timeIntervalSince1970).timeIntervalSince1970).remainderReportingOverflow(dividingBy: UInt64(60*60*24))
-        let (codeIndex, _) = daySecond.dividedReportingOverflow(by: UInt64(beaconCodes.count))
+        let (codeIndex, _) = daySecond.remainderReportingOverflow(dividingBy: UInt64(beaconCodes.count))
         return beaconCodes[Int(codeIndex)]
-    }
-    
-    func get() -> BeaconCode? {
-        let timerstamp = Timestamp()
-        if seed == nil {
-            guard let (seed, _) = dayCodes.seed(timerstamp) else {
-                logger.fault("No seed code available")
-                return nil
-            }
-            self.seed = seed
-        }
-        guard let (seedToday, today) = dayCodes.seed(timerstamp) else {
-            logger.fault("No seed code available")
-            return nil
-        }
-        if values == nil || seed != seedToday {
-            logger.fault("Generating beacon codes for new day (day=\(today.description),seed=\(seedToday.description))")
-            seed = seedToday
-            values = ConcreteBeaconCodes.beaconCodes(seedToday, count: ConcreteBeaconCodes.codesPerDay)
-        }
-        guard let values = values else {
-            logger.fault("No beacon code available")
-            return nil
-        }
-        return values[Int.random(in: 0 ... (values.count - 1))]
     }
     
     static func beaconCodes(_ beaconCodeSeed: BeaconCodeSeed, count: Int) -> [BeaconCode] {

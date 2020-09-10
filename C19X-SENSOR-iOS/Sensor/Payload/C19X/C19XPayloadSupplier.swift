@@ -11,7 +11,7 @@ protocol PayloadDataSupplier : PayloadDataSupplier {
 }
 
 ///  payload supplier for generating time specific beacon codes based on day codes.
-class ConcretePayloadSupplier : PayloadDataSupplier {
+class ConcretePayloadDataSupplier : PayloadDataSupplier {
     static let length: Int = 8
     private let dayCodes: DayCodes
     private let beaconCodes: BeaconCodes
@@ -31,12 +31,12 @@ class ConcretePayloadSupplier : PayloadDataSupplier {
     
     func payload(_ data: Data) -> [PayloadData] {
         var payloads: [PayloadData] = []
-        var indexStart = 0, indexEnd = ConcretePayloadSupplier.length
+        var indexStart = 0, indexEnd = ConcretePayloadDataSupplier.length
         while indexEnd <= data.count {
             let payload = PayloadData(data.subdata(in: indexStart..<indexEnd))
             payloads.append(payload)
-            indexStart += ConcretePayloadSupplier.length
-            indexEnd += ConcretePayloadSupplier.length
+            indexStart += ConcretePayloadDataSupplier.length
+            indexEnd += ConcretePayloadDataSupplier.length
         }
         return payloads
     }

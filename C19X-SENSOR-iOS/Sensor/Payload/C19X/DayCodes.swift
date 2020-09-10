@@ -14,15 +14,23 @@ import Foundation
  code given the previous codes. Each day is allocated a day code up to a finite number of days for simplicity.
  */
 protocol DayCodes {
-    func day(_ timestamp: Timestamp) -> Day?
-    func get(_ timestamp: Timestamp) -> DayCode?
+    /// Get beacon code seed for a particular day. This is used for deriving the beacon codes for the day.
     func seed(_ timestamp: Timestamp) -> (BeaconCodeSeed, Day)?
 }
 
+/// Shared secret between device and server for deriving day codes and beacon codes.
 typealias SharedSecret = Data
+
+/// Day codes are published by the server to enable on-device matching in a de-centralised solution.
 typealias DayCode = Int64
+
+/// Day is the number of whole days since epoch (2020-01-01 00:00:00)
 typealias Day = UInt
+
+/// Beacon code seed is derived from the day code. This is used to derive the beacon codes for the day.
 typealias BeaconCodeSeed = Int64
+
+/// Timestamp has been abstracted to enable change from Date if required in the future.
 typealias Timestamp = Date
 
 class ConcreteDayCodes : DayCodes {
@@ -66,7 +74,7 @@ class ConcreteDayCodes : DayCodes {
         return seed
     }
     
-    func day(_ timestamp: Timestamp) -> Day? {
+    private func day(_ timestamp: Timestamp) -> Day? {
         let time = UInt64(NSDate(timeIntervalSince1970: timestamp.timeIntervalSince1970).timeIntervalSince1970)
         let (epochDay,_) = (time - epoch).dividedReportingOverflow(by: UInt64(24 * 60 * 60))
         let day = Day(epochDay)
@@ -77,7 +85,7 @@ class ConcreteDayCodes : DayCodes {
         return day
     }
     
-    func get(_ timestamp: Timestamp) -> DayCode? {
+    private func get(_ timestamp: Timestamp) -> DayCode? {
         guard let day = day(timestamp) else {
             logger.fault("Day out of range")
             return nil
