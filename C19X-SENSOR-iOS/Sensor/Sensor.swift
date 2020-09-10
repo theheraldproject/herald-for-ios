@@ -123,27 +123,6 @@ enum SensorState : String {
 /// Ephemeral identifier for detected target (e.g. smartphone, beacon, place). This is likely to be an UUID but using String for variable identifier length.
 typealias TargetIdentifier = String
 
-// MARK:- Payload data
-
-/// Payload data supplier
-protocol PayloadDataSupplier {
-    /// Get payload for given timestamp. Use this for integration with any payload generator.
-    func payload(_ timestamp: PayloadTimestamp) -> PayloadData
-    /// Parse raw data into payloads
-    func payload(_ data: Data) -> [PayloadData]
-}
-
-/// Payload timestamp, should normally be Date, but it may change to UInt64 in the future to use server synchronised relative timestamp.
-typealias PayloadTimestamp = Date
-
-/// Encrypted payload data received from target. This is likely to be an encrypted datagram of the target's actual permanent identifier.
-typealias PayloadData = Data
-extension PayloadData {
-    var shortName: String {
-        return String(subdata(in: 3..<count-3).base64EncodedString().prefix(6))
-    }
-}
-
 // MARK:- Proximity data
 
 /// Raw data for estimating proximity between sensor and target, e.g. RSSI for BLE.

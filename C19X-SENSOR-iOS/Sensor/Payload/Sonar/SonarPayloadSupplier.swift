@@ -6,7 +6,7 @@
 
 import Foundation
 
-/// SONAR payload supplier for integration with SONAR protocol
+/// SONAR payload supplier for integration with SONAR protocol. Payload data is 129 bytes.
 protocol SonarPayloadDataSupplier : PayloadDataSupplier {
 }
 
@@ -32,17 +32,5 @@ class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
         // Fill with blank data to make payload the same size as that in SONAR
         payloadData.append(Data(repeating: 0, count: MockSonarPayloadSupplier.length - payloadData.count))
         return payloadData
-    }
-
-    func payload(_ data: Data) -> [PayloadData] {
-        var payloads: [PayloadData] = []
-        var indexStart = 0, indexEnd = MockSonarPayloadSupplier.length
-        while indexEnd <= data.count {
-            let payload = PayloadData(data.subdata(in: indexStart..<indexEnd))
-            payloads.append(payload)
-            indexStart += MockSonarPayloadSupplier.length
-            indexEnd += MockSonarPayloadSupplier.length
-        }
-        return payloads
     }
 }

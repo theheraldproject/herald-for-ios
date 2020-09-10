@@ -6,13 +6,12 @@
 
 import Foundation
 
-///  payload supplier for integration with  backend
+///  payload supplier for integration with  backend. Payload data is 8 bytes.
 protocol PayloadDataSupplier : PayloadDataSupplier {
 }
 
 ///  payload supplier for generating time specific beacon codes based on day codes.
 class ConcretePayloadDataSupplier : PayloadDataSupplier {
-    static let length: Int = 8
     private let dayCodes: DayCodes
     private let beaconCodes: BeaconCodes
     private let emptyPayloadData = PayloadData()
@@ -28,17 +27,4 @@ class ConcretePayloadDataSupplier : PayloadDataSupplier {
         }
         return JavaData.longToByteArray(value: beaconCode)
     }
-    
-    func payload(_ data: Data) -> [PayloadData] {
-        var payloads: [PayloadData] = []
-        var indexStart = 0, indexEnd = ConcretePayloadDataSupplier.length
-        while indexEnd <= data.count {
-            let payload = PayloadData(data.subdata(in: indexStart..<indexEnd))
-            payloads.append(payload)
-            indexStart += ConcretePayloadDataSupplier.length
-            indexEnd += ConcretePayloadDataSupplier.length
-        }
-        return payloads
-    }
-
 }

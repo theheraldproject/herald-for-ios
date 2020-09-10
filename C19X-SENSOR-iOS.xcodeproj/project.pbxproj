@@ -30,6 +30,7 @@
 		B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD724CC30D300F45AEE /* BLEUtilities.swift */; };
 		B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADB24CD936B00F45AEE /* BLEDatabase.swift */; };
 		B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADD24CF2B1400F45AEE /* TextFile.swift */; };
+		B6CEFD83250A916600FC158B /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CEFD82250A916600FC158B /* PayloadDataSupplier.swift */; };
 		B6F9F6AF24F6B1FC006F39A0 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		B692CAD724CC30D300F45AEE /* BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
 		B692CADB24CD936B00F45AEE /* BLEDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
 		B692CADD24CF2B1400F45AEE /* TextFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
+		B6CEFD82250A916600FC158B /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryLog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -153,6 +155,7 @@
 			children = (
 				B692CACA24CC27DA00F45AEE /*  */,
 				B692CAC924CC27CC00F45AEE /* Sonar */,
+				B6CEFD82250A916600FC158B /* PayloadDataSupplier.swift */,
 			);
 			path = Payload;
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 				B692CAD624CC30A700F45AEE /* BLEReceiver.swift in Sources */,
 				B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */,
 				B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */,
+				B6CEFD83250A916600FC158B /* PayloadDataSupplier.swift in Sources */,
 				B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */,
 				B6F9F6AF24F6B1FC006F39A0 /* BatteryLog.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
