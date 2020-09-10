@@ -41,7 +41,7 @@ class ConcreteBeaconCodes : BeaconCodes {
             return nil
         }
         if seed != beaconCodeSeed {
-            beaconCodes = ConcreteBeaconCodes.beaconCodes(seed, count: ConcreteBeaconCodes.codesPerDay)
+            beaconCodes = ConcreteBeaconCodes.beaconCodes(seed)
         }
         guard let beaconCodes = beaconCodes else {
             return nil
@@ -51,7 +51,7 @@ class ConcreteBeaconCodes : BeaconCodes {
         return beaconCodes[Int(codeIndex)]
     }
     
-    static func beaconCodes(_ beaconCodeSeed: BeaconCodeSeed, count: Int) -> [BeaconCode] {
+    static func beaconCodes(_ beaconCodeSeed: BeaconCodeSeed, count: Int = codesPerDay) -> [BeaconCode] {
         let data = Data(withUnsafeBytes(of: beaconCodeSeed) { Data($0) }.reversed())
         var hash = SHA.hash(data: data)
         var values = [BeaconCode](repeating: 0, count: count)
