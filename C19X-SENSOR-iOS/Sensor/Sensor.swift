@@ -35,6 +35,23 @@ protocol SensorDelegate {
     
     /// Detection of time spent at location, e.g. at specific restaurant between 02/06/2020 19:00 and 02/06/2020 21:00
     func sensor(_ sensor: SensorType, didVisit: Location)
+    
+    /// Measure proximity to target with payload data. Combines didMeasure and didRead into a single convenient delegate method
+    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData)
+    
+    /// Sensor state update
+    func sensor(_ sensor: SensorType, didUpdateState: SensorState)
+}
+
+/// Sensor delegate functions are all optional.
+extension SensorDelegate {
+    func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didVisit: Location) {}
+    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {}
+    func sensor(_ sensor: SensorType, didUpdateState: SensorState) {}
 }
 
 // MARK:- SensorArray
@@ -91,6 +108,16 @@ enum SensorType : String {
     case BEACON
     /// Ultrasound audio beacon.
     case ULTRASOUND
+}
+
+/// Sensor state
+enum SensorState : String {
+    /// Sensor is powered on, active and operational
+    case on
+    /// Sensor is powered off, inactive and not operational
+    case off
+    /// Sensor is not available
+    case unavailable
 }
 
 /// Ephemeral identifier for detected target (e.g. smartphone, beacon, place). This is likely to be an UUID but using String for variable identifier length.

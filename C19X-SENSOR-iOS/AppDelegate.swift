@@ -84,6 +84,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         logger.info(sensor.rawValue + ",didVisit=" + didVisit.description)
     }
     
+    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {
+        logger.info(sensor.rawValue + ",didMeasure=" + didMeasure.description + ",fromTarget=" + fromTarget.description + ",withPayload=" + withPayload.shortName)
+    }
+    
+    func sensor(_ sensor: SensorType, didUpdateState: SensorState) {
+        logger.info(sensor.rawValue + ",didUpdateState=" + didUpdateState.rawValue)
+    }
 
 }
 

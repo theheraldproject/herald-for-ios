@@ -109,6 +109,12 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
             delegateQueue.async {
                 self.delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: device.identifier) }
             }
+            guard let payloadData = device.payloadData else {
+                return
+            }
+            delegateQueue.async {
+                self.delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: device.identifier, withPayload: payloadData) }
+            }
         case .payloadData:
             guard let payloadData = device.payloadData else {
                 return

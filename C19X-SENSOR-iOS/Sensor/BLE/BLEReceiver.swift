@@ -551,6 +551,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Bluetooth on -> Scan
         if (central.state == .poweredOn) {
             logger.debug("Update state (state=poweredOn))")
+            delegates.forEach({ $0.sensor(.BLE, didUpdateState: .on) })
             scan("updateState")
         } else {
             if #available(iOS 10.0, *) {
@@ -574,6 +575,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                         logger.debug("Update state (state=undefined)")
                 }
             }
+            delegates.forEach({ $0.sensor(.BLE, didUpdateState: .off) })
         }
     }
     
