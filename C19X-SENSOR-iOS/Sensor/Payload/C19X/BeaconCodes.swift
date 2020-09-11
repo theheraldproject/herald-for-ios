@@ -41,6 +41,7 @@ class ConcreteBeaconCodes : BeaconCodes {
             return nil
         }
         if seed != beaconCodeSeed {
+            beaconCodeSeed = seed
             beaconCodes = ConcreteBeaconCodes.beaconCodes(seed)
         }
         guard let beaconCodes = beaconCodes else {
