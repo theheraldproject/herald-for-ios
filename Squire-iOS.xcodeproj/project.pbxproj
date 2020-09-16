@@ -78,7 +78,7 @@
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
-				B692CA9224CADA7500F45AEE /*  */,
+				B692CA9224CADA7500F45AEE /* Squire-iOS */,
 				B692CA9124CADA7500F45AEE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -91,7 +91,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B692CA9224CADA7500F45AEE /*  */ = {
+		B692CA9224CADA7500F45AEE /* Squire-iOS */ = {
 			isa = PBXGroup;
 			children = (
 				B692CAB324CB093A00F45AEE /* Sensor */,
@@ -102,7 +102,7 @@
 				B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */,
 				B692CAA424CADA7A00F45AEE /* Info.plist */,
 			);
-			path = "";
+			path = "Squire-iOS";
 			sourceTree = "<group>";
 		};
 		B692CAAA24CADE2E00F45AEE /* Data */ = {
@@ -420,7 +420,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
-				INFOPLIST_FILE = "/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Squire-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -440,7 +440,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
-				INFOPLIST_FILE = "/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Squire-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
