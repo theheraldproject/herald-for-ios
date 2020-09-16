@@ -1,7 +1,8 @@
 //
 //  Sensor.swift
 //
-//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
+//  Copyright 2020 VMware, Inc.
+//  SPDX-License-Identifier: MIT
 //
 
 import Foundation

@@ -1,11 +1,11 @@
 //
 //  ViewController.swift
 //
-//  Copyright © 2020 {COPYRIGHT}. All rights reserved.
+//  Copyright 2020 VMware, Inc.
+//  SPDX-License-Identifier: MIT
 //
 
 import UIKit
-//import os
 
 class ViewController: UIViewController, SensorDelegate {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ViewController")
