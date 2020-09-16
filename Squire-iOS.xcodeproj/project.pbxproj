@@ -38,7 +38,7 @@
 		B6374DC424D00228005985BC /* ContactLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
 		B6845AD624D8D746004B8E5C /* DetectionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
 		B68645E024E3570200E71658 /* StatisticsLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
-		B692CA9024CADA7500F45AEE /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ".app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B692CA9024CADA7500F45AEE /* Squire-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Squire-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B692CA9A24CADA7500F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -86,7 +86,7 @@
 		B692CA9124CADA7500F45AEE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B692CA9024CADA7500F45AEE /* .app */,
+				B692CA9024CADA7500F45AEE /* Squire-iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -183,9 +183,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B692CA8F24CADA7500F45AEE /*  */ = {
+		B692CA8F24CADA7500F45AEE /* Squire-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "" */;
+			buildConfigurationList = B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "Squire-iOS" */;
 			buildPhases = (
 				B692CA8C24CADA7500F45AEE /* Sources */,
 				B692CA8D24CADA7500F45AEE /* Frameworks */,
@@ -195,9 +195,9 @@
 			);
 			dependencies = (
 			);
-			name = "";
+			name = "Squire-iOS";
 			productName = "";
-			productReference = B692CA9024CADA7500F45AEE /* .app */;
+			productReference = B692CA9024CADA7500F45AEE /* Squire-iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -206,16 +206,17 @@
 		B692CA8824CADA7500F45AEE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = com.vmware.squire;
 				LastSwiftUpdateCheck = 1160;
 				LastUpgradeCheck = 1160;
-				ORGANIZATIONNAME = ;
+				ORGANIZATIONNAME = "VMware, Inc.";
 				TargetAttributes = {
 					B692CA8F24CADA7500F45AEE = {
 						CreatedOnToolsVersion = 11.6;
 					};
 				};
 			};
-			buildConfigurationList = B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "" */;
+			buildConfigurationList = B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "Squire-iOS" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -228,7 +229,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B692CA8F24CADA7500F45AEE /*  */,
+				B692CA8F24CADA7500F45AEE /* Squire-iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -425,7 +426,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.c19x.";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -445,7 +446,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.c19x.";
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -455,7 +456,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "" */ = {
+		B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "Squire-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B692CAA524CADA7A00F45AEE /* Debug */,
@@ -464,7 +465,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "" */ = {
+		B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "Squire-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B692CAA824CADA7A00F45AEE /* Debug */,
