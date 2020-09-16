@@ -1,4 +1,4 @@
-# iOS
+# Squire-iOS
 
 Continuous proximity detection across iOS and Android devices in background mode for contact tracing and infection control according to epidemiology requirements. 
 
@@ -10,7 +10,7 @@ Licensed under the MIT license
 
 This solution will:
 
-- Detect 100% of iOS and Android devices within 8 meters for contact tracing.
+- Detect 100% of iOS and Android devices within 8 metres for contact tracing.
 - Measure distance between devices at least once every 30 seconds for infection risk estimation.
 - Operates on 98.0% of UK phones and 97.5% of phones worldwide without requiring a software update.
 
@@ -22,8 +22,8 @@ This is a new, original, free and open source cross-platform proximity detection
 - Fully operational as a background app on both iOS and Android devices for consistent and continuous use to maximise disease transmission monitoring and control across the population.
 - Low power usage (circa 2% per hour) to maximise population acceptance for continuous use.
 - Detection and identification of iOS and Android devices in both foreground and background modes is 100% to maximise contact tracing coverage. 
-- One or more distance measurement per 30 second window for devices within epidemiologically relevant range (8 meters) for accurate infection risk estimation and case isolation; coverage is > 99.5% of 30 second windows for 2 to 3 devices, and 93% - 96% of windows for 9 to 10 devices.
-- Distance estimation accuracy is ... **(TBC ADAM)**
+- One or more distance measurement per 30 second window for devices within epidemiologically relevant range (8 metres) for accurate infection risk estimation and case isolation; coverage is > 99.5% of 30 second windows for 2 to 3 devices, and 93% - 96% of windows for 9 to 10 devices.
+- RSSI measurements for distance estimation is 98.5% accurate within epidemiologically relevant range (8 metres).
 - Device identification payload agnostic to support both centralised, and decentralised approaches, as well as retrospective integration into existing solutions.
 - MIT license and open source for ease of integration, reuse and transparency.
 
@@ -58,7 +58,7 @@ A procedure for installing and testing the solution in background mode is as fol
 2. Build, deploy and run test app on iOS and Android devices with Bluetooth OFF.
 3. Allow test app to access Bluetooth and Location, move app to background, and lock test devices.
 4. Switch Bluetooth ON while devices are locked and app is in background to start test.
-5. Place devices within 8 meters of each other and wait for 10 to 30 minutes.
+5. Place devices within 8 metres of each other and wait for 10 to 30 minutes.
 6. Switch Bluetooth OFF while devices are locked and app is in the background to end test.
 7. Open app on each device to quickly check other devices were detected and most recent detection time.
 8. Download plain text CSV log data files from each device for detailed analysis.
@@ -88,18 +88,26 @@ Tests were conducted using a selection of common and challenging devices to unde
 
 Development assumed the solution will be running in the background with no user interaction and the device is locked as this is the normal and preferred operating condition for user acceptance and for ensuring consistent and continuous usage. Tests were therefore conducted to ensure devices are introduced (come into range of each other) while the app is in the background and device is locked. The general procedure for every test was as follows:
 
-1. Place test device in Airplane mode and ensure Bluetooth is OFF.
-2. Uninstall test app from device if it has already been installed.
-3. Reboot device (optional, only required if Android or iOS BLE has crashed).
-4. Install test app on the device while Bluetooth is OFF.
-5. Open test app and allow required Bluetooth and Location permissions.
-6. Move app to background and lock device.
-7. Disable Airplane mode and ensure Bluetooth is ON for each device, while the device is locked where possible, or at least ensuring the app is in the background if Bluetooth can only be enabled after device unlock, in which case lock the device after enabling Bluetooth.
-8. Place test devices within 8 meters of each other to commence test.
-9. Wait for 10 to 30 minutes for a quick test, and 8+ hours for a longer continuity test.
-10. At the end of the test period, place all test devices in Airplane mode and ensure Bluetooth is OFF, while the device is locked where possible, but always ensuring the app remains in the background.
-11. Open app for quick check of test results, then download the full test logs from each device using Finder for iOS and Android File Transfer for Android devices.
-12. Run test results analysis R script to visualise and summarise test results to assess detection and continuity.
+1. Reset device to clean state.
+   1. Place test device in Airplane mode and ensure Bluetooth is OFF.
+   2. Uninstall test app from device if it has already been installed.
+   3. Reboot device (optional, only required if Android or iOS BLE has crashed).
+2. Prepare device for test.
+   1. Install test app on the device while Bluetooth is OFF.
+   2. Open test app and allow required Bluetooth and Location permissions.
+   3. Move app to background and lock device.
+   4. Disable Airplane mode and ensure Bluetooth is ON for each device, while the device is locked where possible, or at least ensuring the app is in the background if Bluetooth can only be enabled after device unlock, in which case lock the device after enabling Bluetooth.
+   5. Place device in a Faraday bag to simulate an active device that is currently out of range.
+   6. Repeat procedure for each device, using a separate Faraday bag for each device to ensure isolation.
+3. Start test.
+   1. Take each test device out of its Faraday bag, taking care to not activate the device in any way in the process.
+   2. Place test devices within 8 metres of each other to commence test.
+   3. Optional : If location permission is enabled on iOS for the specific test, activate iPhone display for a moment by pressing the home button.
+4. End test.
+   1. Wait 10 to 30 minutes for a quick test, and 8+ hours for a longer continuity test.
+   2. At the end of the test period, place all test devices in Airplane mode and ensure Bluetooth is OFF, while the device is locked where possible, but always ensuring the app remains in the background.
+   3. Open app for quick check of test results, then download the full test logs from each device using Finder for iOS and Android File Transfer for Android devices.
+   4. Run test results analysis R script to visualise and summarise test results to assess detection and continuity.
 
 ## Test results
 
