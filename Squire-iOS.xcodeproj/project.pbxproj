@@ -7,20 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B644F2B02513EFC700E2E1A0 /* squire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B644F2AE2513EF8400E2E1A0 /* squire.framework */; };
-		B644F2B12513EFC700E2E1A0 /* squire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B644F2AE2513EF8400E2E1A0 /* squire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
 		B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9F24CADA7A00F45AEE /* Assets.xcassets */; };
 		B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */; };
 		B6B733BD2513F4F1000DF74C /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B733BC2513F4F1000DF74C /* Log.swift */; };
+		B6DDEB5D2513FA5B0003AFBB /* squire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DDEB5C2513FA4A0003AFBB /* squire.framework */; };
+		B6DDEB5E2513FA5B0003AFBB /* squire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B6DDEB5C2513FA4A0003AFBB /* squire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B644F2AD2513EF8400E2E1A0 /* PBXContainerItemProxy */ = {
+		B6DDEB5B2513FA4A0003AFBB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */;
+			containerPortal = B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = B644F2692513ED2000E2E1A0;
 			remoteInfo = squire;
@@ -34,7 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B644F2B12513EFC700E2E1A0 /* squire.framework in Embed Frameworks */,
+				B6DDEB5E2513FA5B0003AFBB /* squire.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,7 +42,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = squire.xcodeproj; path = ../squire/squire.xcodeproj; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* Squire-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Squire-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -51,6 +50,7 @@
 		B692CAA224CADA7A00F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B692CAA424CADA7A00F45AEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6B733BC2513F4F1000DF74C /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
+		B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = squire.xcodeproj; path = squire/squire.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,21 +58,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B644F2B02513EFC700E2E1A0 /* squire.framework in Frameworks */,
+				B6DDEB5D2513FA5B0003AFBB /* squire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B644F2AA2513EF8400E2E1A0 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B644F2AE2513EF8400E2E1A0 /* squire.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		B644F2AF2513EFC700E2E1A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -83,7 +75,7 @@
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
-				B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */,
+				B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */,
 				B692CA9224CADA7500F45AEE /* Squire-iOS */,
 				B692CA9124CADA7500F45AEE /* Products */,
 				B644F2AF2513EFC700E2E1A0 /* Frameworks */,
@@ -110,6 +102,14 @@
 				B692CAA424CADA7A00F45AEE /* Info.plist */,
 			);
 			path = "Squire-iOS";
+			sourceTree = "<group>";
+		};
+		B6DDEB582513FA4A0003AFBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B6DDEB5C2513FA4A0003AFBB /* squire.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -162,8 +162,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = B644F2AA2513EF8400E2E1A0 /* Products */;
-					ProjectRef = B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */;
+					ProductGroup = B6DDEB582513FA4A0003AFBB /* Products */;
+					ProjectRef = B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -174,11 +174,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		B644F2AE2513EF8400E2E1A0 /* squire.framework */ = {
+		B6DDEB5C2513FA4A0003AFBB /* squire.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = squire.framework;
-			remoteRef = B644F2AD2513EF8400E2E1A0 /* PBXContainerItemProxy */;
+			remoteRef = B6DDEB5B2513FA4A0003AFBB /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
