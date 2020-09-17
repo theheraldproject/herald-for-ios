@@ -7,37 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B6374DC524D00228005985BC /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6374DC424D00228005985BC /* ContactLog.swift */; };
-		B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6845AD624D8D746004B8E5C /* DetectionLog.swift */; };
-		B68645E124E3570200E71658 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68645E024E3570200E71658 /* StatisticsLog.swift */; };
+		B644F2B02513EFC700E2E1A0 /* squire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B644F2AE2513EF8400E2E1A0 /* squire.framework */; };
+		B644F2B12513EFC700E2E1A0 /* squire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B644F2AE2513EF8400E2E1A0 /* squire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
 		B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9F24CADA7A00F45AEE /* Assets.xcassets */; };
 		B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */; };
-		B692CAAE24CADE7300F45AEE /* SensorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAAD24CADE7300F45AEE /* SensorLogger.swift */; };
-		B692CAB524CB096300F45AEE /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB424CB096300F45AEE /* Sensor.swift */; };
-		B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */; };
-		B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */; };
-		B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC524CB6E2C00F45AEE /* BLESensor.swift */; };
-		B692CAC824CC27BC00F45AEE /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAC724CC27BC00F45AEE /* BLETransmitter.swift */; };
-		B692CACC24CC27ED00F45AEE /* BeaconCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CACB24CC27ED00F45AEE /* BeaconCodes.swift */; };
-		B692CACE24CC27F400F45AEE /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CACD24CC27F400F45AEE /* DayCodes.swift */; };
-		B692CAD024CC287000F45AEE /* SHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CACF24CC287000F45AEE /* SHA.swift */; };
-		B692CAD224CC2BAA00F45AEE /* PayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD124CC2BAA00F45AEE /* PayloadSupplier.swift */; };
-		B692CAD424CC2DA100F45AEE /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD324CC2DA100F45AEE /* JavaData.swift */; };
-		B692CAD624CC30A700F45AEE /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD524CC30A700F45AEE /* BLEReceiver.swift */; };
-		B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CAD724CC30D300F45AEE /* BLEUtilities.swift */; };
-		B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADB24CD936B00F45AEE /* BLEDatabase.swift */; };
-		B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CADD24CF2B1400F45AEE /* TextFile.swift */; };
-		B6CEFD83250A916600FC158B /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CEFD82250A916600FC158B /* PayloadDataSupplier.swift */; };
-		B6F9F6AF24F6B1FC006F39A0 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */; };
+		B6B733BD2513F4F1000DF74C /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B733BC2513F4F1000DF74C /* Log.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B644F2AD2513EF8400E2E1A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B644F2692513ED2000E2E1A0;
+			remoteInfo = squire;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B644F2B22513EFC700E2E1A0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B644F2B12513EFC700E2E1A0 /* squire.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		B6374DC424D00228005985BC /* ContactLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
-		B6845AD624D8D746004B8E5C /* DetectionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
-		B68645E024E3570200E71658 /* StatisticsLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
+		B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = squire.xcodeproj; path = ../squire/squire.xcodeproj; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* Squire-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Squire-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -45,23 +50,7 @@
 		B692CA9F24CADA7A00F45AEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B692CAA224CADA7A00F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B692CAA424CADA7A00F45AEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B692CAAD24CADE7300F45AEE /* SensorLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorLogger.swift; sourceTree = "<group>"; };
-		B692CAB424CB096300F45AEE /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
-		B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
-		B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
-		B692CAC524CB6E2C00F45AEE /* BLESensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLESensor.swift; sourceTree = "<group>"; };
-		B692CAC724CC27BC00F45AEE /* BLETransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
-		B692CACB24CC27ED00F45AEE /* BeaconCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconCodes.swift; sourceTree = "<group>"; };
-		B692CACD24CC27F400F45AEE /* DayCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
-		B692CACF24CC287000F45AEE /* SHA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHA.swift; sourceTree = "<group>"; };
-		B692CAD124CC2BAA00F45AEE /* PayloadSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadSupplier.swift; sourceTree = "<group>"; };
-		B692CAD324CC2DA100F45AEE /* JavaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaData.swift; sourceTree = "<group>"; };
-		B692CAD524CC30A700F45AEE /* BLEReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
-		B692CAD724CC30D300F45AEE /* BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
-		B692CADB24CD936B00F45AEE /* BLEDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
-		B692CADD24CF2B1400F45AEE /* TextFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
-		B6CEFD82250A916600FC158B /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
-		B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryLog.swift; sourceTree = "<group>"; };
+		B6B733BC2513F4F1000DF74C /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,17 +58,35 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B644F2B02513EFC700E2E1A0 /* squire.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B644F2AA2513EF8400E2E1A0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2AE2513EF8400E2E1A0 /* squire.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B644F2AF2513EFC700E2E1A0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
+				B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */,
 				B692CA9224CADA7500F45AEE /* Squire-iOS */,
 				B692CA9124CADA7500F45AEE /* Products */,
+				B644F2AF2513EFC700E2E1A0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -94,90 +101,15 @@
 		B692CA9224CADA7500F45AEE /* Squire-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				B692CAB324CB093A00F45AEE /* Sensor */,
 				B692CA9324CADA7500F45AEE /* AppDelegate.swift */,
 				B692CA9724CADA7500F45AEE /* ViewController.swift */,
+				B6B733BC2513F4F1000DF74C /* Log.swift */,
 				B692CA9924CADA7500F45AEE /* Main.storyboard */,
 				B692CA9F24CADA7A00F45AEE /* Assets.xcassets */,
 				B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */,
 				B692CAA424CADA7A00F45AEE /* Info.plist */,
 			);
 			path = "Squire-iOS";
-			sourceTree = "<group>";
-		};
-		B692CAAA24CADE2E00F45AEE /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				B692CADD24CF2B1400F45AEE /* TextFile.swift */,
-				B692CAAD24CADE7300F45AEE /* SensorLogger.swift */,
-				B6374DC424D00228005985BC /* ContactLog.swift */,
-				B6845AD624D8D746004B8E5C /* DetectionLog.swift */,
-				B68645E024E3570200E71658 /* StatisticsLog.swift */,
-				B6F9F6AE24F6B1FC006F39A0 /* BatteryLog.swift */,
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
-		B692CAB324CB093A00F45AEE /* Sensor */ = {
-			isa = PBXGroup;
-			children = (
-				B692CAAA24CADE2E00F45AEE /* Data */,
-				B692CABF24CB3E7E00F45AEE /* Payload */,
-				B692CAB724CB1A0700F45AEE /* GPS */,
-				B692CAB624CB19D800F45AEE /* BLE */,
-				B692CAB424CB096300F45AEE /* Sensor.swift */,
-			);
-			path = Sensor;
-			sourceTree = "<group>";
-		};
-		B692CAB624CB19D800F45AEE /* BLE */ = {
-			isa = PBXGroup;
-			children = (
-				B692CAC524CB6E2C00F45AEE /* BLESensor.swift */,
-				B692CAC724CC27BC00F45AEE /* BLETransmitter.swift */,
-				B692CAD524CC30A700F45AEE /* BLEReceiver.swift */,
-				B692CAD724CC30D300F45AEE /* BLEUtilities.swift */,
-				B692CADB24CD936B00F45AEE /* BLEDatabase.swift */,
-			);
-			path = BLE;
-			sourceTree = "<group>";
-		};
-		B692CAB724CB1A0700F45AEE /* GPS */ = {
-			isa = PBXGroup;
-			children = (
-				B692CAB824CB1AAB00F45AEE /* GPSSensor.swift */,
-			);
-			path = GPS;
-			sourceTree = "<group>";
-		};
-		B692CABF24CB3E7E00F45AEE /* Payload */ = {
-			isa = PBXGroup;
-			children = (
-				B692CACA24CC27DA00F45AEE /*  */,
-				B692CAC924CC27CC00F45AEE /* Sonar */,
-				B6CEFD82250A916600FC158B /* PayloadDataSupplier.swift */,
-			);
-			path = Payload;
-			sourceTree = "<group>";
-		};
-		B692CAC924CC27CC00F45AEE /* Sonar */ = {
-			isa = PBXGroup;
-			children = (
-				B692CAC024CB3F5000F45AEE /* SonarPayloadSupplier.swift */,
-			);
-			path = Sonar;
-			sourceTree = "<group>";
-		};
-		B692CACA24CC27DA00F45AEE /*  */ = {
-			isa = PBXGroup;
-			children = (
-				B692CAD124CC2BAA00F45AEE /* PayloadSupplier.swift */,
-				B692CACD24CC27F400F45AEE /* DayCodes.swift */,
-				B692CACB24CC27ED00F45AEE /* BeaconCodes.swift */,
-				B692CACF24CC287000F45AEE /* SHA.swift */,
-				B692CAD324CC2DA100F45AEE /* JavaData.swift */,
-			);
-			path = ;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -190,6 +122,7 @@
 				B692CA8C24CADA7500F45AEE /* Sources */,
 				B692CA8D24CADA7500F45AEE /* Frameworks */,
 				B692CA8E24CADA7500F45AEE /* Resources */,
+				B644F2B22513EFC700E2E1A0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -227,12 +160,28 @@
 			mainGroup = B692CA8724CADA7500F45AEE;
 			productRefGroup = B692CA9124CADA7500F45AEE /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = B644F2AA2513EF8400E2E1A0 /* Products */;
+					ProjectRef = B644F2A92513EF8400E2E1A0 /* squire.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				B692CA8F24CADA7500F45AEE /* Squire-iOS */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		B644F2AE2513EF8400E2E1A0 /* squire.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = squire.framework;
+			remoteRef = B644F2AD2513EF8400E2E1A0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B692CA8E24CADA7500F45AEE /* Resources */ = {
@@ -252,28 +201,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6374DC524D00228005985BC /* ContactLog.swift in Sources */,
-				B692CAD824CC30D300F45AEE /* BLEUtilities.swift in Sources */,
-				B692CADC24CD936B00F45AEE /* BLEDatabase.swift in Sources */,
-				B692CAAE24CADE7300F45AEE /* SensorLogger.swift in Sources */,
-				B692CAB524CB096300F45AEE /* Sensor.swift in Sources */,
-				B692CACE24CC27F400F45AEE /* DayCodes.swift in Sources */,
-				B692CACC24CC27ED00F45AEE /* BeaconCodes.swift in Sources */,
-				B692CADE24CF2B1500F45AEE /* TextFile.swift in Sources */,
-				B68645E124E3570200E71658 /* StatisticsLog.swift in Sources */,
-				B692CAD224CC2BAA00F45AEE /* PayloadSupplier.swift in Sources */,
-				B692CAD424CC2DA100F45AEE /* JavaData.swift in Sources */,
-				B692CAD624CC30A700F45AEE /* BLEReceiver.swift in Sources */,
 				B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */,
-				B692CAC124CB3F5000F45AEE /* SonarPayloadSupplier.swift in Sources */,
-				B6CEFD83250A916600FC158B /* PayloadDataSupplier.swift in Sources */,
-				B6845AD724D8D746004B8E5C /* DetectionLog.swift in Sources */,
-				B6F9F6AF24F6B1FC006F39A0 /* BatteryLog.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
-				B692CAC824CC27BC00F45AEE /* BLETransmitter.swift in Sources */,
-				B692CAC624CB6E2C00F45AEE /* BLESensor.swift in Sources */,
-				B692CAD024CC287000F45AEE /* SHA.swift in Sources */,
-				B692CAB924CB1AAB00F45AEE /* GPSSensor.swift in Sources */,
+				B6B733BD2513F4F1000DF74C /* Log.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,7 +356,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -446,7 +376,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

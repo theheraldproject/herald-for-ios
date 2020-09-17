@@ -6,9 +6,10 @@
 //
 
 import UIKit
+import squire
 
 class ViewController: UIViewController, SensorDelegate {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ViewController")
+    private let logger = Log(subsystem: "Squire", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: Sensor!
     private let dateFormatter = DateFormatter()
