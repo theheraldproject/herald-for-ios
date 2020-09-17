@@ -23,7 +23,6 @@
 		B644F29C2513ED5900E2E1A0 /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2862513ED5900E2E1A0 /* JavaData.swift */; };
 		B644F29D2513ED5900E2E1A0 /* PayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */; };
 		B644F29E2513ED5900E2E1A0 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2892513ED5900E2E1A0 /* TextFile.swift */; };
-		B644F29F2513ED5900E2E1A0 /* RScriptLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28A2513ED5900E2E1A0 /* RScriptLog.swift */; };
 		B644F2A02513ED5900E2E1A0 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */; };
 		B644F2A12513ED5900E2E1A0 /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */; };
 		B644F2A22513ED5900E2E1A0 /* SensorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */; };
@@ -260,7 +259,6 @@
 				B644F2992513ED5900E2E1A0 /* DayCodes.swift in Sources */,
 				B644F29B2513ED5900E2E1A0 /* BeaconCodes.swift in Sources */,
 				B644F2922513ED5900E2E1A0 /* BLEUtilities.swift in Sources */,
-				B644F29F2513ED5900E2E1A0 /* RScriptLog.swift in Sources */,
 				B644F29C2513ED5900E2E1A0 /* JavaData.swift in Sources */,
 				B644F2A12513ED5900E2E1A0 /* DetectionLog.swift in Sources */,
 				B644F2982513ED5900E2E1A0 /* PayloadDataSupplier.swift in Sources */,
