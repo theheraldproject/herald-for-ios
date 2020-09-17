@@ -8,15 +8,15 @@
 import Foundation
 
 /// SONAR payload supplier for integration with SONAR protocol. Payload data is 129 bytes.
-protocol SonarPayloadDataSupplier : PayloadDataSupplier {
+public protocol SonarPayloadDataSupplier : PayloadDataSupplier {
 }
 
 /// Mock SONAR payload supplier for simulating payload transfer of the same size
-class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
+public class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
     static let length: Int = 129
     let identifier: Int32
     
-    init(identifier: Int32) {
+    public init(identifier: Int32) {
         self.identifier = identifier
     }
     
@@ -25,7 +25,7 @@ class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
         return Data(bytes: &mutableSelf, count: MemoryLayout.size(ofValue: mutableSelf))
     }
     
-    func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
+    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
         var payloadData = PayloadData()
         // First 3 bytes are reserved in SONAR
         payloadData.append(Data(repeating: 0, count: 3))

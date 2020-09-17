@@ -28,8 +28,6 @@
 	<string>Detect recently visited places and areas to trace indirect disease transmissions</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Detect recently visited places and areas to trace indirect disease transmissions</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Detect close contacts with other users to trace direct disease transmissions</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>

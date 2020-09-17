@@ -1,37 +1,23 @@
 //
-//  Logger.swift
+//  Log.swift
+//  Squire-iOS
 //
 //  Copyright 2020 VMware, Inc.
 //  SPDX-License-Identifier: MIT
 //
 
 import Foundation
-import UIKit
 import os
 
-protocol SensorLogger {
-    init(subsystem: String, category: String)
-    
-    func log(_ level: SensorLoggerLevel, _ message: String)
-    
-    func debug(_ message: String)
-    
-    func info(_ message: String)
-    
-    func fault(_ message: String)
-}
-
-enum SensorLoggerLevel: String {
-    case debug, info, fault
-}
-
-class ConcreteSensorLogger: NSObject, SensorLogger {
+/// Common log interface across supported iOS versions
+class Log: NSObject {
+    /// Define log level acros all logger messages
+    private let logLevel: LogLevel = .debug
     private let subsystem: String
     private let category: String
     private let dateFormatter = DateFormatter()
     private let log: OSLog?
-    private static let logFile = TextFile(filename: "log.txt")
-
+    
     required init(subsystem: String, category: String) {
         self.subsystem = subsystem
         self.category = category
@@ -43,18 +29,18 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
         }
     }
     
-    private func suppress(_ level: SensorLoggerLevel) -> Bool {
+    private func suppress(_ level: LogLevel) -> Bool {
         switch level {
         case .debug:
-            return (BLESensorConfiguration.logLevel == .info || BLESensorConfiguration.logLevel == .fault);
+            return (logLevel == .info || logLevel == .fault);
         case .info:
-            return (BLESensorConfiguration.logLevel == .fault);
+            return (logLevel == .fault);
         default:
             return false;
         }
     }
-
-    func log(_ level: SensorLoggerLevel, _ message: String) {
+    
+    func log(_ level: LogLevel, _ message: String) {
         guard !suppress(level) else {
             return
         }
@@ -63,7 +49,6 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
         let csvMessage = message.replacingOccurrences(of: "\"", with: "'")
         let quotedMessage = (message.contains(",") ? "\"" + csvMessage + "\"" : csvMessage)
         let entry = timestamp + "," + level.rawValue + "," + subsystem + "," + category + "," + quotedMessage
-        ConcreteSensorLogger.logFile.write(entry)
         guard let log = log else {
             print(entry)
             return
@@ -86,11 +71,16 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
     }
     
     func info(_ message: String) {
-           log(.debug, message)
-       }
+        log(.debug, message)
+    }
     
     func fault(_ message: String) {
-           log(.debug, message)
-       }
+        log(.debug, message)
+    }
+    
+}
 
+/// Log level for messages
+enum LogLevel : String {
+    case debug, info, fault
 }

@@ -9,7 +9,7 @@ import Foundation
 
 /// Payload data supplier for generating payload data that is shared with other devices to provide device identity information while maintaining privacy and security.
 /// Implement this to integration your solution with this transport.
-protocol PayloadDataSupplier {
+public protocol PayloadDataSupplier {
     /// Get payload for given timestamp. Use this for integration with any payload generator.
     func payload(_ timestamp: PayloadTimestamp) -> PayloadData
     
@@ -18,7 +18,7 @@ protocol PayloadDataSupplier {
 }
 
 /// Implements payload splitting function, assuming fixed length payloads.
-extension PayloadDataSupplier {
+public extension PayloadDataSupplier {
     /// Default implementation assumes fixed length payload data.
     func payload(_ data: Data) -> [PayloadData] {
         // Get example payload to determine length
@@ -38,12 +38,12 @@ extension PayloadDataSupplier {
 }
 
 /// Payload timestamp, should normally be Date, but it may change to UInt64 in the future to use server synchronised relative timestamp.
-typealias PayloadTimestamp = Date
+public typealias PayloadTimestamp = Date
 
 /// Encrypted payload data received from target. This is likely to be an encrypted datagram of the target's actual permanent identifier.
-typealias PayloadData = Data
+public typealias PayloadData = Data
 
-extension PayloadData {
+public extension PayloadData {
     var shortName: String {
         return String(subdata(in: 3..<count-3).base64EncodedString().prefix(6))
     }
