@@ -137,10 +137,11 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Xcode.
 2. Select menu item *Source Control > Clone* to clone the iOS repo as a new project.
-3. Select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier*.
-4. Connect iPhone to computer with USB cable, unlock device, select device in Xcode.
-5. Select menu item *Product > Run* to build and deploy test app.
-6. Expect the test app to open on the device.
+3. Select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
+4. Select *squire.xcodeproj* then select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
+5. Connect iPhone to computer with USB cable, unlock device, select device in Xcode.
+6. Select menu item *Product > Run* to build and deploy test app.
+7. Expect the test app to open on the device.
 
 ### iOS app log files
 
@@ -153,7 +154,7 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Android Studio.
 2. Select menu item *VCS > Git > Clone* to clone the Android repo as a new project.
-3. Select menu item *File > Sync Project with Gradle Files* to show both app and *squire* module.
+3. Select menu item *File > Sync Project with Gradle Files* to show both *app* and *squire* module.
 4. Select menu item *Build > Make Project* to build app and module.
 5. Enable Developer Mode on Android phone (*Settings > About > Software > Tap Build number repeatedly*).
 6. Connect Android phone to computer with USB cable, select device in Android Studio.
