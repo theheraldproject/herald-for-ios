@@ -153,17 +153,19 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Android Studio.
 2. Select menu item *VCS > Git > Clone* to clone the Android repo as a new project.
-3. Enable Developer Mode on Android phone (*Settings > About > Software > Tap Build number repeatedly*).
-4. Connect Android phone to computer with USB cable, select device in Android Studio.
-5. Select menu item *Run* to build and deploy test app.
-6. Expect the test app to open on the device.
+3. Select menu item *File > Sync Project with Gradle Files* to show both app and *squire* module.
+4. Select menu item *Build > Make Project* to build app and module.
+5. Enable Developer Mode on Android phone (*Settings > About > Software > Tap Build number repeatedly*).
+6. Connect Android phone to computer with USB cable, select device in Android Studio.
+7. Select menu item *Run > Run 'app'* to build and deploy test app.
+8. Expect the test app to open on the device.
 
 ### Android app log files
 
 1. Install and open Android File Transfer utility (https://www.android.com/filetransfer/)
 2. Connect Android phone to computer with USB cable, unlock device, ensuring USB Preferences is set to "File transfer".
 3. Open Android File Transfer utility.
-4. Select path *Android / media / app name*.
+4. Select path *Android / media / com.vmware.squire.app / Sensor*.
 5. Expect a list of log files (e.g. *contacts.csv*).
 6. Drag and drop to copy log files to computer for analysis.
 
