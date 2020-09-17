@@ -2,8 +2,8 @@
 //  squire.h
 //  squire
 //
-//  Created  on 17/09/2020.
-//  Copyright © 2020 VMware, Inc. All rights reserved.
+//  Copyright 2020 VMware, Inc.
+//  SPDX-License-Identifier: MIT
 //
 
 #import <Foundation/Foundation.h>

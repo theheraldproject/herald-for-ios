@@ -2,8 +2,8 @@
 //  RScriptLog.swift
 //  
 //
-//  Created  on 03/08/2020.
-//  Copyright © 2020 . All rights reserved.
+//  Copyright 2020 VMware, Inc.
+//  SPDX-License-Identifier: MIT
 //
 
 import Foundation
