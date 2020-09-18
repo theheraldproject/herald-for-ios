@@ -22,7 +22,7 @@ protocol BeaconCodes {
 }
 
 /// Beacon code for identifying a device. This is derived from the shared secret.
-typealias BeaconCode = Int64
+public typealias BeaconCode = Int64
 
 class ConcreteBeaconCodes : BeaconCodes {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteBeaconCodes")
@@ -53,7 +53,7 @@ class ConcreteBeaconCodes : BeaconCodes {
         return beaconCodes[Int(codeIndex)]
     }
     
-    static func beaconCodes(_ beaconCodeSeed: BeaconCodeSeed, count: Int = codesPerDay) -> [BeaconCode] {
+    public static func beaconCodes(_ beaconCodeSeed: BeaconCodeSeed, count: Int = codesPerDay) -> [BeaconCode] {
         let data = Data(withUnsafeBytes(of: beaconCodeSeed) { Data($0) }.reversed())
         var hash = SHA.hash(data: data)
         var values = [BeaconCode](repeating: 0, count: count)

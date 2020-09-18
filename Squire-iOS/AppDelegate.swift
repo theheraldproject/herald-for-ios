@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import os
+import squire
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
-    private let logger = ConcreteSensorLogger(subsystem: "App", category: "AppDelegate")
+    private let logger = Log(subsystem: "Squire", category: "AppDelegate")
     var window: UIWindow?
 
     // Payload data supplier, sensor and contact log

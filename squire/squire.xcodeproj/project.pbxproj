@@ -1,0 +1,482 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B644F26E2513ED2000E2E1A0 /* squire.h in Headers */ = {isa = PBXBuildFile; fileRef = B644F26C2513ED2000E2E1A0 /* squire.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B644F2902513ED5900E2E1A0 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2762513ED5900E2E1A0 /* BLESensor.swift */; };
+		B644F2912513ED5900E2E1A0 /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2772513ED5900E2E1A0 /* BLEDatabase.swift */; };
+		B644F2922513ED5900E2E1A0 /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2782513ED5900E2E1A0 /* BLEUtilities.swift */; };
+		B644F2932513ED5900E2E1A0 /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2792513ED5900E2E1A0 /* BLETransmitter.swift */; };
+		B644F2942513ED5900E2E1A0 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F27A2513ED5900E2E1A0 /* BLEReceiver.swift */; };
+		B644F2952513ED5900E2E1A0 /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F27C2513ED5900E2E1A0 /* GPSSensor.swift */; };
+		B644F2962513ED5900E2E1A0 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F27D2513ED5900E2E1A0 /* Sensor.swift */; };
+		B644F2972513ED5900E2E1A0 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2802513ED5900E2E1A0 /* SonarPayloadSupplier.swift */; };
+		B644F2982513ED5900E2E1A0 /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2812513ED5900E2E1A0 /* PayloadDataSupplier.swift */; };
+		B644F2992513ED5900E2E1A0 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2832513ED5900E2E1A0 /* DayCodes.swift */; };
+		B644F29A2513ED5900E2E1A0 /* SHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2842513ED5900E2E1A0 /* SHA.swift */; };
+		B644F29B2513ED5900E2E1A0 /* BeaconCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2852513ED5900E2E1A0 /* BeaconCodes.swift */; };
+		B644F29C2513ED5900E2E1A0 /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2862513ED5900E2E1A0 /* JavaData.swift */; };
+		B644F29D2513ED5900E2E1A0 /* PayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */; };
+		B644F29E2513ED5900E2E1A0 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2892513ED5900E2E1A0 /* TextFile.swift */; };
+		B644F2A02513ED5900E2E1A0 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */; };
+		B644F2A12513ED5900E2E1A0 /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */; };
+		B644F2A22513ED5900E2E1A0 /* SensorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */; };
+		B644F2A32513ED5900E2E1A0 /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28E2513ED5900E2E1A0 /* ContactLog.swift */; };
+		B644F2A42513ED5900E2E1A0 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28F2513ED5900E2E1A0 /* StatisticsLog.swift */; };
+		B644F2A62513EDD700E2E1A0 /* SensorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2A52513EDD700E2E1A0 /* SensorDelegate.swift */; };
+		B644F2A82513EE0F00E2E1A0 /* SensorArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2A72513EE0F00E2E1A0 /* SensorArray.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B644F2692513ED2000E2E1A0 /* squire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = squire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B644F26C2513ED2000E2E1A0 /* squire.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = squire.h; sourceTree = "<group>"; };
+		B644F26D2513ED2000E2E1A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B644F2762513ED5900E2E1A0 /* BLESensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLESensor.swift; sourceTree = "<group>"; };
+		B644F2772513ED5900E2E1A0 /* BLEDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
+		B644F2782513ED5900E2E1A0 /* BLEUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
+		B644F2792513ED5900E2E1A0 /* BLETransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
+		B644F27A2513ED5900E2E1A0 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
+		B644F27C2513ED5900E2E1A0 /* GPSSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
+		B644F27D2513ED5900E2E1A0 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
+		B644F2802513ED5900E2E1A0 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
+		B644F2812513ED5900E2E1A0 /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
+		B644F2832513ED5900E2E1A0 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
+		B644F2842513ED5900E2E1A0 /* SHA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHA.swift; sourceTree = "<group>"; };
+		B644F2852513ED5900E2E1A0 /* BeaconCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconCodes.swift; sourceTree = "<group>"; };
+		B644F2862513ED5900E2E1A0 /* JavaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JavaData.swift; sourceTree = "<group>"; };
+		B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadSupplier.swift; sourceTree = "<group>"; };
+		B644F2892513ED5900E2E1A0 /* TextFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
+		B644F28A2513ED5900E2E1A0 /* RScriptLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RScriptLog.swift; sourceTree = "<group>"; };
+		B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatteryLog.swift; sourceTree = "<group>"; };
+		B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
+		B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorLogger.swift; sourceTree = "<group>"; };
+		B644F28E2513ED5900E2E1A0 /* ContactLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
+		B644F28F2513ED5900E2E1A0 /* StatisticsLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
+		B644F2A52513EDD700E2E1A0 /* SensorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorDelegate.swift; sourceTree = "<group>"; };
+		B644F2A72513EE0F00E2E1A0 /* SensorArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorArray.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B644F2662513ED2000E2E1A0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B644F25F2513ED2000E2E1A0 = {
+			isa = PBXGroup;
+			children = (
+				B644F26B2513ED2000E2E1A0 /* squire */,
+				B644F26A2513ED2000E2E1A0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B644F26A2513ED2000E2E1A0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2692513ED2000E2E1A0 /* squire.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B644F26B2513ED2000E2E1A0 /* squire */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2742513ED5900E2E1A0 /* Sensor */,
+				B644F26C2513ED2000E2E1A0 /* squire.h */,
+				B644F26D2513ED2000E2E1A0 /* Info.plist */,
+			);
+			path = squire;
+			sourceTree = "<group>";
+		};
+		B644F2742513ED5900E2E1A0 /* Sensor */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2752513ED5900E2E1A0 /* BLE */,
+				B644F27B2513ED5900E2E1A0 /* GPS */,
+				B644F27E2513ED5900E2E1A0 /* Payload */,
+				B644F2882513ED5900E2E1A0 /* Data */,
+				B644F27D2513ED5900E2E1A0 /* Sensor.swift */,
+				B644F2A52513EDD700E2E1A0 /* SensorDelegate.swift */,
+				B644F2812513ED5900E2E1A0 /* PayloadDataSupplier.swift */,
+				B644F2A72513EE0F00E2E1A0 /* SensorArray.swift */,
+			);
+			path = Sensor;
+			sourceTree = "<group>";
+		};
+		B644F2752513ED5900E2E1A0 /* BLE */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2762513ED5900E2E1A0 /* BLESensor.swift */,
+				B644F2772513ED5900E2E1A0 /* BLEDatabase.swift */,
+				B644F2782513ED5900E2E1A0 /* BLEUtilities.swift */,
+				B644F2792513ED5900E2E1A0 /* BLETransmitter.swift */,
+				B644F27A2513ED5900E2E1A0 /* BLEReceiver.swift */,
+			);
+			path = BLE;
+			sourceTree = "<group>";
+		};
+		B644F27B2513ED5900E2E1A0 /* GPS */ = {
+			isa = PBXGroup;
+			children = (
+				B644F27C2513ED5900E2E1A0 /* GPSSensor.swift */,
+			);
+			path = GPS;
+			sourceTree = "<group>";
+		};
+		B644F27E2513ED5900E2E1A0 /* Payload */ = {
+			isa = PBXGroup;
+			children = (
+				B644F27F2513ED5900E2E1A0 /* Sonar */,
+				B644F2822513ED5900E2E1A0 /*  */,
+			);
+			path = Payload;
+			sourceTree = "<group>";
+		};
+		B644F27F2513ED5900E2E1A0 /* Sonar */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2802513ED5900E2E1A0 /* SonarPayloadSupplier.swift */,
+			);
+			path = Sonar;
+			sourceTree = "<group>";
+		};
+		B644F2822513ED5900E2E1A0 /*  */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2832513ED5900E2E1A0 /* DayCodes.swift */,
+				B644F2842513ED5900E2E1A0 /* SHA.swift */,
+				B644F2852513ED5900E2E1A0 /* BeaconCodes.swift */,
+				B644F2862513ED5900E2E1A0 /* JavaData.swift */,
+				B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */,
+			);
+			path = ;
+			sourceTree = "<group>";
+		};
+		B644F2882513ED5900E2E1A0 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				B644F2892513ED5900E2E1A0 /* TextFile.swift */,
+				B644F28A2513ED5900E2E1A0 /* RScriptLog.swift */,
+				B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */,
+				B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */,
+				B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */,
+				B644F28E2513ED5900E2E1A0 /* ContactLog.swift */,
+				B644F28F2513ED5900E2E1A0 /* StatisticsLog.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		B644F2642513ED2000E2E1A0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B644F26E2513ED2000E2E1A0 /* squire.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		B644F2682513ED2000E2E1A0 /* squire */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B644F2712513ED2000E2E1A0 /* Build configuration list for PBXNativeTarget "squire" */;
+			buildPhases = (
+				B644F2642513ED2000E2E1A0 /* Headers */,
+				B644F2652513ED2000E2E1A0 /* Sources */,
+				B644F2662513ED2000E2E1A0 /* Frameworks */,
+				B644F2672513ED2000E2E1A0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = squire;
+			productName = squire;
+			productReference = B644F2692513ED2000E2E1A0 /* squire.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B644F2602513ED2000E2E1A0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1170;
+				ORGANIZATIONNAME = "VMware, Inc.";
+				TargetAttributes = {
+					B644F2682513ED2000E2E1A0 = {
+						CreatedOnToolsVersion = 11.7;
+					};
+				};
+			};
+			buildConfigurationList = B644F2632513ED2000E2E1A0 /* Build configuration list for PBXProject "squire" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B644F25F2513ED2000E2E1A0;
+			productRefGroup = B644F26A2513ED2000E2E1A0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B644F2682513ED2000E2E1A0 /* squire */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B644F2672513ED2000E2E1A0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B644F2652513ED2000E2E1A0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B644F2942513ED5900E2E1A0 /* BLEReceiver.swift in Sources */,
+				B644F2992513ED5900E2E1A0 /* DayCodes.swift in Sources */,
+				B644F29B2513ED5900E2E1A0 /* BeaconCodes.swift in Sources */,
+				B644F2922513ED5900E2E1A0 /* BLEUtilities.swift in Sources */,
+				B644F29C2513ED5900E2E1A0 /* JavaData.swift in Sources */,
+				B644F2A12513ED5900E2E1A0 /* DetectionLog.swift in Sources */,
+				B644F2982513ED5900E2E1A0 /* PayloadDataSupplier.swift in Sources */,
+				B644F2A02513ED5900E2E1A0 /* BatteryLog.swift in Sources */,
+				B644F2A82513EE0F00E2E1A0 /* SensorArray.swift in Sources */,
+				B644F29E2513ED5900E2E1A0 /* TextFile.swift in Sources */,
+				B644F2912513ED5900E2E1A0 /* BLEDatabase.swift in Sources */,
+				B644F2902513ED5900E2E1A0 /* BLESensor.swift in Sources */,
+				B644F2952513ED5900E2E1A0 /* GPSSensor.swift in Sources */,
+				B644F2A32513ED5900E2E1A0 /* ContactLog.swift in Sources */,
+				B644F2A62513EDD700E2E1A0 /* SensorDelegate.swift in Sources */,
+				B644F29A2513ED5900E2E1A0 /* SHA.swift in Sources */,
+				B644F2A42513ED5900E2E1A0 /* StatisticsLog.swift in Sources */,
+				B644F2A22513ED5900E2E1A0 /* SensorLogger.swift in Sources */,
+				B644F2932513ED5900E2E1A0 /* BLETransmitter.swift in Sources */,
+				B644F29D2513ED5900E2E1A0 /* PayloadSupplier.swift in Sources */,
+				B644F2972513ED5900E2E1A0 /* SonarPayloadSupplier.swift in Sources */,
+				B644F2962513ED5900E2E1A0 /* Sensor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B644F26F2513ED2000E2E1A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.7;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		B644F2702513ED2000E2E1A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.7;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		B644F2722513ED2000E2E1A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = squire/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B644F2732513ED2000E2E1A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = squire/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B644F2632513ED2000E2E1A0 /* Build configuration list for PBXProject "squire" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B644F26F2513ED2000E2E1A0 /* Debug */,
+				B644F2702513ED2000E2E1A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B644F2712513ED2000E2E1A0 /* Build configuration list for PBXNativeTarget "squire" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B644F2722513ED2000E2E1A0 /* Debug */,
+				B644F2732513ED2000E2E1A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B644F2602513ED2000E2E1A0 /* Project object */;
+}

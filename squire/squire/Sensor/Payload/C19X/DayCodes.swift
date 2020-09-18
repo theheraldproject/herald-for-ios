@@ -20,7 +20,7 @@ protocol DayCodes {
 }
 
 /// Shared secret between device and server for deriving day codes and beacon codes.
-typealias SharedSecret = Data
+public typealias SharedSecret = Data
 
 /// Day codes are published by the server to enable on-device matching in a de-centralised solution.
 typealias DayCode = Int64
@@ -29,7 +29,7 @@ typealias DayCode = Int64
 typealias Day = UInt
 
 /// Beacon code seed is derived from the day code. This is used to derive the beacon codes for the day.
-typealias BeaconCodeSeed = Int64
+public typealias BeaconCodeSeed = Int64
 
 /// Timestamp has been abstracted to enable change from Date if required in the future.
 typealias Timestamp = Date
