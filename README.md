@@ -6,11 +6,13 @@ Copyright 2020 VMware, Inc.
 
 Licensed under the MIT license
 
+### Contents
+
 - [Introduction](#introduction)
 - [Key features](#key-features)
 - [Hardware requirements](#hardware-requirements)
 - [Quick start](#quick-start)
-- [Testing](#testing)
+- [Test procedure](#test-procedure)
 - [Test results](#test-results)
 - [Installation](#installation)
 - [References](#references)
@@ -74,7 +76,7 @@ A procedure for installing and testing the solution in background mode is as fol
 
 Detailed step-by-step instructions can be found in the [Installation](#installation) section.
 
-## Testing
+## Test procedure
 
 Iterative development was driven by practical experiments and automated testing with a range of common and challenging devices to evaluate the solution according to epidemiology requirements:
 
