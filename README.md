@@ -19,11 +19,13 @@ Licensed under the MIT license
 
 ## Introduction
 
+![Efficacy](images/efficacy.png)
+
 This solution will:
 
+- Operates on 98.0% of UK phones and 97.5% of phones worldwide without requiring a software update.
 - Detect 100% of iOS and Android devices within 8 metres for contact tracing.
 - Measure distance between devices at least once every 30 seconds for infection risk estimation.
-- Operates on 98.0% of UK phones and 97.5% of phones worldwide without requiring a software update.
 
 This is a new, original, free and open source cross-platform proximity detection solution that has been developed according to epidemiology requirements (Ferretti, et al., 2020) for controlling COVID-19. This Bluetooth Low Energy (BLE) based solution offers accurate and frequent distance measurements between phones running iOS 9.3+ and Android 5.0+, including devices that do not support BLE advertising (circa 35% in the UK).
 
