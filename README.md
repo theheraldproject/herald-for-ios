@@ -6,6 +6,15 @@ Copyright 2020 VMware, Inc.
 
 Licensed under the MIT license
 
+- [Introduction](#introduction)
+- [Key features](#key-features)
+- [Hardware requirements](#hardware-requirements)
+- [Quick start](#quick-start)
+- [Testing](#testing)
+- [Test results](#test-results)
+- [Installation](#installation)
+- [References](#references)
+
 ## Introduction
 
 This solution will:
@@ -63,7 +72,7 @@ A procedure for installing and testing the solution in background mode is as fol
 7. Open app on each device to quickly check other devices were detected and most recent detection time.
 8. Download plain text CSV log data files from each device for detailed analysis.
 
-Detailed step-by-step instructions can be found in the **Getting started** section.
+Detailed step-by-step instructions can be found in the [Installation](#installation) section.
 
 ## Testing
 
@@ -129,7 +138,7 @@ Test devices were selected to ensure the solution were being tested under the mo
 - Test 4 included all the Android devices in Test 1.
 - Test 5 included Android devices that changed BLE device address constantly, and all the iPhones had Location OFF to assess situations where this permission is unacceptable (please note Location permission is mandatory on Android devices and generally acceptable).
 
-## Getting started
+## Installation
 
 The proximity detection solution has been integrated into a standalone test app on iOS and Android for ease of evaluation, and to demonstrate how it can be applied in your own apps. The test app will detect, identify and measure distance for all iOS and Android devices within detection range, present the results on a simple user interface, and also write the results to local device storage for download and analysis.
 
