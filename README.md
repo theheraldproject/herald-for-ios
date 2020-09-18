@@ -1,5 +1,7 @@
 # Squire-iOS
 
+![Epidemiology](images/epidemiology.png)
+
 Continuous proximity detection across iOS and Android devices in background mode for contact tracing and infection control according to epidemiology requirements. 
 
 Copyright 2020 VMware, Inc.
