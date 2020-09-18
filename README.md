@@ -6,6 +6,17 @@ Copyright 2020 VMware, Inc.
 
 Licensed under the MIT license
 
+### Contents
+
+- [Introduction](#introduction)
+- [Key features](#key-features)
+- [Hardware requirements](#hardware-requirements)
+- [Quick start](#quick-start)
+- [Test procedure](#test-procedure)
+- [Test results](#test-results)
+- [Installation](#installation)
+- [References](#references)
+
 ## Introduction
 
 This solution will:
@@ -63,9 +74,9 @@ A procedure for installing and testing the solution in background mode is as fol
 7. Open app on each device to quickly check other devices were detected and most recent detection time.
 8. Download plain text CSV log data files from each device for detailed analysis.
 
-Detailed step-by-step instructions can be found in the **Getting started** section.
+Detailed step-by-step instructions can be found in the [Installation](#installation) section.
 
-## Testing
+## Test procedure
 
 Iterative development was driven by practical experiments and automated testing with a range of common and challenging devices to evaluate the solution according to epidemiology requirements:
 
@@ -129,7 +140,7 @@ Test devices were selected to ensure the solution were being tested under the mo
 - Test 4 included all the Android devices in Test 1.
 - Test 5 included Android devices that changed BLE device address constantly, and all the iPhones had Location OFF to assess situations where this permission is unacceptable (please note Location permission is mandatory on Android devices and generally acceptable).
 
-## Getting started
+## Installation
 
 The proximity detection solution has been integrated into a standalone test app on iOS and Android for ease of evaluation, and to demonstrate how it can be applied in your own apps. The test app will detect, identify and measure distance for all iOS and Android devices within detection range, present the results on a simple user interface, and also write the results to local device storage for download and analysis.
 
@@ -137,10 +148,11 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Xcode.
 2. Select menu item *Source Control > Clone* to clone the iOS repo as a new project.
-3. Select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier*.
-4. Connect iPhone to computer with USB cable, unlock device, select device in Xcode.
-5. Select menu item *Product > Run* to build and deploy test app.
-6. Expect the test app to open on the device.
+3. Select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
+4. Select *squire.xcodeproj* then select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
+5. Connect iPhone to computer with USB cable, unlock device, select device in Xcode.
+6. Select menu item *Product > Run* to build and deploy test app.
+7. Expect the test app to open on the device.
 
 ### iOS app log files
 
@@ -153,7 +165,7 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Android Studio.
 2. Select menu item *VCS > Git > Clone* to clone the Android repo as a new project.
-3. Select menu item *File > Sync Project with Gradle Files* to show both app and *squire* module.
+3. Select menu item *File > Sync Project with Gradle Files* to show both *app* and *squire* module.
 4. Select menu item *Build > Make Project* to build app and module.
 5. Enable Developer Mode on Android phone (*Settings > About > Software > Tap Build number repeatedly*).
 6. Connect Android phone to computer with USB cable, select device in Android Studio.
