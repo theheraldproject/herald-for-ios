@@ -25,7 +25,7 @@ Licensed under the MIT license
 
 This solution will:
 
-- Operates on 98.0% of UK phones and 97.5% of phones worldwide without requiring a software update.
+- Operate on 98.0% of UK phones and 97.5% of phones worldwide without requiring a software update.
 - Detect 100% of iOS and Android devices within 8 metres for contact tracing.
 - Measure distance between devices at least once every 30 seconds for infection risk estimation.
 
