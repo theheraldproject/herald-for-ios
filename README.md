@@ -130,7 +130,7 @@ The following tables present a selection of summary test results for demonstrati
 
 | Test                              | Devices |   Duration | Detection | Continuity |
 | --------------------------------- | ------: | ---------: | --------: | ---------: |
-| 1. Androids only                  |       3 |   22 hours |    100.0% |      99.6% |
+| 1. Android only                   |       3 |   22 hours |    100.0% |      99.6% |
 | 2. iOS only (Location ON)         |       2 |   20 hours |    100.0% |     100.0% |
 | 3. iOS (Location OFF) and Android |       3 | 80 minutes |    100.0% |      97.1% |
 | 4. iOS (Location ON) and Android  |       9 |   13 hours |    100.0% |      96.2% |
@@ -169,8 +169,8 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Android Studio.
 2. Select menu item *VCS > Git > Clone* to clone the Android repo as a new project.
-3. Select menu item *File > Sync Project with Gradle Files* to show both *app* and *squire* module.
-4. Select menu item *Build > Make Project* to build app and module.
+3. Select menu item *File > Sync Project with Gradle Files* to show both *app* and *squire* modules.
+4. Select menu item *Build > Make Project* to build *app* and *squire* modules.
 5. Enable Developer Mode on Android phone (*Settings > About > Software > Tap Build number repeatedly*).
 6. Connect Android phone to computer with USB cable, select device in Android Studio.
 7. Select menu item *Run > Run 'app'* to build and deploy test app.
