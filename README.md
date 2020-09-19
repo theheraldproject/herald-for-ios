@@ -6,7 +6,7 @@ Continuous proximity detection across iOS and Android devices in background mode
 
 Copyright 2020 VMware, Inc.
 
-Licensed under the MIT license
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ### Contents
 
