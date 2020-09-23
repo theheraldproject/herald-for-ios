@@ -9,7 +9,7 @@ import UIKit
 import Herald
 
 class ViewController: UIViewController, SensorDelegate {
-    private let logger = Log(subsystem: "Squire", category: "ViewController")
+    private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: Sensor!
     private let dateFormatter = DateFormatter()

@@ -204,7 +204,7 @@
 			dependencies = (
 			);
 			name = Herald;
-			productName = squire;
+			productName = herald;
 			productReference = B644F2692513ED2000E2E1A0 /* Herald.framework */;
 			productType = "com.apple.product-type.framework";
 		};
