@@ -11,7 +11,7 @@ import Herald
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
-    private let logger = Log(subsystem: "Squire", category: "AppDelegate")
+    private let logger = Log(subsystem: "Herald", category: "AppDelegate")
     var window: UIWindow?
 
     // Payload data supplier, sensor and contact log

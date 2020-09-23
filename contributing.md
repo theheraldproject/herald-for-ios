@@ -8,7 +8,7 @@ This page presents guidelines for contributing to This repository. Following the
 
 ## Submitting Bug Reports and Feature Requests
 
-Please submit bug reports and feature requests by using our GitHub [Issues](https://github.com/vmware/squire-ios/issues) page.
+Please submit bug reports and feature requests by using our GitHub [Issues](https://github.com/vmware/Herald-for-iOS/issues) page.
 
 Before you submit a bug report about the code in the repository, please check the Issues page to see whether someone has already reported the problem. In the bug report, be as specific as possible about the error and the conditions under which it occurred. On what version and build did it occur? What are the steps to reproduce the bug? 
 
