@@ -7,7 +7,7 @@
 
 import UIKit
 import os
-import squire
+import Herald
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {

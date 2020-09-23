@@ -1,4 +1,4 @@
-# Squire-iOS
+# Herald-for-iOS
 
 ![Epidemiology](images/epidemiology.png)
 
@@ -153,7 +153,7 @@ The proximity detection solution has been integrated into a standalone test app 
 1. Open Xcode.
 2. Select menu item *Source Control > Clone* to clone the iOS repo as a new project.
 3. Select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
-4. Select *squire.xcodeproj* then select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
+4. Select *Herald.xcodeproj* then select *Target > Signing & Capabilities* to edit *Team* and *Bundle identifier* to resolve name clash if required.
 5. Connect iPhone to computer with USB cable, unlock device, select device in Xcode.
 6. Select menu item *Product > Run* to build and deploy test app.
 7. Expect the test app to open on the device.
@@ -169,8 +169,8 @@ The proximity detection solution has been integrated into a standalone test app 
 
 1. Open Android Studio.
 2. Select menu item *VCS > Git > Clone* to clone the Android repo as a new project.
-3. Select menu item *File > Sync Project with Gradle Files* to show both *app* and *squire* modules.
-4. Select menu item *Build > Make Project* to build *app* and *squire* modules.
+3. Select menu item *File > Sync Project with Gradle Files* to show both *app* and *herald* modules.
+4. Select menu item *Build > Make Project* to build *app* and *herald* modules.
 5. Enable Developer Mode on Android phone (*Settings > About > Software > Tap Build number repeatedly*).
 6. Connect Android phone to computer with USB cable, select device in Android Studio.
 7. Select menu item *Run > Run 'app'* to build and deploy test app.
@@ -181,7 +181,7 @@ The proximity detection solution has been integrated into a standalone test app 
 1. Install and open Android File Transfer utility (https://www.android.com/filetransfer/)
 2. Connect Android phone to computer with USB cable, unlock device, ensuring USB Preferences is set to "File transfer".
 3. Open Android File Transfer utility.
-4. Select path *Android / media / com.vmware.squire.app / Sensor*.
+4. Select path *Android / media / com.vmware.herald.app / Sensor*.
 5. Expect a list of log files (e.g. *contacts.csv*).
 6. Drag and drop to copy log files to computer for analysis.
 

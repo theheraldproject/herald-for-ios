@@ -7,34 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B61C44D5251B3792006D085F /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61C44D3251B3785006D085F /* Herald.framework */; };
+		B61C44D6251B3792006D085F /* Herald.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B61C44D3251B3785006D085F /* Herald.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
 		B692CAA024CADA7A00F45AEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9F24CADA7A00F45AEE /* Assets.xcassets */; };
 		B692CAA324CADA7A00F45AEE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */; };
 		B6B733BD2513F4F1000DF74C /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B733BC2513F4F1000DF74C /* Log.swift */; };
-		B6DDEB5D2513FA5B0003AFBB /* squire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6DDEB5C2513FA4A0003AFBB /* squire.framework */; };
-		B6DDEB5E2513FA5B0003AFBB /* squire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B6DDEB5C2513FA4A0003AFBB /* squire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B6DDEB5B2513FA4A0003AFBB /* PBXContainerItemProxy */ = {
+		B61C44D2251B3785006D085F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */;
+			containerPortal = B61C44CE251B3785006D085F /* Herald.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = B644F2692513ED2000E2E1A0;
-			remoteInfo = squire;
+			remoteInfo = Herald;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		B644F2B22513EFC700E2E1A0 /* Embed Frameworks */ = {
+		B61C44D7251B3792006D085F /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B6DDEB5E2513FA5B0003AFBB /* squire.framework in Embed Frameworks */,
+				B61C44D6251B3792006D085F /* Herald.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,7 +42,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B692CA9024CADA7500F45AEE /* Squire-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Squire-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B61C44CE251B3785006D085F /* Herald.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Herald.xcodeproj; path = herald/Herald.xcodeproj; sourceTree = "<group>"; };
+		B6894BC3251B33E500BDFB1E /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6894BD0251B356000BDFB1E /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B692CA9024CADA7500F45AEE /* Herald-for-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Herald-for-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B692CA9A24CADA7500F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -50,7 +53,6 @@
 		B692CAA224CADA7A00F45AEE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B692CAA424CADA7A00F45AEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6B733BC2513F4F1000DF74C /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
-		B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = squire.xcodeproj; path = squire/squire.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,16 +60,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6DDEB5D2513FA5B0003AFBB /* squire.framework in Frameworks */,
+				B61C44D5251B3792006D085F /* Herald.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B61C44CF251B3785006D085F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B61C44D3251B3785006D085F /* Herald.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		B644F2AF2513EFC700E2E1A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B6894BD0251B356000BDFB1E /* Herald.framework */,
+				B6894BC3251B33E500BDFB1E /* Herald.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -75,8 +87,8 @@
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
-				B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */,
-				B692CA9224CADA7500F45AEE /* Squire-iOS */,
+				B61C44CE251B3785006D085F /* Herald.xcodeproj */,
+				B692CA9224CADA7500F45AEE /* Herald-for-iOS */,
 				B692CA9124CADA7500F45AEE /* Products */,
 				B644F2AF2513EFC700E2E1A0 /* Frameworks */,
 			);
@@ -85,12 +97,12 @@
 		B692CA9124CADA7500F45AEE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B692CA9024CADA7500F45AEE /* Squire-iOS.app */,
+				B692CA9024CADA7500F45AEE /* Herald-for-iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B692CA9224CADA7500F45AEE /* Squire-iOS */ = {
+		B692CA9224CADA7500F45AEE /* Herald-for-iOS */ = {
 			isa = PBXGroup;
 			children = (
 				B692CA9324CADA7500F45AEE /* AppDelegate.swift */,
@@ -101,36 +113,28 @@
 				B692CAA124CADA7A00F45AEE /* LaunchScreen.storyboard */,
 				B692CAA424CADA7A00F45AEE /* Info.plist */,
 			);
-			path = "Squire-iOS";
-			sourceTree = "<group>";
-		};
-		B6DDEB582513FA4A0003AFBB /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B6DDEB5C2513FA4A0003AFBB /* squire.framework */,
-			);
-			name = Products;
+			path = "Herald-for-iOS";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B692CA8F24CADA7500F45AEE /* Squire-iOS */ = {
+		B692CA8F24CADA7500F45AEE /* Herald-for-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "Squire-iOS" */;
+			buildConfigurationList = B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "Herald-for-iOS" */;
 			buildPhases = (
 				B692CA8C24CADA7500F45AEE /* Sources */,
 				B692CA8D24CADA7500F45AEE /* Frameworks */,
 				B692CA8E24CADA7500F45AEE /* Resources */,
-				B644F2B22513EFC700E2E1A0 /* Embed Frameworks */,
+				B61C44D7251B3792006D085F /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "Squire-iOS";
+			name = "Herald-for-iOS";
 			productName = "";
-			productReference = B692CA9024CADA7500F45AEE /* Squire-iOS.app */;
+			productReference = B692CA9024CADA7500F45AEE /* Herald-for-iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -139,7 +143,7 @@
 		B692CA8824CADA7500F45AEE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = com.vmware.squire;
+				CLASSPREFIX = com.vmware.herald;
 				LastSwiftUpdateCheck = 1160;
 				LastUpgradeCheck = 1160;
 				ORGANIZATIONNAME = "VMware, Inc.";
@@ -149,7 +153,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "Squire-iOS" */;
+			buildConfigurationList = B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "Herald-for-iOS" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -162,23 +166,23 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = B6DDEB582513FA4A0003AFBB /* Products */;
-					ProjectRef = B6DDEB572513FA4A0003AFBB /* squire.xcodeproj */;
+					ProductGroup = B61C44CF251B3785006D085F /* Products */;
+					ProjectRef = B61C44CE251B3785006D085F /* Herald.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
-				B692CA8F24CADA7500F45AEE /* Squire-iOS */,
+				B692CA8F24CADA7500F45AEE /* Herald-for-iOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		B6DDEB5C2513FA4A0003AFBB /* squire.framework */ = {
+		B61C44D3251B3785006D085F /* Herald.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			path = squire.framework;
-			remoteRef = B6DDEB5B2513FA4A0003AFBB /* PBXContainerItemProxy */;
+			path = Herald.framework;
+			remoteRef = B61C44D2251B3785006D085F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -350,13 +354,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
-				INFOPLIST_FILE = "$(SRCROOT)/Squire-iOS/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.herald.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -370,13 +374,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
-				INFOPLIST_FILE = "$(SRCROOT)/Squire-iOS/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.squire.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.herald.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -386,7 +390,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "Squire-iOS" */ = {
+		B692CA8B24CADA7500F45AEE /* Build configuration list for PBXProject "Herald-for-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B692CAA524CADA7A00F45AEE /* Debug */,
@@ -395,7 +399,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "Squire-iOS" */ = {
+		B692CAA724CADA7A00F45AEE /* Build configuration list for PBXNativeTarget "Herald-for-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B692CAA824CADA7A00F45AEE /* Debug */,

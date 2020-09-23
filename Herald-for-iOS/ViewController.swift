@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import squire
+import Herald
 
 class ViewController: UIViewController, SensorDelegate {
     private let logger = Log(subsystem: "Squire", category: "ViewController")
