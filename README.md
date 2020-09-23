@@ -8,6 +8,8 @@ Copyright 2020 VMware, Inc.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+See LICENSE.txt and NOTICE.txt for details.
+
 ### Contents
 
 - [Introduction](#introduction)
