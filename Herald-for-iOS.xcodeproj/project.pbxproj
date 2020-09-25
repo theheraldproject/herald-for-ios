@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B61C44D5251B3792006D085F /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61C44D3251B3785006D085F /* Herald.framework */; };
-		B61C44D6251B3792006D085F /* Herald.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B61C44D3251B3785006D085F /* Herald.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B637EF99251E572E0072D238 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF96251E56E80072D238 /* Herald.framework */; };
+		B637EF9A251E572E0072D238 /* Herald.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF96251E56E80072D238 /* Herald.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
@@ -18,11 +18,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B61C44D2251B3785006D085F /* PBXContainerItemProxy */ = {
+		B637EF95251E56E80072D238 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B61C44CE251B3785006D085F /* Herald.xcodeproj */;
+			containerPortal = B637EF91251E56E80072D238 /* Herald.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B644F2692513ED2000E2E1A0;
+			remoteGlobalIDString = B637EF50251E55E60072D238;
 			remoteInfo = Herald;
 		};
 /* End PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B61C44D6251B3792006D085F /* Herald.framework in Embed Frameworks */,
+				B637EF9A251E572E0072D238 /* Herald.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,9 +42,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B61C44CE251B3785006D085F /* Herald.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Herald.xcodeproj; path = herald/Herald.xcodeproj; sourceTree = "<group>"; };
-		B6894BC3251B33E500BDFB1E /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B6894BD0251B356000BDFB1E /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B637EF91251E56E80072D238 /* Herald.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Herald.xcodeproj; path = Herald/Herald.xcodeproj; sourceTree = "<group>"; };
 		B692CA9024CADA7500F45AEE /* Herald-for-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Herald-for-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9324CADA7500F45AEE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B692CA9724CADA7500F45AEE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -60,17 +58,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B61C44D5251B3792006D085F /* Herald.framework in Frameworks */,
+				B637EF99251E572E0072D238 /* Herald.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B61C44CF251B3785006D085F /* Products */ = {
+		B637EF92251E56E80072D238 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B61C44D3251B3785006D085F /* Herald.framework */,
+				B637EF96251E56E80072D238 /* Herald.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,8 +76,6 @@
 		B644F2AF2513EFC700E2E1A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B6894BD0251B356000BDFB1E /* Herald.framework */,
-				B6894BC3251B33E500BDFB1E /* Herald.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -87,7 +83,7 @@
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
-				B61C44CE251B3785006D085F /* Herald.xcodeproj */,
+				B637EF91251E56E80072D238 /* Herald.xcodeproj */,
 				B692CA9224CADA7500F45AEE /* Herald-for-iOS */,
 				B692CA9124CADA7500F45AEE /* Products */,
 				B644F2AF2513EFC700E2E1A0 /* Frameworks */,
@@ -145,7 +141,7 @@
 			attributes = {
 				CLASSPREFIX = com.vmware.herald;
 				LastSwiftUpdateCheck = 1160;
-				LastUpgradeCheck = 1160;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "VMware, Inc.";
 				TargetAttributes = {
 					B692CA8F24CADA7500F45AEE = {
@@ -166,8 +162,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = B61C44CF251B3785006D085F /* Products */;
-					ProjectRef = B61C44CE251B3785006D085F /* Herald.xcodeproj */;
+					ProductGroup = B637EF92251E56E80072D238 /* Products */;
+					ProjectRef = B637EF91251E56E80072D238 /* Herald.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -178,11 +174,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		B61C44D3251B3785006D085F /* Herald.framework */ = {
+		B637EF96251E56E80072D238 /* Herald.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = Herald.framework;
-			remoteRef = B61C44D2251B3785006D085F /* PBXContainerItemProxy */;
+			remoteRef = B637EF95251E56E80072D238 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -259,6 +255,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -319,6 +316,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
