@@ -7,62 +7,61 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B644F26E2513ED2000E2E1A0 /* herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B644F26C2513ED2000E2E1A0 /* herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B644F2902513ED5900E2E1A0 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2762513ED5900E2E1A0 /* BLESensor.swift */; };
-		B644F2912513ED5900E2E1A0 /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2772513ED5900E2E1A0 /* BLEDatabase.swift */; };
-		B644F2922513ED5900E2E1A0 /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2782513ED5900E2E1A0 /* BLEUtilities.swift */; };
-		B644F2932513ED5900E2E1A0 /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2792513ED5900E2E1A0 /* BLETransmitter.swift */; };
-		B644F2942513ED5900E2E1A0 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F27A2513ED5900E2E1A0 /* BLEReceiver.swift */; };
-		B644F2952513ED5900E2E1A0 /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F27C2513ED5900E2E1A0 /* GPSSensor.swift */; };
-		B644F2962513ED5900E2E1A0 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F27D2513ED5900E2E1A0 /* Sensor.swift */; };
-		B644F2972513ED5900E2E1A0 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2802513ED5900E2E1A0 /* SonarPayloadSupplier.swift */; };
-		B644F2982513ED5900E2E1A0 /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2812513ED5900E2E1A0 /* PayloadDataSupplier.swift */; };
-		B644F2992513ED5900E2E1A0 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2832513ED5900E2E1A0 /* DayCodes.swift */; };
-		B644F29A2513ED5900E2E1A0 /* SHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2842513ED5900E2E1A0 /* SHA.swift */; };
-		B644F29B2513ED5900E2E1A0 /* BeaconCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2852513ED5900E2E1A0 /* BeaconCodes.swift */; };
-		B644F29C2513ED5900E2E1A0 /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2862513ED5900E2E1A0 /* JavaData.swift */; };
-		B644F29D2513ED5900E2E1A0 /* PayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */; };
-		B644F29E2513ED5900E2E1A0 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2892513ED5900E2E1A0 /* TextFile.swift */; };
-		B644F2A02513ED5900E2E1A0 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */; };
-		B644F2A12513ED5900E2E1A0 /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */; };
-		B644F2A22513ED5900E2E1A0 /* SensorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */; };
-		B644F2A32513ED5900E2E1A0 /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28E2513ED5900E2E1A0 /* ContactLog.swift */; };
-		B644F2A42513ED5900E2E1A0 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F28F2513ED5900E2E1A0 /* StatisticsLog.swift */; };
-		B644F2A62513EDD700E2E1A0 /* SensorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2A52513EDD700E2E1A0 /* SensorDelegate.swift */; };
-		B644F2A82513EE0F00E2E1A0 /* SensorArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644F2A72513EE0F00E2E1A0 /* SensorArray.swift */; };
+		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B637EF79251E56320072D238 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5E251E56320072D238 /* BLESensor.swift */; };
+		B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5F251E56320072D238 /* BLEDatabase.swift */; };
+		B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF60251E56320072D238 /* BLEUtilities.swift */; };
+		B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF61251E56320072D238 /* BLETransmitter.swift */; };
+		B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF62251E56320072D238 /* BLEReceiver.swift */; };
+		B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* GPSSensor.swift */; };
+		B637EF7F251E56320072D238 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF65251E56320072D238 /* Sensor.swift */; };
+		B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */; };
+		B637EF81251E56320072D238 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6A251E56320072D238 /* DayCodes.swift */; };
+		B637EF82251E56320072D238 /* SHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6B251E56320072D238 /* SHA.swift */; };
+		B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6C251E56320072D238 /* BeaconCodes.swift */; };
+		B637EF84251E56320072D238 /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6D251E56320072D238 /* JavaData.swift */; };
+		B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */; };
+		B637EF86251E56320072D238 /* SensorArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6F251E56320072D238 /* SensorArray.swift */; };
+		B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF70251E56320072D238 /* PayloadDataSupplier.swift */; };
+		B637EF88251E56320072D238 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF72251E56320072D238 /* TextFile.swift */; };
+		B637EF89251E56320072D238 /* BatteryLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF73251E56320072D238 /* BatteryLog.swift */; };
+		B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF74251E56320072D238 /* DetectionLog.swift */; };
+		B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF75251E56320072D238 /* SensorLogger.swift */; };
+		B637EF8C251E56320072D238 /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF76251E56320072D238 /* ContactLog.swift */; };
+		B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF77251E56320072D238 /* StatisticsLog.swift */; };
+		B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF78251E56320072D238 /* SensorDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B644F2692513ED2000E2E1A0 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B644F26C2513ED2000E2E1A0 /* herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = herald.h; sourceTree = "<group>"; };
-		B644F26D2513ED2000E2E1A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B644F2762513ED5900E2E1A0 /* BLESensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLESensor.swift; sourceTree = "<group>"; };
-		B644F2772513ED5900E2E1A0 /* BLEDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
-		B644F2782513ED5900E2E1A0 /* BLEUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
-		B644F2792513ED5900E2E1A0 /* BLETransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
-		B644F27A2513ED5900E2E1A0 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
-		B644F27C2513ED5900E2E1A0 /* GPSSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
-		B644F27D2513ED5900E2E1A0 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
-		B644F2802513ED5900E2E1A0 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
-		B644F2812513ED5900E2E1A0 /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
-		B644F2832513ED5900E2E1A0 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
-		B644F2842513ED5900E2E1A0 /* SHA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHA.swift; sourceTree = "<group>"; };
-		B644F2852513ED5900E2E1A0 /* BeaconCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconCodes.swift; sourceTree = "<group>"; };
-		B644F2862513ED5900E2E1A0 /* JavaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JavaData.swift; sourceTree = "<group>"; };
-		B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadSupplier.swift; sourceTree = "<group>"; };
-		B644F2892513ED5900E2E1A0 /* TextFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
-		B644F28A2513ED5900E2E1A0 /* RScriptLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RScriptLog.swift; sourceTree = "<group>"; };
-		B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatteryLog.swift; sourceTree = "<group>"; };
-		B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
-		B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorLogger.swift; sourceTree = "<group>"; };
-		B644F28E2513ED5900E2E1A0 /* ContactLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
-		B644F28F2513ED5900E2E1A0 /* StatisticsLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
-		B644F2A52513EDD700E2E1A0 /* SensorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorDelegate.swift; sourceTree = "<group>"; };
-		B644F2A72513EE0F00E2E1A0 /* SensorArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorArray.swift; sourceTree = "<group>"; };
+		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B637EF53251E55E60072D238 /* Herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Herald.h; sourceTree = "<group>"; };
+		B637EF54251E55E60072D238 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B637EF5E251E56320072D238 /* BLESensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLESensor.swift; sourceTree = "<group>"; };
+		B637EF5F251E56320072D238 /* BLEDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEDatabase.swift; sourceTree = "<group>"; };
+		B637EF60251E56320072D238 /* BLEUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
+		B637EF61251E56320072D238 /* BLETransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
+		B637EF62251E56320072D238 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
+		B637EF64251E56320072D238 /* GPSSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
+		B637EF65251E56320072D238 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
+		B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
+		B637EF6A251E56320072D238 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
+		B637EF6B251E56320072D238 /* SHA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHA.swift; sourceTree = "<group>"; };
+		B637EF6C251E56320072D238 /* BeaconCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconCodes.swift; sourceTree = "<group>"; };
+		B637EF6D251E56320072D238 /* JavaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JavaData.swift; sourceTree = "<group>"; };
+		B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = C19XPayloadSupplier.swift; sourceTree = "<group>"; };
+		B637EF6F251E56320072D238 /* SensorArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorArray.swift; sourceTree = "<group>"; };
+		B637EF70251E56320072D238 /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
+		B637EF72251E56320072D238 /* TextFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
+		B637EF73251E56320072D238 /* BatteryLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatteryLog.swift; sourceTree = "<group>"; };
+		B637EF74251E56320072D238 /* DetectionLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetectionLog.swift; sourceTree = "<group>"; };
+		B637EF75251E56320072D238 /* SensorLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorLogger.swift; sourceTree = "<group>"; };
+		B637EF76251E56320072D238 /* ContactLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
+		B637EF77251E56320072D238 /* StatisticsLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
+		B637EF78251E56320072D238 /* SensorDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		B644F2662513ED2000E2E1A0 /* Frameworks */ = {
+		B637EF4D251E55E60072D238 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,106 +71,105 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B644F25F2513ED2000E2E1A0 = {
+		B637EF46251E55E60072D238 = {
 			isa = PBXGroup;
 			children = (
-				B644F26B2513ED2000E2E1A0 /* herald */,
-				B644F26A2513ED2000E2E1A0 /* Products */,
+				B637EF52251E55E60072D238 /* Herald */,
+				B637EF51251E55E60072D238 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		B644F26A2513ED2000E2E1A0 /* Products */ = {
+		B637EF51251E55E60072D238 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2692513ED2000E2E1A0 /* Herald.framework */,
+				B637EF50251E55E60072D238 /* Herald.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B644F26B2513ED2000E2E1A0 /* herald */ = {
+		B637EF52251E55E60072D238 /* Herald */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2742513ED5900E2E1A0 /* Sensor */,
-				B644F26C2513ED2000E2E1A0 /* herald.h */,
-				B644F26D2513ED2000E2E1A0 /* Info.plist */,
+				B637EF5C251E56320072D238 /* Sensor */,
+				B637EF53251E55E60072D238 /* Herald.h */,
+				B637EF54251E55E60072D238 /* Info.plist */,
 			);
-			path = herald;
+			path = Herald;
 			sourceTree = "<group>";
 		};
-		B644F2742513ED5900E2E1A0 /* Sensor */ = {
+		B637EF5C251E56320072D238 /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2752513ED5900E2E1A0 /* BLE */,
-				B644F27B2513ED5900E2E1A0 /* GPS */,
-				B644F27E2513ED5900E2E1A0 /* Payload */,
-				B644F2882513ED5900E2E1A0 /* Data */,
-				B644F27D2513ED5900E2E1A0 /* Sensor.swift */,
-				B644F2A52513EDD700E2E1A0 /* SensorDelegate.swift */,
-				B644F2812513ED5900E2E1A0 /* PayloadDataSupplier.swift */,
-				B644F2A72513EE0F00E2E1A0 /* SensorArray.swift */,
+				B637EF5D251E56320072D238 /* BLE */,
+				B637EF63251E56320072D238 /* GPS */,
+				B637EF71251E56320072D238 /* Data */,
+				B637EF66251E56320072D238 /* Payload */,
+				B637EF65251E56320072D238 /* Sensor.swift */,
+				B637EF6F251E56320072D238 /* SensorArray.swift */,
+				B637EF70251E56320072D238 /* PayloadDataSupplier.swift */,
+				B637EF78251E56320072D238 /* SensorDelegate.swift */,
 			);
 			path = Sensor;
 			sourceTree = "<group>";
 		};
-		B644F2752513ED5900E2E1A0 /* BLE */ = {
+		B637EF5D251E56320072D238 /* BLE */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2762513ED5900E2E1A0 /* BLESensor.swift */,
-				B644F2772513ED5900E2E1A0 /* BLEDatabase.swift */,
-				B644F2782513ED5900E2E1A0 /* BLEUtilities.swift */,
-				B644F2792513ED5900E2E1A0 /* BLETransmitter.swift */,
-				B644F27A2513ED5900E2E1A0 /* BLEReceiver.swift */,
+				B637EF5E251E56320072D238 /* BLESensor.swift */,
+				B637EF5F251E56320072D238 /* BLEDatabase.swift */,
+				B637EF60251E56320072D238 /* BLEUtilities.swift */,
+				B637EF61251E56320072D238 /* BLETransmitter.swift */,
+				B637EF62251E56320072D238 /* BLEReceiver.swift */,
 			);
 			path = BLE;
 			sourceTree = "<group>";
 		};
-		B644F27B2513ED5900E2E1A0 /* GPS */ = {
+		B637EF63251E56320072D238 /* GPS */ = {
 			isa = PBXGroup;
 			children = (
-				B644F27C2513ED5900E2E1A0 /* GPSSensor.swift */,
+				B637EF64251E56320072D238 /* GPSSensor.swift */,
 			);
 			path = GPS;
 			sourceTree = "<group>";
 		};
-		B644F27E2513ED5900E2E1A0 /* Payload */ = {
+		B637EF66251E56320072D238 /* Payload */ = {
 			isa = PBXGroup;
 			children = (
-				B644F27F2513ED5900E2E1A0 /* Sonar */,
-				B644F2822513ED5900E2E1A0 /*  */,
+				B637EF67251E56320072D238 /* Sonar */,
+				B637EF69251E56320072D238 /* C19X */,
 			);
 			path = Payload;
 			sourceTree = "<group>";
 		};
-		B644F27F2513ED5900E2E1A0 /* Sonar */ = {
+		B637EF67251E56320072D238 /* Sonar */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2802513ED5900E2E1A0 /* SonarPayloadSupplier.swift */,
+				B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */,
 			);
 			path = Sonar;
 			sourceTree = "<group>";
 		};
-		B644F2822513ED5900E2E1A0 /*  */ = {
+		B637EF69251E56320072D238 /* C19X */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2832513ED5900E2E1A0 /* DayCodes.swift */,
-				B644F2842513ED5900E2E1A0 /* SHA.swift */,
-				B644F2852513ED5900E2E1A0 /* BeaconCodes.swift */,
-				B644F2862513ED5900E2E1A0 /* JavaData.swift */,
-				B644F2872513ED5900E2E1A0 /* PayloadSupplier.swift */,
+				B637EF6A251E56320072D238 /* DayCodes.swift */,
+				B637EF6B251E56320072D238 /* SHA.swift */,
+				B637EF6C251E56320072D238 /* BeaconCodes.swift */,
+				B637EF6D251E56320072D238 /* JavaData.swift */,
+				B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */,
 			);
-			path = ;
+			path = C19X;
 			sourceTree = "<group>";
 		};
-		B644F2882513ED5900E2E1A0 /* Data */ = {
+		B637EF71251E56320072D238 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				B644F2892513ED5900E2E1A0 /* TextFile.swift */,
-				B644F28A2513ED5900E2E1A0 /* RScriptLog.swift */,
-				B644F28B2513ED5900E2E1A0 /* BatteryLog.swift */,
-				B644F28C2513ED5900E2E1A0 /* DetectionLog.swift */,
-				B644F28D2513ED5900E2E1A0 /* SensorLogger.swift */,
-				B644F28E2513ED5900E2E1A0 /* ContactLog.swift */,
-				B644F28F2513ED5900E2E1A0 /* StatisticsLog.swift */,
+				B637EF72251E56320072D238 /* TextFile.swift */,
+				B637EF73251E56320072D238 /* BatteryLog.swift */,
+				B637EF74251E56320072D238 /* DetectionLog.swift */,
+				B637EF75251E56320072D238 /* SensorLogger.swift */,
+				B637EF76251E56320072D238 /* ContactLog.swift */,
+				B637EF77251E56320072D238 /* StatisticsLog.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -179,50 +177,50 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		B644F2642513ED2000E2E1A0 /* Headers */ = {
+		B637EF4B251E55E60072D238 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B644F26E2513ED2000E2E1A0 /* herald.h in Headers */,
+				B637EF55251E55E60072D238 /* Herald.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		B644F2682513ED2000E2E1A0 /* Herald */ = {
+		B637EF4F251E55E60072D238 /* Herald */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B644F2712513ED2000E2E1A0 /* Build configuration list for PBXNativeTarget "Herald" */;
+			buildConfigurationList = B637EF58251E55E60072D238 /* Build configuration list for PBXNativeTarget "Herald" */;
 			buildPhases = (
-				B644F2642513ED2000E2E1A0 /* Headers */,
-				B644F2652513ED2000E2E1A0 /* Sources */,
-				B644F2662513ED2000E2E1A0 /* Frameworks */,
-				B644F2672513ED2000E2E1A0 /* Resources */,
+				B637EF4B251E55E60072D238 /* Headers */,
+				B637EF4C251E55E60072D238 /* Sources */,
+				B637EF4D251E55E60072D238 /* Frameworks */,
+				B637EF4E251E55E60072D238 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Herald;
-			productName = herald;
-			productReference = B644F2692513ED2000E2E1A0 /* Herald.framework */;
+			productName = Herald;
+			productReference = B637EF50251E55E60072D238 /* Herald.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		B644F2602513ED2000E2E1A0 /* Project object */ = {
+		B637EF47251E55E60072D238 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1170;
-				ORGANIZATIONNAME = "VMware, Inc.";
+				LastUpgradeCheck = 1200;
+				ORGANIZATIONNAME = com.vmware;
 				TargetAttributes = {
-					B644F2682513ED2000E2E1A0 = {
-						CreatedOnToolsVersion = 11.7;
+					B637EF4F251E55E60072D238 = {
+						CreatedOnToolsVersion = 12.0.1;
 					};
 				};
 			};
-			buildConfigurationList = B644F2632513ED2000E2E1A0 /* Build configuration list for PBXProject "Herald" */;
+			buildConfigurationList = B637EF4A251E55E60072D238 /* Build configuration list for PBXProject "Herald" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -230,18 +228,18 @@
 				en,
 				Base,
 			);
-			mainGroup = B644F25F2513ED2000E2E1A0;
-			productRefGroup = B644F26A2513ED2000E2E1A0 /* Products */;
+			mainGroup = B637EF46251E55E60072D238;
+			productRefGroup = B637EF51251E55E60072D238 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B644F2682513ED2000E2E1A0 /* Herald */,
+				B637EF4F251E55E60072D238 /* Herald */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		B644F2672513ED2000E2E1A0 /* Resources */ = {
+		B637EF4E251E55E60072D238 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -251,39 +249,39 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		B644F2652513ED2000E2E1A0 /* Sources */ = {
+		B637EF4C251E55E60072D238 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B644F2942513ED5900E2E1A0 /* BLEReceiver.swift in Sources */,
-				B644F2992513ED5900E2E1A0 /* DayCodes.swift in Sources */,
-				B644F29B2513ED5900E2E1A0 /* BeaconCodes.swift in Sources */,
-				B644F2922513ED5900E2E1A0 /* BLEUtilities.swift in Sources */,
-				B644F29C2513ED5900E2E1A0 /* JavaData.swift in Sources */,
-				B644F2A12513ED5900E2E1A0 /* DetectionLog.swift in Sources */,
-				B644F2982513ED5900E2E1A0 /* PayloadDataSupplier.swift in Sources */,
-				B644F2A02513ED5900E2E1A0 /* BatteryLog.swift in Sources */,
-				B644F2A82513EE0F00E2E1A0 /* SensorArray.swift in Sources */,
-				B644F29E2513ED5900E2E1A0 /* TextFile.swift in Sources */,
-				B644F2912513ED5900E2E1A0 /* BLEDatabase.swift in Sources */,
-				B644F2902513ED5900E2E1A0 /* BLESensor.swift in Sources */,
-				B644F2952513ED5900E2E1A0 /* GPSSensor.swift in Sources */,
-				B644F2A32513ED5900E2E1A0 /* ContactLog.swift in Sources */,
-				B644F2A62513EDD700E2E1A0 /* SensorDelegate.swift in Sources */,
-				B644F29A2513ED5900E2E1A0 /* SHA.swift in Sources */,
-				B644F2A42513ED5900E2E1A0 /* StatisticsLog.swift in Sources */,
-				B644F2A22513ED5900E2E1A0 /* SensorLogger.swift in Sources */,
-				B644F2932513ED5900E2E1A0 /* BLETransmitter.swift in Sources */,
-				B644F29D2513ED5900E2E1A0 /* PayloadSupplier.swift in Sources */,
-				B644F2972513ED5900E2E1A0 /* SonarPayloadSupplier.swift in Sources */,
-				B644F2962513ED5900E2E1A0 /* Sensor.swift in Sources */,
+				B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */,
+				B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */,
+				B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */,
+				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
+				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
+				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
+				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
+				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
+				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
+				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
+				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
+				B637EF82251E56320072D238 /* SHA.swift in Sources */,
+				B637EF81251E56320072D238 /* DayCodes.swift in Sources */,
+				B637EF8C251E56320072D238 /* ContactLog.swift in Sources */,
+				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
+				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
+				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
+				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
+				B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */,
+				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
+				B637EF88251E56320072D238 /* TextFile.swift in Sources */,
+				B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		B644F26F2513ED2000E2E1A0 /* Debug */ = {
+		B637EF56251E55E60072D238 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -309,6 +307,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -334,7 +333,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -346,7 +345,7 @@
 			};
 			name = Debug;
 		};
-		B644F2702513ED2000E2E1A0 /* Release */ = {
+		B637EF57251E55E60072D238 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -372,6 +371,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -391,7 +391,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -403,16 +403,15 @@
 			};
 			name = Release;
 		};
-		B644F2722513ED2000E2E1A0 /* Debug */ = {
+		B637EF59251E55E60072D238 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = herald/Info.plist;
+				INFOPLIST_FILE = Herald/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -429,16 +428,15 @@
 			};
 			name = Debug;
 		};
-		B644F2732513ED2000E2E1A0 /* Release */ = {
+		B637EF5A251E55E60072D238 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = herald/Info.plist;
+				INFOPLIST_FILE = Herald/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -458,25 +456,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B644F2632513ED2000E2E1A0 /* Build configuration list for PBXProject "Herald" */ = {
+		B637EF4A251E55E60072D238 /* Build configuration list for PBXProject "Herald" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B644F26F2513ED2000E2E1A0 /* Debug */,
-				B644F2702513ED2000E2E1A0 /* Release */,
+				B637EF56251E55E60072D238 /* Debug */,
+				B637EF57251E55E60072D238 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B644F2712513ED2000E2E1A0 /* Build configuration list for PBXNativeTarget "Herald" */ = {
+		B637EF58251E55E60072D238 /* Build configuration list for PBXNativeTarget "Herald" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B644F2722513ED2000E2E1A0 /* Debug */,
-				B644F2732513ED2000E2E1A0 /* Release */,
+				B637EF59251E55E60072D238 /* Debug */,
+				B637EF5A251E55E60072D238 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = B644F2602513ED2000E2E1A0 /* Project object */;
+	rootObject = B637EF47251E55E60072D238 /* Project object */;
 }
