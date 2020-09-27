@@ -30,6 +30,7 @@
 		B637EF8C251E56320072D238 /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF76251E56320072D238 /* ContactLog.swift */; };
 		B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF77251E56320072D238 /* StatisticsLog.swift */; };
 		B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF78251E56320072D238 /* SensorDelegate.swift */; };
+		B6DEAA07251FB29D002E8AE5 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DEAA06251FB29D002E8AE5 /* SimplePayloadDataSupplier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		B637EF76251E56320072D238 /* ContactLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
 		B637EF77251E56320072D238 /* StatisticsLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
 		B637EF78251E56320072D238 /* SensorDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDelegate.swift; sourceTree = "<group>"; };
+		B6DEAA06251FB29D002E8AE5 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +137,7 @@
 		B637EF66251E56320072D238 /* Payload */ = {
 			isa = PBXGroup;
 			children = (
+				B6584F68251FAED6000F7719 /* Simple */,
 				B637EF67251E56320072D238 /* Sonar */,
 				B637EF69251E56320072D238 /* C19X */,
 			);
@@ -172,6 +175,14 @@
 				B637EF77251E56320072D238 /* StatisticsLog.swift */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		B6584F68251FAED6000F7719 /* Simple */ = {
+			isa = PBXGroup;
+			children = (
+				B6DEAA06251FB29D002E8AE5 /* SimplePayloadDataSupplier.swift */,
+			);
+			path = Simple;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -262,6 +273,7 @@
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
 				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
+				B6DEAA07251FB29D002E8AE5 /* SimplePayloadDataSupplier.swift in Sources */,
 				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
