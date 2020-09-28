@@ -205,7 +205,8 @@ class K {
         /**
          Matching key on day 0 is derived from matching key seed on day 0 and day -1. Implemented as special case for clarity in above code.
          */
-        matchingKey[0] = MatchingKey(F.h(F.xor(matchingKeySeed[0], F.h(F.t(matchingKeySeed[0])))))
+        let matchingKeySeedMinusOne = MatchingKeySeed(F.h(F.t(matchingKeySeed[0])))
+        matchingKey[0] = MatchingKey(F.h(F.xor(matchingKeySeed[0], matchingKeySeedMinusOne)))
         return matchingKey
     }
     
@@ -234,12 +235,13 @@ class K {
         /**
          Contact key on day 0 is derived from contact key seed at period 0 and period -1. Implemented as special case for clarity in above code.
          */
-        contactKey[0] = ContactKey(F.h(F.xor(contactKeySeed[0], F.h(F.t(contactKeySeed[0])))))
+        let contactKeySeedMinusOne = ContactKeySeed(F.h(F.t(contactKeySeed[0])))
+        contactKey[0] = ContactKey(F.h(F.xor(contactKeySeed[0], contactKeySeedMinusOne)))
         return contactKey
     }
 
     /// Generate contact identifer I_{c}
-    fileprivate static func contactIdentifier(_ contactKey: ContactKey) -> ContactIdentifier {
+    static func contactIdentifier(_ contactKey: ContactKey) -> ContactIdentifier {
         return ContactIdentifier(F.t(contactKey, 16))
     }
 }
