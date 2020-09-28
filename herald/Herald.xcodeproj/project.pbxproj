@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,7 +30,20 @@
 		B637EF8C251E56320072D238 /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF76251E56320072D238 /* ContactLog.swift */; };
 		B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF77251E56320072D238 /* StatisticsLog.swift */; };
 		B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF78251E56320072D238 /* SensorDelegate.swift */; };
+		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
+		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
+		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B650152125229D480070F774 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B637EF47251E55E60072D238 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B637EF4F251E55E60072D238;
+			remoteInfo = Herald;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,6 +71,10 @@
 		B637EF76251E56320072D238 /* ContactLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
 		B637EF77251E56320072D238 /* StatisticsLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
 		B637EF78251E56320072D238 /* SensorDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDelegate.swift; sourceTree = "<group>"; };
+		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
+		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +85,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B650151825229D480070F774 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B650152025229D480070F774 /* Herald.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -75,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				B637EF52251E55E60072D238 /* Herald */,
+				B650151C25229D480070F774 /* HeraldTests */,
 				B637EF51251E55E60072D238 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -83,6 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				B637EF50251E55E60072D238 /* Herald.framework */,
+				B650151B25229D480070F774 /* HeraldTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -135,6 +162,7 @@
 		B637EF66251E56320072D238 /* Payload */ = {
 			isa = PBXGroup;
 			children = (
+				B650151225229CED0070F774 /* Simple */,
 				B637EF67251E56320072D238 /* Sonar */,
 				B637EF69251E56320072D238 /* C19X */,
 			);
@@ -174,6 +202,23 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		B650151225229CED0070F774 /* Simple */ = {
+			isa = PBXGroup;
+			children = (
+				B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */,
+			);
+			path = Simple;
+			sourceTree = "<group>";
+		};
+		B650151C25229D480070F774 /* HeraldTests */ = {
+			isa = PBXGroup;
+			children = (
+				B6D8A56E25229F33000E6CC2 /* Info.plist */,
+				B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */,
+			);
+			path = HeraldTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -206,16 +251,38 @@
 			productReference = B637EF50251E55E60072D238 /* Herald.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		B650151A25229D480070F774 /* HeraldTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B650152325229D480070F774 /* Build configuration list for PBXNativeTarget "HeraldTests" */;
+			buildPhases = (
+				B650151725229D480070F774 /* Sources */,
+				B650151825229D480070F774 /* Frameworks */,
+				B650151925229D480070F774 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B650152225229D480070F774 /* PBXTargetDependency */,
+			);
+			name = HeraldTests;
+			productName = HeraldTests;
+			productReference = B650151B25229D480070F774 /* HeraldTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		B637EF47251E55E60072D238 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = com.vmware;
 				TargetAttributes = {
 					B637EF4F251E55E60072D238 = {
+						CreatedOnToolsVersion = 12.0.1;
+					};
+					B650151A25229D480070F774 = {
 						CreatedOnToolsVersion = 12.0.1;
 					};
 				};
@@ -234,12 +301,20 @@
 			projectRoot = "";
 			targets = (
 				B637EF4F251E55E60072D238 /* Herald */,
+				B650151A25229D480070F774 /* HeraldTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B637EF4E251E55E60072D238 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B650151925229D480070F774 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -262,6 +337,7 @@
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
 				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
+				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
 				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
@@ -278,7 +354,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B650151725229D480070F774 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B650152225229D480070F774 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = B637EF4F251E55E60072D238 /* Herald */;
+			targetProxy = B650152125229D480070F774 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B637EF56251E55E60072D238 /* Debug */ = {
@@ -453,6 +546,40 @@
 			};
 			name = Release;
 		};
+		B650152425229D480070F774 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = HeraldTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.HeraldTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B650152525229D480070F774 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = HeraldTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.HeraldTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -470,6 +597,15 @@
 			buildConfigurations = (
 				B637EF59251E55E60072D238 /* Debug */,
 				B637EF5A251E55E60072D238 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B650152325229D480070F774 /* Build configuration list for PBXNativeTarget "HeraldTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B650152425229D480070F774 /* Debug */,
+				B650152525229D480070F774 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
