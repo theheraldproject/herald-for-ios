@@ -157,6 +157,10 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         let ks1 = SecretKey(repeating: 0, count: 2048)
         let pds1 = ConcreteSimplePayloadDataSupplier(protocolAndVersion: 0, countryCode: 0, stateCode: 0, secretKey: ks1)
 
+        // Payload is 23 bytes long
+        XCTAssertNotNil(pds1.payload(K.date("2020-09-24T00:00:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!).count, 23)
+
         // Same payload in same period
         XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:00:00+0000")!))
         XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:05:59+0000")!))
