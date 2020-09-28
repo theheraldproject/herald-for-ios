@@ -153,11 +153,40 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         XCTAssertNotEqual(Ic2, Ic3)
     }
 
+    func testPayload() throws {
+        let ks1 = SecretKey(repeating: 0, count: 2048)
+        let pds1 = ConcreteSimplePayloadDataSupplier(protocolAndVersion: 0, countryCode: 0, stateCode: 0, secretKey: ks1)
 
-    func testMatchingKeysPerformance() throws {
+        // Same payload in same period
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:00:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:05:59+0000")!))
+        // Different payloads in different periods
+        XCTAssertNotEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:06:00+0000")!))
+
+        // Same payload in different periods before epoch
+        XCTAssertEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!), pds1.payload(K.date("2020-09-23T00:06:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!), pds1.payload(K.date("2020-09-23T23:54:00+0000")!))
+        // Valid payload on first epoch period
+        XCTAssertNotEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!), pds1.payload(K.date("2020-09-23T23:54:01+0000")!))
+
+        // Same payload in same periods on epoch + 2000 days
+        XCTAssertEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!), pds1.payload(K.date("2026-03-17T00:00:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!), pds1.payload(K.date("2026-03-17T00:05:59+0000")!))
+        // Different payloads in different periods on epoch + 2000 days
+        XCTAssertNotEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!), pds1.payload(K.date("2026-03-17T00:06:00+0000")!))
+
+        // Same payload in different periods after epoch + 2001 days
+        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:05:59+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
+    }
+
+    func testContactIdentifierPerformance() throws {
+        let km1 = MatchingKey(repeating: 0, count: 32)
         self.measure {
-            let ks1 = SecretKey(repeating: 0, count: 2048)
-            let km1 = K.matchingKeys(ks1)
+            for _ in 0...1000 {
+                _ = ConcreteSimplePayloadDataSupplier.contactIdentifiers(km1)
+            }
         }
     }
 
