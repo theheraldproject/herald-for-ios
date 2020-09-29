@@ -194,4 +194,16 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         }
     }
 
+    func testContactIdentifierCrossPlatform() throws {
+        // Generate secret and matching keys
+        let ks1 = SecretKey(repeating: 0, count: 2048)
+        let km1 = K.matchingKeys(ks1)
+        // Print first 10 days of contact keys for comparison across iOS and Android implementations
+        for day in 0...10 {
+            let kc1 = K.contactKeys(km1[day])
+            for period in 0...240 {
+                print("\(day),\(period),\(kc1[period].base64EncodedString())")
+            }
+        }
+    }
 }
