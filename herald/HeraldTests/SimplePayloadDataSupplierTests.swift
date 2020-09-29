@@ -193,6 +193,32 @@ class SimplePayloadDataSupplierTests: XCTestCase {
             }
         }
     }
+    
+    func testCrossPlatformUInt8() throws {
+        print("value,uint8")
+        for i in 0...255 {
+            let value = UInt8(i)
+            var bigEndian = value.bigEndian
+            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
+            print("\(value),\(data.base64EncodedString())")
+        }
+    }
+
+    func testCrossPlatformUInt16() throws {
+        print("value,uint16")
+        for i in 0...127 {
+            let value = UInt16(i)
+            var bigEndian = value.bigEndian
+            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
+            print("\(value),\(data.base64EncodedString())")
+        }
+        for i in (65536-128)...65535 {
+            let value = UInt16(i)
+            var bigEndian = value.bigEndian
+            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
+            print("\(value),\(data.base64EncodedString())")
+        }
+    }
 
     func testContactIdentifierCrossPlatform() throws {
         // Generate secret and matching keys
