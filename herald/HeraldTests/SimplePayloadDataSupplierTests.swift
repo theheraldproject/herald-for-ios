@@ -219,6 +219,15 @@ class SimplePayloadDataSupplierTests: XCTestCase {
             print("\(value),\(data.base64EncodedString())")
         }
     }
+    
+    func testCrossPlatformFloat16() throws {
+        print("value,float16")
+        print("-65504,\(F.float16(-65504).base64EncodedString())")
+        print("-0.0000000596046,\(F.float16(-0.0000000596046).base64EncodedString())")
+        print("0,\(F.float16(0).base64EncodedString())")
+        print("0.0000000596046,\(F.float16(0.0000000596046).base64EncodedString())")
+        print("65504,\(F.float16(65504).base64EncodedString())")
+    }
 
     func testContactIdentifierCrossPlatform() throws {
         // Generate secret and matching keys
