@@ -43,12 +43,11 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         // Generate common payload
         // Transmit power is not available on iOS, pre-compute common payload
         let transmitPower: Float = 0
-        var transmitPowerBinary16 = F.binary16(transmitPower)
-        let transmitPowerBinary16Data = Data(bytes: &transmitPowerBinary16, count: MemoryLayout.size(ofValue: transmitPowerBinary16))
+        let transmitPowerData = F.float16(transmitPower)
         // Common payload = commonHeader + transmitPower
         var commonPayload = Data()
         commonPayload.append(commonHeader)
-        commonPayload.append(transmitPowerBinary16Data)
+        commonPayload.append(transmitPowerData)
         self.commonPayload = commonPayload
         
         // Generate matching keys from secret key
@@ -247,7 +246,7 @@ class K {
 }
 
 /// Elementary functions
-private class F {
+class F {
     
     /// Cryptographic hash function : SHA256
     fileprivate static func h(_ data: Data) -> Data {
@@ -279,30 +278,20 @@ private class F {
     
     /// Convert 32-bit float to IEE 754 binary16 format 16-bit float
     /// Float16 is introduced in iOS 14
-    fileprivate static func binary16(_ value: Float) -> Binary16 {
+    static func float16(_ value: Float) -> Float16 {
         var source: [Float] = [value]
         var target: [UInt16] = [0]
         var sourceBuffer = vImage_Buffer(data: &source, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
         var targetBuffer = vImage_Buffer(data: &target, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
         vImageConvert_PlanarFtoPlanar16F(&sourceBuffer, &targetBuffer, 0)
-        let binary16 = Binary16(target[0])
-        return binary16
-    }
-
-    /// Convert IEE 754 binary16 format 16-bit float to 32-bit float
-    /// Float16 is introduced in iOS 14
-    fileprivate static func float(_ value: Binary16) -> Float {
-        var source: [UInt16] = [value]
-        var target: [Float] = [0]
-        var sourceBuffer = vImage_Buffer(data: &source, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        var targetBuffer = vImage_Buffer(data: &target, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        vImageConvert_Planar16FtoPlanarF(&sourceBuffer, &targetBuffer, 0)
-        let float = target[0]
-        return float
+        var binary16 = target[0].bigEndian
+        let float16 = Float16(bytes: &binary16, count: MemoryLayout.size(ofValue: binary16))
+        return float16
     }
 }
 
-fileprivate typealias Binary16 = UInt16
+/// IEE 754 binary16 format 16-bit float (Float16 is introduced in iOS 14)
+typealias Float16 = Data
 fileprivate typealias MatchingKeySeed = Data
 fileprivate typealias ContactKeySeed = Data
 typealias ContactKey = Data
