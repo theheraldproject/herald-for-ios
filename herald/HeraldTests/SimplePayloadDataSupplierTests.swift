@@ -230,6 +230,7 @@ class SimplePayloadDataSupplierTests: XCTestCase {
     }
 
     func testContactIdentifierCrossPlatform() throws {
+        print("day,period,matchingKey,contactKey,contactIdentifier");
         // Generate secret and matching keys
         let ks1 = SecretKey(repeating: 0, count: 2048)
         let km1 = K.matchingKeys(ks1)
@@ -237,7 +238,8 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         for day in 0...10 {
             let kc1 = K.contactKeys(km1[day])
             for period in 0...240 {
-                print("\(day),\(period),\(kc1[period].base64EncodedString())")
+                let Ic1 = K.contactIdentifier(kc1[period])
+                print("\(day),\(period),\(km1[day].base64EncodedString()),\(kc1[period].base64EncodedString()),\(Ic1.base64EncodedString())")
             }
         }
     }
