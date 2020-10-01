@@ -12,8 +12,8 @@ public protocol SonarPayloadDataSupplier : PayloadDataSupplier {
 }
 
 /// Mock SONAR payload supplier for simulating payload transfer of the same size
-public class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
-    static let length: Int = 129
+public class MockSonarPayloadDataSupplier : SonarPayloadDataSupplier {
+    let length: Int = 129
     let identifier: Int32
     
     public init(identifier: Int32) {
@@ -31,7 +31,7 @@ public class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
         payloadData.append(Data(repeating: 0, count: 3))
         payloadData.append(networkByteOrderData(identifier))
         // Fill with blank data to make payload the same size as that in SONAR
-        payloadData.append(Data(repeating: 0, count: MockSonarPayloadSupplier.length - payloadData.count))
+        payloadData.append(Data(repeating: 0, count: length - payloadData.count))
         return payloadData
     }
 }

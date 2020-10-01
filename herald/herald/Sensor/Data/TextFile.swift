@@ -9,18 +9,18 @@ import Foundation
 
 class TextFile {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.TextFile")
-    private var file: URL?
+    let url: URL?
     private let queue: DispatchQueue
     
     init(filename: String) {
-        file = try? FileManager.default
+        url = try? FileManager.default
         .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         .appendingPathComponent(filename)
         queue = DispatchQueue(label: "Sensor.Data.TextFile(\(filename))")
     }
     
     func empty() -> Bool {
-        guard let file = file else {
+        guard let file = url else {
             return true
         }
         return !FileManager.default.fileExists(atPath: file.path)
@@ -29,7 +29,7 @@ class TextFile {
     /// Append line to new or existing file
     func write(_ line: String) {
         queue.sync {
-            guard let file = file else {
+            guard let file = url else {
                 return
             }
             guard let data = (line+"\n").data(using: .utf8) else {
@@ -50,7 +50,7 @@ class TextFile {
     /// Overwrite file content
     func overwrite(_ content: String) {
         queue.sync {
-            guard let file = file else {
+            guard let file = url else {
                 return
             }
             guard let data = content.data(using: .utf8) else {

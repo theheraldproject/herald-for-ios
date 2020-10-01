@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
-        payloadDataSupplier = MockSonarPayloadSupplier(identifier: identifier())
+        payloadDataSupplier = MockSonarPayloadDataSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
         sensor?.start()

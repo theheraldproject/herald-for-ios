@@ -15,12 +15,12 @@
 		B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF62251E56320072D238 /* BLEReceiver.swift */; };
 		B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* GPSSensor.swift */; };
 		B637EF7F251E56320072D238 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF65251E56320072D238 /* Sensor.swift */; };
-		B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */; };
+		B637EF80251E56320072D238 /* SonarPayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadDataSupplier.swift */; };
 		B637EF81251E56320072D238 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6A251E56320072D238 /* DayCodes.swift */; };
 		B637EF82251E56320072D238 /* SHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6B251E56320072D238 /* SHA.swift */; };
 		B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6C251E56320072D238 /* BeaconCodes.swift */; };
 		B637EF84251E56320072D238 /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6D251E56320072D238 /* JavaData.swift */; };
-		B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */; };
+		B637EF85251E56320072D238 /* C19XPayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6E251E56320072D238 /* C19XPayloadDataSupplier.swift */; };
 		B637EF86251E56320072D238 /* SensorArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6F251E56320072D238 /* SensorArray.swift */; };
 		B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF70251E56320072D238 /* PayloadDataSupplier.swift */; };
 		B637EF88251E56320072D238 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF72251E56320072D238 /* TextFile.swift */; };
@@ -33,6 +33,16 @@
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
+		B6D3180B2525D9DA005C1AAE /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3180A2525D9DA005C1AAE /* Contact.swift */; };
+		B6D3180F2525DAEE005C1AAE /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3180E2525DAEE005C1AAE /* Analysis.swift */; };
+		B6D3181F2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3181E2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift */; };
+		B6D318232525E603005C1AAE /* SonarPayloadDataIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D318222525E603005C1AAE /* SonarPayloadDataIdentifier.swift */; };
+		B6D318272525E68F005C1AAE /* SimplePayloadDataIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D318262525E68F005C1AAE /* SimplePayloadDataIdentifier.swift */; };
+		B6D3182B2526544C005C1AAE /* BloomFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3182A2526544C005C1AAE /* BloomFilter.swift */; };
+		B6D3182F2526547C005C1AAE /* BloomFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */; };
+		B6D8A58E2524C41B000E6CC2 /* EncounterLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8A58D2524C41B000E6CC2 /* EncounterLog.swift */; };
+		B6D8A59E2524E55E000E6CC2 /* Encounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8A59D2524E55E000E6CC2 /* Encounter.swift */; };
+		B6D8A5A42524E968000E6CC2 /* PayloadDataIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8A5A32524E968000E6CC2 /* PayloadDataIdentifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,12 +66,12 @@
 		B637EF62251E56320072D238 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
 		B637EF64251E56320072D238 /* GPSSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
 		B637EF65251E56320072D238 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
-		B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
+		B637EF68251E56320072D238 /* SonarPayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF6A251E56320072D238 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
 		B637EF6B251E56320072D238 /* SHA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHA.swift; sourceTree = "<group>"; };
 		B637EF6C251E56320072D238 /* BeaconCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconCodes.swift; sourceTree = "<group>"; };
 		B637EF6D251E56320072D238 /* JavaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JavaData.swift; sourceTree = "<group>"; };
-		B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = C19XPayloadSupplier.swift; sourceTree = "<group>"; };
+		B637EF6E251E56320072D238 /* C19XPayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = C19XPayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF6F251E56320072D238 /* SensorArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorArray.swift; sourceTree = "<group>"; };
 		B637EF70251E56320072D238 /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF72251E56320072D238 /* TextFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
@@ -74,7 +84,17 @@
 		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		B6D3180A2525D9DA005C1AAE /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Contact.swift; path = herald/Sensor/Analysis/Contact.swift; sourceTree = SOURCE_ROOT; };
+		B6D3180E2525DAEE005C1AAE /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Analysis.swift; path = herald/Sensor/Analysis/Analysis.swift; sourceTree = SOURCE_ROOT; };
+		B6D3181E2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonarPayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		B6D318222525E603005C1AAE /* SonarPayloadDataIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SonarPayloadDataIdentifier.swift; path = herald/Sensor/Payload/Sonar/SonarPayloadDataIdentifier.swift; sourceTree = SOURCE_ROOT; };
+		B6D318262525E68F005C1AAE /* SimplePayloadDataIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataIdentifier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataIdentifier.swift; sourceTree = SOURCE_ROOT; };
+		B6D3182A2526544C005C1AAE /* BloomFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BloomFilter.swift; path = herald/Sensor/Analysis/BloomFilter.swift; sourceTree = SOURCE_ROOT; };
+		B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloomFilterTests.swift; sourceTree = "<group>"; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6D8A58D2524C41B000E6CC2 /* EncounterLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EncounterLog.swift; path = Herald/Sensor/Analysis/EncounterLog.swift; sourceTree = SOURCE_ROOT; };
+		B6D8A59D2524E55E000E6CC2 /* Encounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Encounter.swift; path = herald/Sensor/Analysis/Encounter.swift; sourceTree = SOURCE_ROOT; };
+		B6D8A5A32524E968000E6CC2 /* PayloadDataIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PayloadDataIdentifier.swift; path = Herald/Sensor/Analysis/PayloadDataIdentifier.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +147,7 @@
 		B637EF5C251E56320072D238 /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				B6D8A5962524E4B4000E6CC2 /* Analysis */,
 				B637EF5D251E56320072D238 /* BLE */,
 				B637EF63251E56320072D238 /* GPS */,
 				B637EF71251E56320072D238 /* Data */,
@@ -172,7 +193,8 @@
 		B637EF67251E56320072D238 /* Sonar */ = {
 			isa = PBXGroup;
 			children = (
-				B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */,
+				B637EF68251E56320072D238 /* SonarPayloadDataSupplier.swift */,
+				B6D318222525E603005C1AAE /* SonarPayloadDataIdentifier.swift */,
 			);
 			path = Sonar;
 			sourceTree = "<group>";
@@ -184,7 +206,7 @@
 				B637EF6B251E56320072D238 /* SHA.swift */,
 				B637EF6C251E56320072D238 /* BeaconCodes.swift */,
 				B637EF6D251E56320072D238 /* JavaData.swift */,
-				B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */,
+				B637EF6E251E56320072D238 /* C19XPayloadDataSupplier.swift */,
 			);
 			path = C19X;
 			sourceTree = "<group>";
@@ -206,6 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */,
+				B6D318262525E68F005C1AAE /* SimplePayloadDataIdentifier.swift */,
 			);
 			path = Simple;
 			sourceTree = "<group>";
@@ -215,8 +238,23 @@
 			children = (
 				B6D8A56E25229F33000E6CC2 /* Info.plist */,
 				B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */,
+				B6D3181E2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift */,
+				B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */,
 			);
 			path = HeraldTests;
+			sourceTree = "<group>";
+		};
+		B6D8A5962524E4B4000E6CC2 /* Analysis */ = {
+			isa = PBXGroup;
+			children = (
+				B6D3180E2525DAEE005C1AAE /* Analysis.swift */,
+				B6D8A59D2524E55E000E6CC2 /* Encounter.swift */,
+				B6D8A58D2524C41B000E6CC2 /* EncounterLog.swift */,
+				B6D3180A2525D9DA005C1AAE /* Contact.swift */,
+				B6D8A5A32524E968000E6CC2 /* PayloadDataIdentifier.swift */,
+				B6D3182A2526544C005C1AAE /* BloomFilter.swift */,
+			);
+			path = Analysis;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -328,16 +366,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6D3180B2525D9DA005C1AAE /* Contact.swift in Sources */,
 				B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */,
 				B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */,
-				B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */,
+				B6D8A58E2524C41B000E6CC2 /* EncounterLog.swift in Sources */,
+				B637EF85251E56320072D238 /* C19XPayloadDataSupplier.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
 				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
+				B6D3180F2525DAEE005C1AAE /* Analysis.swift in Sources */,
 				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
+				B6D318272525E68F005C1AAE /* SimplePayloadDataIdentifier.swift in Sources */,
 				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
@@ -347,8 +389,12 @@
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
-				B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */,
+				B637EF80251E56320072D238 /* SonarPayloadDataSupplier.swift in Sources */,
+				B6D318232525E603005C1AAE /* SonarPayloadDataIdentifier.swift in Sources */,
+				B6D8A5A42524E968000E6CC2 /* PayloadDataIdentifier.swift in Sources */,
+				B6D3182B2526544C005C1AAE /* BloomFilter.swift in Sources */,
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
+				B6D8A59E2524E55E000E6CC2 /* Encounter.swift in Sources */,
 				B637EF88251E56320072D238 /* TextFile.swift in Sources */,
 				B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */,
 			);
@@ -358,7 +404,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6D3181F2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift in Sources */,
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
+				B6D3182F2526547C005C1AAE /* BloomFilterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,6 +598,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = HeraldTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -567,6 +616,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = HeraldTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
