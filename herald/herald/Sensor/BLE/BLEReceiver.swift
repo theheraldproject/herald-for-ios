@@ -102,6 +102,18 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
+    func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {
+        logger.debug("immediateSend (targetIdentifier=\(targetIdentifier))")
+        let device = database.device(targetIdentifier)
+        logger.debug("immediateSend (peripheral=\(device.identifier))")
+        guard let peripheral = device.peripheral, peripheral.state == .connected else {
+            logger.fault("immediateSend denied, peripheral not connected (peripheral=\(device.identifier))")
+            return false
+        }
+        peripheral.writeValue(data, for: device.payloadCharacteristic!, type: .withResponse)
+        return true;
+    }
+    
     // MARK:- Scan for peripherals and initiate connection if required
     
     /// All work starts from scan loop.

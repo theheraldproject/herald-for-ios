@@ -64,7 +64,7 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     private var delegates: [SensorDelegate] = []
     private let database: BLEDatabase
     private let transmitter: BLETransmitter
-    private let receiver: BLEReceiver
+    private let receiver: ConcreteBLEReceiver
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         database = ConcreteBLEDatabase()
@@ -88,6 +88,10 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
         delegates.append(delegate)
         transmitter.add(delegate: delegate)
         receiver.add(delegate: delegate)
+    }
+    
+    func immediateSend(data: Data,_ targetIdentifier: TargetIdentifier) -> Bool {
+        return receiver.immediateSend(data:data,targetIdentifier);
     }
     
     // MARK:- BLEDatabaseDelegate
