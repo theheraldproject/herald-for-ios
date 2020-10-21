@@ -25,6 +25,13 @@
 			remoteGlobalIDString = B637EF50251E55E60072D238;
 			remoteInfo = Herald;
 		};
+		B6D8A5892523714C000E6CC2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B68215B6251E78840091DE22 /* Herald.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B650151B25229D480070F774;
+			remoteInfo = HeraldTests;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -80,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				B68215BB251E78840091DE22 /* Herald.framework */,
+				B6D8A58A2523714C000E6CC2 /* HeraldTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -183,6 +191,13 @@
 			fileType = wrapper.framework;
 			path = Herald.framework;
 			remoteRef = B68215BA251E78840091DE22 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B6D8A58A2523714C000E6CC2 /* HeraldTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = HeraldTests.xctest;
+			remoteRef = B6D8A5892523714C000E6CC2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -352,7 +367,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -372,7 +387,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
