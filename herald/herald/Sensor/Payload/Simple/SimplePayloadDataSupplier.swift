@@ -63,11 +63,16 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         return SecretKey(secretKey)
     }
     
-    /// Generate contact identifiers for a matching key
-    public static func contactIdentifiers(_ matchingKey: MatchingKey) -> [ContactIdentifier] {
-        return K.contactKeys(matchingKey).map({ K.contactIdentifier($0) })
+    /// Get matching key for a day
+    public func matchingKey(_ time: Date) -> MatchingKey? {
+        let day = K.day(time)
+        guard day >= 0, day < matchingKeys.count else {
+            logger.fault("Matching key out of day range (time=\(time),day=\(day)))")
+            return nil
+        }
+        return matchingKeys[day]
     }
-    
+        
     /// Generate contact identifier for time
     private func contactIdentifier(_ time: Date) -> ContactIdentifier? {
         let day = K.day(time)
@@ -129,7 +134,6 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         }
         return payloads
     }
-
 }
 
 /// Key derivation functions

@@ -33,16 +33,18 @@
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
-		B6D3180B2525D9DA005C1AAE /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3180A2525D9DA005C1AAE /* Contact.swift */; };
+		B677FBE825271E5D003C66EB /* XXH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B677FBE725271E5D003C66EB /* XXH3.swift */; };
+		B677FBEE2527274B003C66EB /* PayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B677FBED2527274B003C66EB /* PayloadDataMatcher.swift */; };
+		B677FBF8252728A6003C66EB /* SimplePayloadDataMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B677FBF7252728A6003C66EB /* SimplePayloadDataMatcherTests.swift */; };
+		B677FC0625274FDC003C66EB /* AnalysisTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B677FC0525274FDC003C66EB /* AnalysisTests.swift */; };
+		B677FC0C25277409003C66EB /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B677FC0B25277409003C66EB /* Sample.swift */; };
+		B677FC102529BEDA003C66EB /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B677FC0F2529BEDA003C66EB /* SocialDistance.swift */; };
 		B6D3180F2525DAEE005C1AAE /* Analysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3180E2525DAEE005C1AAE /* Analysis.swift */; };
-		B6D3181F2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3181E2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift */; };
-		B6D318232525E603005C1AAE /* SonarPayloadDataIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D318222525E603005C1AAE /* SonarPayloadDataIdentifier.swift */; };
-		B6D318272525E68F005C1AAE /* SimplePayloadDataIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D318262525E68F005C1AAE /* SimplePayloadDataIdentifier.swift */; };
+		B6D318272525E68F005C1AAE /* SimplePayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D318262525E68F005C1AAE /* SimplePayloadDataMatcher.swift */; };
 		B6D3182B2526544C005C1AAE /* BloomFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3182A2526544C005C1AAE /* BloomFilter.swift */; };
 		B6D3182F2526547C005C1AAE /* BloomFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */; };
 		B6D8A58E2524C41B000E6CC2 /* EncounterLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8A58D2524C41B000E6CC2 /* EncounterLog.swift */; };
 		B6D8A59E2524E55E000E6CC2 /* Encounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8A59D2524E55E000E6CC2 /* Encounter.swift */; };
-		B6D8A5A42524E968000E6CC2 /* PayloadDataIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8A5A32524E968000E6CC2 /* PayloadDataIdentifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,17 +86,19 @@
 		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
-		B6D3180A2525D9DA005C1AAE /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Contact.swift; path = herald/Sensor/Analysis/Contact.swift; sourceTree = SOURCE_ROOT; };
+		B677FBE725271E5D003C66EB /* XXH3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = XXH3.swift; path = herald/Sensor/Payload/Simple/XXH3.swift; sourceTree = SOURCE_ROOT; };
+		B677FBED2527274B003C66EB /* PayloadDataMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PayloadDataMatcher.swift; path = herald/Sensor/Payload/PayloadDataMatcher.swift; sourceTree = SOURCE_ROOT; };
+		B677FBF7252728A6003C66EB /* SimplePayloadDataMatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcherTests.swift; sourceTree = "<group>"; };
+		B677FC0525274FDC003C66EB /* AnalysisTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisTests.swift; sourceTree = "<group>"; };
+		B677FC0B25277409003C66EB /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Sample.swift; path = herald/Sensor/Analysis/Sample.swift; sourceTree = SOURCE_ROOT; };
+		B677FC0F2529BEDA003C66EB /* SocialDistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SocialDistance.swift; path = herald/Sensor/Analysis/SocialDistance.swift; sourceTree = SOURCE_ROOT; };
 		B6D3180E2525DAEE005C1AAE /* Analysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Analysis.swift; path = herald/Sensor/Analysis/Analysis.swift; sourceTree = SOURCE_ROOT; };
-		B6D3181E2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonarPayloadDataSupplierTests.swift; sourceTree = "<group>"; };
-		B6D318222525E603005C1AAE /* SonarPayloadDataIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SonarPayloadDataIdentifier.swift; path = herald/Sensor/Payload/Sonar/SonarPayloadDataIdentifier.swift; sourceTree = SOURCE_ROOT; };
-		B6D318262525E68F005C1AAE /* SimplePayloadDataIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataIdentifier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataIdentifier.swift; sourceTree = SOURCE_ROOT; };
-		B6D3182A2526544C005C1AAE /* BloomFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BloomFilter.swift; path = herald/Sensor/Analysis/BloomFilter.swift; sourceTree = SOURCE_ROOT; };
+		B6D318262525E68F005C1AAE /* SimplePayloadDataMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataMatcher.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataMatcher.swift; sourceTree = SOURCE_ROOT; };
+		B6D3182A2526544C005C1AAE /* BloomFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BloomFilter.swift; path = Herald/Sensor/Payload/Simple/BloomFilter.swift; sourceTree = SOURCE_ROOT; };
 		B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloomFilterTests.swift; sourceTree = "<group>"; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6D8A58D2524C41B000E6CC2 /* EncounterLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EncounterLog.swift; path = Herald/Sensor/Analysis/EncounterLog.swift; sourceTree = SOURCE_ROOT; };
 		B6D8A59D2524E55E000E6CC2 /* Encounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Encounter.swift; path = herald/Sensor/Analysis/Encounter.swift; sourceTree = SOURCE_ROOT; };
-		B6D8A5A32524E968000E6CC2 /* PayloadDataIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PayloadDataIdentifier.swift; path = Herald/Sensor/Analysis/PayloadDataIdentifier.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +190,7 @@
 				B650151225229CED0070F774 /* Simple */,
 				B637EF67251E56320072D238 /* Sonar */,
 				B637EF69251E56320072D238 /* C19X */,
+				B677FBED2527274B003C66EB /* PayloadDataMatcher.swift */,
 			);
 			path = Payload;
 			sourceTree = "<group>";
@@ -194,7 +199,6 @@
 			isa = PBXGroup;
 			children = (
 				B637EF68251E56320072D238 /* SonarPayloadDataSupplier.swift */,
-				B6D318222525E603005C1AAE /* SonarPayloadDataIdentifier.swift */,
 			);
 			path = Sonar;
 			sourceTree = "<group>";
@@ -228,7 +232,9 @@
 			isa = PBXGroup;
 			children = (
 				B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */,
-				B6D318262525E68F005C1AAE /* SimplePayloadDataIdentifier.swift */,
+				B6D318262525E68F005C1AAE /* SimplePayloadDataMatcher.swift */,
+				B6D3182A2526544C005C1AAE /* BloomFilter.swift */,
+				B677FBE725271E5D003C66EB /* XXH3.swift */,
 			);
 			path = Simple;
 			sourceTree = "<group>";
@@ -238,8 +244,9 @@
 			children = (
 				B6D8A56E25229F33000E6CC2 /* Info.plist */,
 				B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */,
-				B6D3181E2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift */,
+				B677FBF7252728A6003C66EB /* SimplePayloadDataMatcherTests.swift */,
 				B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */,
+				B677FC0525274FDC003C66EB /* AnalysisTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -250,9 +257,8 @@
 				B6D3180E2525DAEE005C1AAE /* Analysis.swift */,
 				B6D8A59D2524E55E000E6CC2 /* Encounter.swift */,
 				B6D8A58D2524C41B000E6CC2 /* EncounterLog.swift */,
-				B6D3180A2525D9DA005C1AAE /* Contact.swift */,
-				B6D8A5A32524E968000E6CC2 /* PayloadDataIdentifier.swift */,
-				B6D3182A2526544C005C1AAE /* BloomFilter.swift */,
+				B677FC0B25277409003C66EB /* Sample.swift */,
+				B677FC0F2529BEDA003C66EB /* SocialDistance.swift */,
 			);
 			path = Analysis;
 			sourceTree = "<group>";
@@ -366,8 +372,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6D3180B2525D9DA005C1AAE /* Contact.swift in Sources */,
 				B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */,
+				B677FBEE2527274B003C66EB /* PayloadDataMatcher.swift in Sources */,
 				B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */,
 				B6D8A58E2524C41B000E6CC2 /* EncounterLog.swift in Sources */,
 				B637EF85251E56320072D238 /* C19XPayloadDataSupplier.swift in Sources */,
@@ -377,21 +383,22 @@
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
 				B6D3180F2525DAEE005C1AAE /* Analysis.swift in Sources */,
 				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
+				B677FC0C25277409003C66EB /* Sample.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
-				B6D318272525E68F005C1AAE /* SimplePayloadDataIdentifier.swift in Sources */,
+				B6D318272525E68F005C1AAE /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
+				B677FBE825271E5D003C66EB /* XXH3.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
 				B637EF81251E56320072D238 /* DayCodes.swift in Sources */,
 				B637EF8C251E56320072D238 /* ContactLog.swift in Sources */,
+				B677FC102529BEDA003C66EB /* SocialDistance.swift in Sources */,
 				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
 				B637EF80251E56320072D238 /* SonarPayloadDataSupplier.swift in Sources */,
-				B6D318232525E603005C1AAE /* SonarPayloadDataIdentifier.swift in Sources */,
-				B6D8A5A42524E968000E6CC2 /* PayloadDataIdentifier.swift in Sources */,
 				B6D3182B2526544C005C1AAE /* BloomFilter.swift in Sources */,
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
 				B6D8A59E2524E55E000E6CC2 /* Encounter.swift in Sources */,
@@ -404,9 +411,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6D3181F2525E224005C1AAE /* SonarPayloadDataSupplierTests.swift in Sources */,
+				B677FC0625274FDC003C66EB /* AnalysisTests.swift in Sources */,
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
 				B6D3182F2526547C005C1AAE /* BloomFilterTests.swift in Sources */,
+				B677FBF8252728A6003C66EB /* SimplePayloadDataMatcherTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -184,14 +184,4 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:05:59+0000")!))
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
     }
-
-    func testContactIdentifierPerformance() throws {
-        let km1 = MatchingKey(repeating: 0, count: 32)
-        self.measure {
-            for _ in 0...1000 {
-                _ = ConcreteSimplePayloadDataSupplier.contactIdentifiers(km1)
-            }
-        }
-    }
-
 }

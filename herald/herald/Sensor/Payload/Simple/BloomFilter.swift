@@ -11,16 +11,16 @@ import Foundation
 /// False positive matches are possible, but false negatives are not.
 /// In other words, a query returns either "possibly in set" or "definitely not in set".
 class BloomFilter {
-    private let bits: UInt
+    private let bits: UInt64
     private var filter: [UInt8]
 
     init(_ bytes: Int) {
-        bits = UInt(bytes * 8)
+        bits = UInt64(bytes * 8)
         filter = Array<UInt8>(repeating: UInt8(0), count: bytes)
     }
     
-    private func setBit(_ index: Int, _ value: Bool) {
-        let bit = UInt(bitPattern: index).remainderReportingOverflow(dividingBy: bits).partialValue
+    private func setBit(_ index: UInt64, _ value: Bool) {
+        let bit = index.remainderReportingOverflow(dividingBy: bits).partialValue
         let byteUInt = bit.dividedReportingOverflow(by: 8).partialValue
         let bitInByte = bit - (byteUInt * 8)
         let byte = Int(byteUInt)
@@ -44,8 +44,8 @@ class BloomFilter {
         }
     }
     
-    private func getBit(_ index: Int) -> Bool {
-        let bit = UInt(bitPattern: index).remainderReportingOverflow(dividingBy: bits).partialValue
+    private func getBit(_ index: UInt64) -> Bool {
+        let bit = index.remainderReportingOverflow(dividingBy: bits).partialValue
         let byteUInt = bit.dividedReportingOverflow(by: 8).partialValue
         let bitInByte = bit - (byteUInt * 8)
         let byte = Int(byteUInt)
@@ -70,11 +70,13 @@ class BloomFilter {
     }
     
     func add(_ data: Data) {
-        setBit(data.hashValue, true)
-        setBit(data.reversed().hashValue, true)
+        let bytes = [UInt8](data)
+        setBit(XXH3.digest64(bytes), true)
+        setBit(XXH3.digest64(bytes.reversed()), true)
     }
     
     func contains(_ data: Data) -> Bool {
-        return getBit(data.hashValue) && getBit(data.reversed().hashValue)
+        let bytes = [UInt8](data)
+        return getBit(XXH3.digest64(bytes)) && getBit(XXH3.digest64(bytes.reversed()))
     }
 }
