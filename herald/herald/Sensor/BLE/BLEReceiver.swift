@@ -110,7 +110,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.fault("immediateSend denied, peripheral not connected (peripheral=\(device.identifier))")
             return false
         }
-        peripheral.writeValue(data, for: device.payloadCharacteristic!, type: .withResponse)
+        var toSend = Data([UInt8(BLESensorConfiguration.signalCharacteristicActionWriteImmediate)])
+        toSend.append(data)
+        peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse)
         return true;
     }
     

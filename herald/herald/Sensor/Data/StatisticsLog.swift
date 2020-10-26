@@ -75,6 +75,9 @@ class StatisticsLog: NSObject, SensorDelegate {
         identifierToPayload[fromTarget] = didRead.shortName
         add(identifier: fromTarget)
     }
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
+        // Do nothing
+    }
     
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         add(identifier: fromTarget)

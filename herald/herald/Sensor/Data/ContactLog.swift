@@ -39,6 +39,10 @@ class ContactLog: NSObject, SensorDelegate {
         textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,2,,,," + csv(didRead.shortName))
     }
     
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
+        // Do nothing
+    }
+    
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,,3,,," + csv(didMeasure.description))
     }

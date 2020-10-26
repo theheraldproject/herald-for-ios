@@ -339,6 +339,10 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writePayloadSharing)")
                         }
+                    case BLESensorConfiguration.signalCharacteristicActionWriteImmediate:
+                        logger.debug("didReceiveWrite (central=\(targetIdentifier),action=immediateSend)")
+                        let datasubset = data.subdata(in: 1..<data.count)
+                        delegates.forEach { $0.sensor(.BLE, didReceive: datasubset, fromTarget: targetIdentifier) }
                     default:
                         logger.fault("didReceiveWrite (central=\(targetIdentifier),action=unknown,actionCode=\(actionCode))")
                     }
