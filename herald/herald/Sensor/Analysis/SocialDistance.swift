@@ -7,69 +7,105 @@
 
 import Foundation
 
+/// Estimate social distance to other app users.
 public class SocialDistance: SensorDelegate {
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Analysis.SocialDistance")
+    // Database of targets and distribution of RSSI measurements
     private var targets: [TargetIdentifier:SocialDistanceTarget] = [:]
     
     // MARK:- SensorDelegate
     
     public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
-        guard didMeasure.unit == .RSSI, didMeasure.value < 0, didMeasure.value > -100 else {
+        // Use RSSI [-100,0] as data source
+        guard didMeasure.unit == .RSSI, didMeasure.value >= -100, didMeasure.value <= 0 else {
             return
         }
+        // Collate RSSI measurements for each target
         guard let target = targets[fromTarget] else {
+            logger.debug("didMeasure(rssi=\(didMeasure.value),fromTarget=\(fromTarget))")
             targets[fromTarget] = SocialDistanceTarget(fromTarget, didMeasure.value)
             return
         }
+        logger.debug("didMeasure(rssi=\(didMeasure.value),fromTarget=\(fromTarget))")
         target.didMeasure(didMeasure.value)
     }
     
     // MARK:- Profiling
     
-    /// Estimate measured power based on behaviour
-    func measuredPower() -> Double {
+    /// Calibrate measured power by behaviour
+    func calibrateByBehaviour() -> (distance: Distance, rssi: RSSI)? {
+        // Assume at least 5% of people will always walk too close
+        // to you where 0.45m as nearnest possible distance
+        let passing = targets.values.filter({ $0.type == .passing })
+        let samples = Int(round(Double(passing.count) * 0.05))
+        guard samples >= 1 else {
+            return nil
+        }
+        let rssiValues = passing.filter({ $0.rssiDistribution.max != nil }).map({ $0.rssiDistribution.max! }).sorted(by: { $0 > $1 }).prefix(samples)
+        var rssiSum: Double = 0
+        for rssiValue in rssiValues {
+            rssiSum = rssiSum + rssiValue
+        }
+        let rssi = rssiSum / Double(samples)
+        return (Distance(0.45), RSSI(rssi))
+    }
+    
+    /// Estimate measured power based on behaviour to avoid phone model specific calibration
+    func measuredPower() -> MeasuredPower {
         // Default value for iBeacons
         let defaultValue: Double = -56 // 1m
         let minimumValue: Double = -65 // 4m
         let maximumValue: Double = -28 // 50% of 1m
-        // Assume at least 1% of people will always walk too close
-        // to you where 0.45m as nearnest possible distance
-        let passing = targets.values.filter({ $0.type == .passing })
-        guard passing.count > 100 else {
+        // Calibration
+        guard let calibration = calibrateByBehaviour() else {
             return defaultValue
         }
-        guard let minimumPassingRSSI = passing.sorted(by: { $0.rssiDistribution.min! < $1.rssiDistribution.min! }).first?.rssiDistribution.min else {
-            return defaultValue
-        }
-        // Use RSSI at minimum passing distance of 0.45m as basis for
-        // estimating measured power or use bootstrap value if minimum
+        // Estimate measured power or use bootstrap value if minimum
         // passing RSSI looks too low/high to be reliable
-        let estimatedValue = SocialDistance.measuredPower(distance: 0.45, rssi: minimumPassingRSSI)
-        guard estimatedValue > minimumValue, estimatedValue < maximumValue else {
+        let estimatedValue = SocialDistance.measuredPower(distance: calibration.distance, rssi: calibration.rssi)
+        guard estimatedValue >= minimumValue, estimatedValue <= maximumValue else {
             return defaultValue
         }
         return estimatedValue
     }
     
-    private func stationaryTargets(_ start: Date, _ end: Date = Date()) {
-        let stationary = targets.values.filter({ $0.type == .stationary && $0.lastSeenAt >= start && $0.lastSeenAt < end })
-        let power = measuredPower()
-        var exposure: [(target: SocialDistanceTarget, distance: Double)] = []
-        stationary.forEach { target in
-            let estimatedDistance = SocialDistance.distance(measuredPower: power, rssi: target.rssi)
-            exposure.append((target, estimatedDistance))
+    /// Calculate mean distance and total duration of exposure for a set of targets over a time period
+    func exposure(type: SocialDistanceTargetType, _ start: Date, _ end: Date = Date()) -> (distance: Distance, duration: TimeInterval) {
+        let filteredTargets = targets.values.filter({ $0.type == type && $0.lastSeenAt >= start && $0.lastSeenAt < end })
+        let rssi = Sample()
+        var duration: TimeInterval = 0
+        filteredTargets.forEach() { target in
+            rssi.add(target.rssiDistribution)
+            duration = duration + target.duration
         }
+        let distance = SocialDistance.distance(measuredPower: measuredPower(), rssi: (rssi.mean ?? -100))
+        return (distance: distance, duration: duration)
     }
     
     /// Calculate measured power given distance (metres), rssi and environmental factor
-    private static func measuredPower(distance: Double, rssi: Double, environmentalFactor: Double = Double(2)) -> Double {
-        return rssi + pow(distance, 0.1) * 10 * environmentalFactor
+    static func measuredPower(distance: Distance, rssi: RSSI, environmentalFactor: Double = Double(2)) -> MeasuredPower {
+        return MeasuredPower(rssi + log10(distance) * 10 * environmentalFactor)
     }
     
     /// Calculate distance given measured power, rssi and environmental factor
-    private static func distance(measuredPower: Double, rssi: Double, environmentalFactor: Double = Double(2)) -> Double {
-        return pow(10, (measuredPower - rssi) / (10 * environmentalFactor))
+    static func distance(measuredPower: MeasuredPower, rssi: RSSI, environmentalFactor: Double = Double(2)) -> Distance {
+        return Distance(pow(10, (measuredPower - rssi) / (10 * environmentalFactor)))
+    }
+    
+    /// Calculate RSSI given distance, measured power and environmental factor
+    static func rssi(distance: Distance, measuredPower: MeasuredPower, environmentalFactor: Double = Double(2)) -> RSSI {
+        return measuredPower - log10(distance) * 10 * environmentalFactor
     }
 }
+
+/// RSSI as decimal value
+typealias RSSI = Double
+
+/// Measured power at 1 metre
+typealias MeasuredPower = Double
+
+/// Distance in metres
+typealias Distance = Double
 
 enum SocialDistanceTargetType {
     // People walking pass: short duration < 60 second, single sample or high variance
@@ -123,7 +159,7 @@ class SocialDistanceTarget {
             self.rssi = rssi
             return
         }
-        guard elapsed > 0 else {
+        guard elapsed >= 1 else {
             rssiDistribution.add(rssi)
             self.rssi = rssi
             return

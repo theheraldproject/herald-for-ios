@@ -30,6 +30,7 @@
 		B637EF8C251E56320072D238 /* ContactLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF76251E56320072D238 /* ContactLog.swift */; };
 		B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF77251E56320072D238 /* StatisticsLog.swift */; };
 		B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF78251E56320072D238 /* SensorDelegate.swift */; };
+		B6442EB325447AAB002101ED /* SocialDistanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6442EB225447AAB002101ED /* SocialDistanceTests.swift */; };
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
@@ -83,6 +84,7 @@
 		B637EF76251E56320072D238 /* ContactLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactLog.swift; sourceTree = "<group>"; };
 		B637EF77251E56320072D238 /* StatisticsLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLog.swift; sourceTree = "<group>"; };
 		B637EF78251E56320072D238 /* SensorDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorDelegate.swift; sourceTree = "<group>"; };
+		B6442EB225447AAB002101ED /* SocialDistanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialDistanceTests.swift; sourceTree = "<group>"; };
 		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				B677FBF7252728A6003C66EB /* SimplePayloadDataMatcherTests.swift */,
 				B6D3182E2526547C005C1AAE /* BloomFilterTests.swift */,
 				B677FC0525274FDC003C66EB /* AnalysisTests.swift */,
+				B6442EB225447AAB002101ED /* SocialDistanceTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -413,6 +416,7 @@
 			files = (
 				B677FC0625274FDC003C66EB /* AnalysisTests.swift in Sources */,
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
+				B6442EB325447AAB002101ED /* SocialDistanceTests.swift in Sources */,
 				B6D3182F2526547C005C1AAE /* BloomFilterTests.swift in Sources */,
 				B677FBF8252728A6003C66EB /* SimplePayloadDataMatcherTests.swift in Sources */,
 			);
