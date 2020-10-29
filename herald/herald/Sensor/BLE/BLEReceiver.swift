@@ -111,8 +111,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return false
         }
         var toSend = Data([UInt8(BLESensorConfiguration.signalCharacteristicActionWriteImmediate)])
-        let length = Int16(data.count)
-        toSend.append([length])
+        var length = Int16(data.count)
+        toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
         toSend.append(data)
         peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse)
         return true;

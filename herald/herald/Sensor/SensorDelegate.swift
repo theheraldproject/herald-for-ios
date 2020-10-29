@@ -39,6 +39,7 @@ public extension SensorDelegate {
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didVisit: Location) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {}
