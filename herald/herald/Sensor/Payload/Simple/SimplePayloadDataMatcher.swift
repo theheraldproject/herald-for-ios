@@ -28,6 +28,8 @@ class ConcreteSimplePayloadDataMatcher : SimplePayloadDataMatcher {
         }
     }
     
+    // MARK:- SimplePayloadDataMatcher
+    
     func matches(_ timestamp: PayloadTimestamp, _ data: PayloadData) -> Bool {
         let day = K.day(timestamp)
         guard let bloomFilter = bloomFilters[day] else {

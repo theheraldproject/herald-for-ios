@@ -8,7 +8,7 @@
 import Foundation
 
 /// Sample statistics, assumes normal distribution.
-class Sample {
+public class Sample {
     private var n:Int64 = 0
     private var m1:Double = 0.0
     private var m2:Double = 0.0

@@ -7,7 +7,9 @@
 
 import Foundation
 
-/// Estimate social distance to other app users.
+/// Estimate social distance to other app users to encourage people to keep their distance from
+/// people. This is intended to be used to generate a daily score as indicator of behavioural change
+/// to improve awareness of social mixing behaviour.
 public class SocialDistance: SensorDelegate {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Analysis.SocialDistance")
     // Database of targets and distribution of RSSI measurements
@@ -69,8 +71,8 @@ public class SocialDistance: SensorDelegate {
         return estimatedValue
     }
     
-    /// Calculate mean distance and total duration of exposure for a set of targets over a time period
-    func exposure(type: SocialDistanceTargetType, _ start: Date, _ end: Date = Date()) -> (distance: Distance, duration: TimeInterval) {
+    /// Calculate mean rssi, distance and total duration of exposure for a set of targets over a time period
+    func exposure(_ type: SocialDistanceTargetType, _ start: Date, _ end: Date = Date()) -> (rssi: RSSI, distance: Distance, duration: TimeInterval) {
         let filteredTargets = targets.values.filter({ $0.type == type && $0.lastSeenAt >= start && $0.lastSeenAt < end })
         let rssi = Sample()
         var duration: TimeInterval = 0
@@ -78,8 +80,11 @@ public class SocialDistance: SensorDelegate {
             rssi.add(target.rssiDistribution)
             duration = duration + target.duration
         }
-        let distance = SocialDistance.distance(measuredPower: measuredPower(), rssi: (rssi.mean ?? -100))
-        return (distance: distance, duration: duration)
+        guard let meanRssi = rssi.mean else {
+            return (0,0,0)
+        }
+        let distance = SocialDistance.distance(measuredPower: measuredPower(), rssi: meanRssi)
+        return (meanRssi, distance, duration)
     }
     
     /// Calculate measured power given distance (metres), rssi and environmental factor

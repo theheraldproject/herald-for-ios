@@ -52,4 +52,20 @@ class SocialDistanceTests: XCTestCase {
             XCTAssertLessThanOrEqual(delta, Double(0.0001))
         }
     }
+
+    func testExposureEstimation() throws {
+        for p in -65 ... -28 {
+            let socialDistance = SocialDistance()
+            let measuredPower = Double(p)
+            let minRssi: Double = SocialDistance.rssi(distance: 0.45, measuredPower: measuredPower)
+            for i in 0 ... 100 {
+                let proximity = Proximity(unit: .RSSI, value: minRssi)
+                socialDistance.sensor(.BLE, didMeasure: proximity, fromTarget: TargetIdentifier("T\(i)"))
+            }
+            let (rssi, distance, duration) = socialDistance.exposure(.passing, Date.distantPast)
+            XCTAssertLessThanOrEqual(abs(rssi - minRssi), Double(0.0001))
+            XCTAssertLessThanOrEqual(abs(distance - 0.45), Double(0.0001))
+            XCTAssertEqual(101, duration)
+        }
+    }
 }
