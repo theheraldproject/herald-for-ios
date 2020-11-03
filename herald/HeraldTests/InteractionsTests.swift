@@ -112,4 +112,61 @@ class InteractionsTests: XCTestCase {
         XCTAssertEqual(interactions.reduceByProximity(encounters6)[1], 1.0)
         XCTAssertEqual(interactions.reduceByProximity(encounters6)[2], 1.0)
     }
+
+    func testReduceByTime() {
+        let interactions = Interactions()
+        
+        XCTAssertEqual(interactions.reduceByTime([]).count, 0)
+        
+        // One encounter at RSSI=1 with one device -> [(2020-09-24T00:00:00+0000,[0:[1]])]
+        let encounters1 = [
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!
+        ]
+        XCTAssertEqual(interactions.reduceByTime(encounters1).count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters1)[0].context.values.first?.count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters1)[0].context.values.first?.first?.value, 1.0)
+        
+        // Two encounters at RSSI=1,2 with one device -> [(2020-09-24T00:00:00+0000,[0:[1,2]])]
+        let encounters2 = [
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!,
+            Encounter(Proximity(unit: .RSSI, value: 2), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:01+0000")!)!
+        ]
+        XCTAssertEqual(interactions.reduceByTime(encounters2).count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters2)[0].context.values.first?.count, 2)
+        print(interactions.reduceByTime(encounters2))
+
+        // Two encounters at RSSI=1,1 with one device -> [(2020-09-24T00:00:00+0000,[0:[1,1]])]
+        let encounters3 = [
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!,
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:30+0000")!)!
+        ]
+        XCTAssertEqual(interactions.reduceByTime(encounters3).count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters3)[0].context.values.first?.count, 2)
+
+        // Two encounters at RSSI=1,2 with one device -> [(2020-09-24T00:00:00+0000,[0:[1,2]])]
+        let encounters4 = [
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!,
+            Encounter(Proximity(unit: .RSSI, value: 2), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:30+0000")!)!
+        ]
+        XCTAssertEqual(interactions.reduceByTime(encounters4).count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters4)[0].context.values.first?.count, 2)
+
+        // Two encounters at RSSI=1,1 with two devices -> [(2020-09-24T00:00:00+0000,[0:[1],1:[1]])]
+        let encounters5 = [
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!,
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 1, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!
+        ]
+        XCTAssertEqual(interactions.reduceByTime(encounters5).count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters5)[0].context.count, 2)
+        XCTAssertEqual(interactions.reduceByTime(encounters5)[0].context.values.first?.count, 1)
+
+        // Two encounters at RSSI=1,1 with one device -> [(2020-09-24T00:00:00+0000,[0:[1]]),(2020-09-24T00:01:00+0000,[0:[1]])]
+        let encounters6 = [
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!,
+            Encounter(Proximity(unit: .RSSI, value: 1), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:15+0000")!)!
+        ]
+        XCTAssertEqual(interactions.reduceByTime(encounters6).count, 2)
+        XCTAssertEqual(interactions.reduceByTime(encounters6)[0].context.count, 1)
+        XCTAssertEqual(interactions.reduceByTime(encounters6)[1].context.count, 1)
+    }
 }

@@ -10,62 +10,50 @@ import XCTest
 
 class SocialDistanceTests: XCTestCase {
 
-    /// Expect measured power and distance calculations are reversible
-    func testMeasuredPowerAndDistanceConversion() throws {
-        for i in 0...200 {
-            let distance = Double(i)
-            let rssi = Double(-i)
-            let estimated = SocialDistance.distance(measuredPower: SocialDistance.measuredPower(distance: distance, rssi: rssi), rssi: rssi)
-            let delta = abs(distance - estimated)
-            XCTAssertLessThanOrEqual(delta, Double(0.0001))
-            print("\(distance),\(rssi),\(estimated)")
-        }
-    }
-    
-    /// Expect distance and Rssi calculations are reversible
-    func testDistanceAndRssiConversion() throws {
-        for i in 0...200 {
-            let distance = Double(i)
-            let measuredPower = Double(-i)
-            let estimated = SocialDistance.distance(measuredPower: measuredPower, rssi: SocialDistance.rssi(distance: distance, measuredPower: measuredPower))
-            let delta = abs(distance - estimated)
-            XCTAssertLessThanOrEqual(delta, Double(0.0001))
-            print("\(distance),\(measuredPower),\(estimated)")
-        }
+    func testScoreByProximity() {
+        let socialDistance = SocialDistance()
+        XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 0)
+        
+        // Close enough to count
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: 0), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 1/60)
+
+        // Too far away to count
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -66), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 1/60)
+
+        // Close enough to count but 0% contribution
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -65), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 1/60)
+
+        // Close enough to count at 100% contribution
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -56), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 2/60)
+
     }
 
-    func testMeasuredPowerEstimation() throws {
-        for p in -65 ... -28 {
-            let socialDistance = SocialDistance()
-            let measuredPower = Double(p)
-            let minRssi: Double = SocialDistance.rssi(distance: 0.45, measuredPower: measuredPower)
-            for i in 0 ... 5 {
-                let proximity = Proximity(unit: .RSSI, value: minRssi)
-                socialDistance.sensor(.BLE, didMeasure: proximity, fromTarget: TargetIdentifier("T\(i)"))
-            }
-            for i in 6 ... 100 {
-                let proximityValue = minRssi - ((minRssi - Double(-100)) * Double(i) / Double(100))
-                let proximity = Proximity(unit: .RSSI, value: proximityValue)
-                socialDistance.sensor(.BLE, didMeasure: proximity, fromTarget: TargetIdentifier("T\(i)"))
-            }
-            let delta = abs(socialDistance.measuredPower() - measuredPower)
-            XCTAssertLessThanOrEqual(delta, Double(0.0001))
-        }
-    }
+    func testScoreByTarget() {
+        let socialDistance = SocialDistance()
+//        XCTAssertEqual(socialDistance.scoreByTarget(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 0)
+        
+        // Close enough to count
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: 0), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:00:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByTarget(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), (1/6)/60)
 
-    func testExposureEstimation() throws {
-        for p in -65 ... -28 {
-            let socialDistance = SocialDistance()
-            let measuredPower = Double(p)
-            let minRssi: Double = SocialDistance.rssi(distance: 0.45, measuredPower: measuredPower)
-            for i in 0 ... 100 {
-                let proximity = Proximity(unit: .RSSI, value: minRssi)
-                socialDistance.sensor(.BLE, didMeasure: proximity, fromTarget: TargetIdentifier("T\(i)"))
-            }
-            let (rssi, distance, duration) = socialDistance.exposure(.passing, Date.distantPast)
-            XCTAssertLessThanOrEqual(abs(rssi - minRssi), Double(0.0001))
-            XCTAssertLessThanOrEqual(abs(distance - 0.45), Double(0.0001))
-            XCTAssertEqual(101, duration)
-        }
+        // Too far away to count
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -66), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByTarget(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), (1/6)/60)
+
+        // Close enough to count
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -65), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByTarget(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), (2/6)/60)
+
+        // Close enough to count but same device
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -56), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByTarget(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), (2/6)/60)
+
+        // Close enough to count and new device
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -56), PayloadData(repeating: 1, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        XCTAssertEqual(socialDistance.scoreByTarget(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), (3/6)/60)
     }
 }

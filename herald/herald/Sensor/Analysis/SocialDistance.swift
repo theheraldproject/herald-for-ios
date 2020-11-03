@@ -10,174 +10,69 @@ import Foundation
 /// Estimate social distance to other app users to encourage people to keep their distance from
 /// people. This is intended to be used to generate a daily score as indicator of behavioural change
 /// to improve awareness of social mixing behaviour.
-public class SocialDistance: SensorDelegate {
+public class SocialDistance: Interactions {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Analysis.SocialDistance")
-    // Database of targets and distribution of RSSI measurements
-    private var targets: [TargetIdentifier:SocialDistanceTarget] = [:]
-    
-    // MARK:- SensorDelegate
-    
-    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
-        // Use RSSI [-100,0] as data source
-        guard didMeasure.unit == .RSSI, didMeasure.value >= -100, didMeasure.value <= 0 else {
-            return
-        }
-        // Collate RSSI measurements for each target
-        guard let target = targets[fromTarget] else {
-            logger.debug("didMeasure(rssi=\(didMeasure.value),fromTarget=\(fromTarget))")
-            targets[fromTarget] = SocialDistanceTarget(fromTarget, didMeasure.value)
-            return
-        }
-        logger.debug("didMeasure(rssi=\(didMeasure.value),fromTarget=\(fromTarget))")
-        target.didMeasure(didMeasure.value)
-    }
-    
-    // MARK:- Profiling
-    
-    /// Calibrate measured power by behaviour
-    func calibrateByBehaviour() -> (distance: Distance, rssi: RSSI)? {
-        // Assume at least 5% of people will always walk too close
-        // to you where 0.45m as nearnest possible distance
-        let passing = targets.values.filter({ $0.type == .passing })
-        let samples = Int(round(Double(passing.count) * 0.05))
-        guard samples >= 1 else {
-            return nil
-        }
-        let rssiValues = passing.filter({ $0.rssiDistribution.max != nil }).map({ $0.rssiDistribution.max! }).sorted(by: { $0 > $1 }).prefix(samples)
-        var rssiSum: Double = 0
-        for rssiValue in rssiValues {
-            rssiSum = rssiSum + rssiValue
-        }
-        let rssi = rssiSum / Double(samples)
-        return (Distance(0.45), RSSI(rssi))
-    }
-    
-    /// Estimate measured power based on behaviour to avoid phone model specific calibration
-    func measuredPower() -> MeasuredPower {
-        // Default value for iBeacons
-        let defaultValue: Double = -56 // 1m
-        let minimumValue: Double = -65 // 4m
-        let maximumValue: Double = -28 // 50% of 1m
-        // Calibration
-        guard let calibration = calibrateByBehaviour() else {
-            return defaultValue
-        }
-        // Estimate measured power or use bootstrap value if minimum
-        // passing RSSI looks too low/high to be reliable
-        let estimatedValue = SocialDistance.measuredPower(distance: calibration.distance, rssi: calibration.rssi)
-        guard estimatedValue >= minimumValue, estimatedValue <= maximumValue else {
-            return defaultValue
-        }
-        return estimatedValue
-    }
-    
-    /// Calculate mean rssi, distance and total duration of exposure for a set of targets over a time period
-    func exposure(_ type: SocialDistanceTargetType, _ start: Date, _ end: Date = Date()) -> (rssi: RSSI, distance: Distance, duration: TimeInterval) {
-        let filteredTargets = targets.values.filter({ $0.type == type && $0.lastSeenAt >= start && $0.lastSeenAt < end })
-        let rssi = Sample()
-        var duration: TimeInterval = 0
-        filteredTargets.forEach() { target in
-            rssi.add(target.rssiDistribution)
-            duration = duration + target.duration
-        }
-        guard let meanRssi = rssi.mean else {
-            return (0,0,0)
-        }
-        let distance = SocialDistance.distance(measuredPower: measuredPower(), rssi: meanRssi)
-        return (meanRssi, distance, duration)
-    }
-    
-    /// Calculate measured power given distance (metres), rssi and environmental factor
-    static func measuredPower(distance: Distance, rssi: RSSI, environmentalFactor: Double = Double(2)) -> MeasuredPower {
-        return MeasuredPower(rssi + log10(distance) * 10 * environmentalFactor)
-    }
-    
-    /// Calculate distance given measured power, rssi and environmental factor
-    static func distance(measuredPower: MeasuredPower, rssi: RSSI, environmentalFactor: Double = Double(2)) -> Distance {
-        return Distance(pow(10, (measuredPower - rssi) / (10 * environmentalFactor)))
-    }
-    
-    /// Calculate RSSI given distance, measured power and environmental factor
-    static func rssi(distance: Distance, measuredPower: MeasuredPower, environmentalFactor: Double = Double(2)) -> RSSI {
-        return measuredPower - log10(distance) * 10 * environmentalFactor
-    }
-}
-
-/// RSSI as decimal value
-typealias RSSI = Double
-
-/// Measured power at 1 metre
-typealias MeasuredPower = Double
-
-/// Distance in metres
-typealias Distance = Double
-
-enum SocialDistanceTargetType {
-    // People walking pass: short duration < 60 second, single sample or high variance
-    case passing
-    // People sitting or standing: long duration > 10 minutes, low variance
-    case stationary
-    // People moving around you: long duration > 10 minutes, high variance
-    case orbiting
-    // Unknown characteristics
-    case unknown
-}
-
-class SocialDistanceTarget {
-    let identifier: TargetIdentifier
-    let rssiDistribution: Sample = Sample()
-    var duration: TimeInterval = 1
-    var firstSeenAt: Date = Date()
-    var lastSeenAt: Date = Date()
-    var rssi: Double
-    var type: SocialDistanceTargetType { get {
-        if duration < 60, (rssiDistribution.count == 1 || rssiDistribution.variance! > rssiDistribution.mean! * 0.3) {
-            return .passing
-        } else if duration > 10 * .minute, let mean = rssiDistribution.mean, let variance = rssiDistribution.variance {
-            if variance < mean * 0.3 {
-                return .stationary
-            } else {
-                return .orbiting
+        
+    /// Calculate social distance score based on maximum RSSI per 1 minute time window over duration
+    /// A score of 1.0 means RSSI >= measuredPower in every minute, score of 0.0 means no encounter
+    /// or RSSI less than excludeRssiBelow in every minute.
+    /// - measuredPower defines RSSI at 1 metre, default is -56 derived from iBeacon
+    /// - excludeRssiBelow defines minimum RSSI to include in analysis, default is -65 for iBeacon at 4m.
+    func scoreByProximity(_ start: Date, _ end: Date = Date(), measuredPower: Double = -56, excludeRssiBelow: Double = -65) -> Double {
+        // Get encounters over time period
+        let encounters = subdata(start: start, end: end)
+        // Get number of minutes in time period
+        let duration = ceil(end.timeIntervalSince(start) / 60)
+        // Get interactions for each time windows over time period
+        let timeWindows = reduceByTime(encounters, duration: 60)
+        // Get sum of exposure in each time window
+        let rssiRange = measuredPower - excludeRssiBelow
+        var totalScore = 0.0
+        timeWindows.forEach() { timeWindow in
+            var maxRSSI: Double?
+            timeWindow.context.values.forEach() { proximities in
+                proximities.forEach() { proximity in
+                    guard proximity.unit == .RSSI, proximity.value >= excludeRssiBelow, proximity.value <= 0 else {
+                        return
+                    }
+                    maxRSSI = max(proximity.value, maxRSSI ?? proximity.value)
+                }
             }
-        } else {
-            return .unknown
+            guard let rssi = maxRSSI else {
+                return
+            }
+            let rssiDelta = measuredPower - min(rssi, measuredPower)
+            let rssiPercentage = 1.0 - (rssiDelta / rssiRange)
+            totalScore = totalScore + rssiPercentage
         }
-    }}
-    
-    init(_ identifier: TargetIdentifier, _ rssi: Double) {
-        self.identifier = identifier
-        self.rssi = rssi
-        rssiDistribution.add(rssi)
+        // Score for time period is totalScore / duration
+        let score = totalScore / duration
+        return score
     }
-    
-    func didMeasure(_ rssi: Double) {
-        guard rssi < 0, rssi > -100 else {
-            return
+
+    /// Calculate social distance score based on number of different devices per 1 minute time window over duration
+    /// A score of 1.0 means 6 or more in every minute, score of 0.0 means no device in every minute.
+    func scoreByTarget(_ start: Date, _ end: Date = Date(), maximumDeviceCount: Int = 6, excludeRssiBelow: Double = -65) -> Double {
+        // Get encounters over time period
+        let encounters = subdata(start: start, end: end)
+        // Get number of minutes in time period
+        let duration = ceil(end.timeIntervalSince(start) / 60)
+        // Get interactions for each time windows over time period
+        let timeWindows = reduceByTime(encounters, duration: 60)
+        // Get sum of exposure in each time window
+        var totalScore = 0.0
+        timeWindows.forEach() { timeWindow in
+            var devices = 0
+            timeWindow.context.values.forEach() { proximities in
+                if proximities.filter({ $0.unit == .RSSI && $0.value >= excludeRssiBelow && $0.value <= 0 }).count > 0 {
+                    devices = devices + 1
+                }
+            }
+            let devicesPercentage = (Double(min(devices, maximumDeviceCount)) / Double(maximumDeviceCount))
+            totalScore = totalScore + devicesPercentage
         }
-        let now = Date()
-        let elapsed = now.timeIntervalSince(lastSeenAt)
-        lastSeenAt = now
-        // Two encounters separated by > 30 seconds is assumed to be disjointed
-        guard elapsed <= 30 else {
-            duration = duration + 1
-            rssiDistribution.add(rssi)
-            self.rssi = rssi
-            return
-        }
-        guard elapsed >= 1 else {
-            rssiDistribution.add(rssi)
-            self.rssi = rssi
-            return
-        }
-        // Two encounters within 30 seconds is assumed to be continuous
-        // Interpolate rssi value for each second
-        duration = duration + elapsed
-        let rssiDeltaPerSecond = (rssi - self.rssi) / Double(Int(elapsed))
-        for period in 1...Int(elapsed) {
-            rssiDistribution.add(Double(period) * rssiDeltaPerSecond)
-        }
-        self.rssi = rssi
-    }
-    
-    
+        // Score for time period is totalScore / duration
+        let score = totalScore / duration
+        return score
+     }
 }

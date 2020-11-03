@@ -45,7 +45,7 @@ public class Interactions: NSObject, SensorDelegate {
         }
     }
     
-    private func append(_ encounter: Encounter) {
+    public func append(_ encounter: Encounter) {
         queue.sync {
             textFile?.write(encounter.csvString)
             encounters.append(encounter)
