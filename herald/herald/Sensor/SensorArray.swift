@@ -26,7 +26,6 @@ public class SensorArray : NSObject, Sensor {
         super.init()
         
         // Loggers
-        add(delegate: Interactions(filename: "interactions.csv"))
         add(delegate: ContactLog(filename: "contacts.csv"))
         add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
         add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
