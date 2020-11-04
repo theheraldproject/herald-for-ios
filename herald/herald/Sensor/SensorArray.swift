@@ -14,13 +14,16 @@ public class SensorArray : NSObject, Sensor {
     private var sensorArray: [Sensor] = []
     public let payloadData: PayloadData
     public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
+    
+    private var concreteBle: ConcreteBLESensor?;
 
     public init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
         // Location sensor is necessary for enabling background BLE advert detection
         // NOT REQUIRED: sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         // BLE sensor for detecting and tracking proximity
-        sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
+        concreteBle = ConcreteBLESensor(payloadDataSupplier)
+        sensorArray.append(concreteBle!)
         // Payload data at initiation time for identifying this device in the logs
         payloadData = payloadDataSupplier.payload(PayloadTimestamp())
         super.init()
@@ -31,6 +34,10 @@ public class SensorArray : NSObject, Sensor {
         add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
         _ = BatteryLog(filename: "battery.csv")
         logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
+    }
+    
+    public func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {
+        return concreteBle!.immediateSend(data: data,targetIdentifier);
     }
     
     public func add(delegate: SensorDelegate) {
