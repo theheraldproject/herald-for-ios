@@ -130,14 +130,26 @@ class ViewController: UIViewController, SensorDelegate {
     }
     
     // Update social distance score
-    private func updateSocialDistance() {
+    private func updateSocialDistance(_ secondsPerUnit: TimeInterval) {
         let secondsPerUnit = 60
-        
+        let labels = [labelSocialMixingScore00, labelSocialMixingScore01, labelSocialMixingScore02, labelSocialMixingScore03, labelSocialMixingScore04, labelSocialMixingScore05, labelSocialMixingScore06, labelSocialMixingScore07, labelSocialMixingScore08, labelSocialMixingScore09, labelSocialMixingScore10, labelSocialMixingScore11]
         let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 12
         for i in 0...11 {
+            // Compute score for time slot
             let start = Date(timeIntervalSince1970: TimeInterval((epoch + i) * secondsPerUnit))
             let end = Date(timeIntervalSince1970: TimeInterval((epoch + i + 1) * secondsPerUnit))
-            socialDistance.scoreByProximity(start, end, measuredPower: -36)
+            let score = socialDistance.scoreByProximity(start, end, measuredPower: -25, excludeRssiBelow: -70)
+            // Present textual score
+            let scoreForPresentation = Int(round(score * 100)).description
+            labels[i]!.text = scoreForPresentation
+            // Change color according to score
+            if score < 0.1 {
+                labels[i]!.backgroundColor = .systemGreen
+            } else if score < 0.5 {
+                labels[i]!.backgroundColor = .systemOrange
+            } else {
+                labels[i]!.backgroundColor = .systemRed
+            }
         }
     }
 
@@ -178,6 +190,7 @@ class ViewController: UIViewController, SensorDelegate {
         DispatchQueue.main.async {
             self.labelDidMeasureCount.text = "\(self.didMeasure)"
             self.updateDetection()
+            self.updateSocialDistance()
         }
     }
 

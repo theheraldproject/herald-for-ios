@@ -18,7 +18,7 @@ public class SensorArray : NSObject, Sensor {
     public init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
         // Location sensor is necessary for enabling background BLE advert detection
-        // NOT REQUIRED: sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         // BLE sensor for detecting and tracking proximity
         sensorArray.append(ConcreteBLESensor(payloadDataSupplier))
         // Payload data at initiation time for identifying this device in the logs

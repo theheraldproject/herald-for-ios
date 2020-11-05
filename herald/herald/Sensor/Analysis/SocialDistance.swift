@@ -16,9 +16,9 @@ public class SocialDistance: Interactions {
     /// Calculate social distance score based on maximum RSSI per 1 minute time window over duration
     /// A score of 1.0 means RSSI >= measuredPower in every minute, score of 0.0 means no encounter
     /// or RSSI less than excludeRssiBelow in every minute.
-    /// - measuredPower defines RSSI at 1 metre, default is -56 derived from iBeacon
-    /// - excludeRssiBelow defines minimum RSSI to include in analysis, default is -65 for iBeacon at 4m.
-    public func scoreByProximity(_ start: Date, _ end: Date = Date(), measuredPower: Double = -56, excludeRssiBelow: Double = -65) -> Double {
+    /// - measuredPower defines RSSI at 1 metre
+    /// - excludeRssiBelow defines minimum RSSI to include in analysis
+    public func scoreByProximity(_ start: Date, _ end: Date = Date(), measuredPower: Double = -32, excludeRssiBelow: Double = -65) -> Double {
         // Get encounters over time period
         let encounters = subdata(start: start, end: end)
         // Get number of minutes in time period
