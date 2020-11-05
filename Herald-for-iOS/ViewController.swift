@@ -22,9 +22,7 @@ class ViewController: UIViewController, SensorDelegate {
     private var payloads: [TargetIdentifier:String] = [:]
     private var didReadPayloads: [String:Date] = [:]
     private var didSharePayloads: [String:Date] = [:]
-    private let socialDistance = SocialDistance()
-    private var socialMixingScoreUnit = TimeInterval(60)
-
+    
     // UI header
     @IBOutlet weak var labelDevice: UILabel!
     @IBOutlet weak var labelPayload: UILabel!
@@ -36,7 +34,10 @@ class ViewController: UIViewController, SensorDelegate {
     @IBOutlet weak var labelDidShareCount: UILabel!
     @IBOutlet weak var labelDidVisitCount: UILabel!
     
-    // UI social mixing score
+    // MARK:- Social mixing
+    private let socialMixingScore = SocialDistance()
+    private var socialMixingScoreUnit = TimeInterval(60)
+    // Labels to show score over time, each label is a unit
     @IBOutlet weak var labelSocialMixingScore00: UILabel!
     @IBOutlet weak var labelSocialMixingScore01: UILabel!
     @IBOutlet weak var labelSocialMixingScore02: UILabel!
@@ -49,8 +50,7 @@ class ViewController: UIViewController, SensorDelegate {
     @IBOutlet weak var labelSocialMixingScore09: UILabel!
     @IBOutlet weak var labelSocialMixingScore10: UILabel!
     @IBOutlet weak var labelSocialMixingScore11: UILabel!
-    
-    // UI social mixing score unit
+    // Buttons to set label unit
     @IBOutlet weak var buttonSocialMixingScoreUnitH24: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitH12: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitH4: UIButton!
@@ -70,7 +70,7 @@ class ViewController: UIViewController, SensorDelegate {
         super.viewDidLoad()
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
-        sensor.add(delegate: socialDistance)
+        sensor.add(delegate: socialMixingScore)
 
         dateFormatter.dateFormat = "MMdd HH:mm:ss"
         
@@ -82,7 +82,7 @@ class ViewController: UIViewController, SensorDelegate {
         enableCrashButton()
     }
         
-    // UI social mixing score unit actions
+    // MARK:- Social mixing score unit buttons
     private func buttonSocialMixingScoreUnit(color: UIColor) {
         buttonSocialMixingScoreUnitH24.setTitleColor(color, for: .normal)
         buttonSocialMixingScoreUnitH12.setTitleColor(color, for: .normal)
@@ -211,7 +211,7 @@ class ViewController: UIViewController, SensorDelegate {
             // Compute score for time slot
             let start = Date(timeIntervalSince1970: TimeInterval((epoch + i) * secondsPerUnit))
             let end = Date(timeIntervalSince1970: TimeInterval((epoch + i + 1) * secondsPerUnit))
-            let score = socialDistance.scoreByProximity(start, end, measuredPower: -25, excludeRssiBelow: -70)
+            let score = socialMixingScore.scoreByProximity(start, end, measuredPower: -25, excludeRssiBelow: -70)
             // Present textual score
             let scoreForPresentation = Int(round(score * 100)).description
             labels[i]!.text = scoreForPresentation
