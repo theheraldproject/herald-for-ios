@@ -43,6 +43,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private var delegates: [SensorDelegate] = []
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue
+    /// Dedicated sequential queue for delegate tasks.
+    private let delegateQueue: DispatchQueue
     private let database: BLEDatabase
     /// Beacon code generator for creating cryptographically secure public codes that can be later used for on-device matching.
     private let payloadDataSupplier: PayloadDataSupplier
@@ -66,8 +68,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
      Create a transmitter  that uses the same sequential dispatch queue as the receiver.
      Transmitter starts automatically when Bluetooth is enabled.
      */
-    init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
+    init(queue: DispatchQueue, delegateQueue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
         self.queue = queue
+        self.delegateQueue = delegateQueue
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
@@ -284,7 +287,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         // 3.. : payload data
                         if let payloadDataCount = data.int16(1) {
                             logger.debug("didReceiveWrite -> didDetect=\(targetIdentifier)")
-                            delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
+                            delegateQueue.async {
+                                self.delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
+                            }
                             if data.count == (3 + payloadDataCount) {
                                 let payloadData = PayloadData(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didRead=\(payloadData.shortName),fromTarget=\(targetIdentifier)")
@@ -330,7 +335,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 5..<data.count))
                                 logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
                                 peripheral.respond(to: request, withResult: .success)
-                                delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
+                                delegateQueue.async {
+                                    self.delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
+                                }
                                 targetDevice.operatingSystem = .android
                                 targetDevice.rssi = BLE_RSSI(rssi)
                                 payloadSharingData.forEach() { payloadData in
@@ -359,7 +366,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (3 + immediateDataCount) {
                                 let datasubset = data.subdata(in: 3..<data.count)
                                 peripheral.respond(to: request, withResult: .success)
-                                delegates.forEach { $0.sensor(.BLE, didReceive: datasubset, fromTarget: targetIdentifier) }
+                                delegateQueue.async {
+                                    self.delegates.forEach { $0.sensor(.BLE, didReceive: datasubset, fromTarget: targetIdentifier) }
+                                }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=immediateSend)")
                                 peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
