@@ -23,6 +23,7 @@ class ViewController: UIViewController, SensorDelegate {
     private var didReadPayloads: [String:Date] = [:]
     private var didSharePayloads: [String:Date] = [:]
     private let socialDistance = SocialDistance()
+    private var socialMixingScoreUnit = TimeInterval(60)
 
     // UI header
     @IBOutlet weak var labelDevice: UILabel!
@@ -49,6 +50,17 @@ class ViewController: UIViewController, SensorDelegate {
     @IBOutlet weak var labelSocialMixingScore10: UILabel!
     @IBOutlet weak var labelSocialMixingScore11: UILabel!
     
+    // UI social mixing score unit
+    @IBOutlet weak var buttonSocialMixingScoreUnitH24: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitH12: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitH4: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitH1: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM30: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM15: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM5: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM1: UIButton!
+    
+    
     // UI detected payloads
     @IBOutlet weak var labelDetection: UILabel!
     @IBOutlet weak var buttonCrash: UIButton!
@@ -69,6 +81,67 @@ class ViewController: UIViewController, SensorDelegate {
         
         enableCrashButton()
     }
+        
+    // UI social mixing score unit actions
+    private func buttonSocialMixingScoreUnit(color: UIColor) {
+        buttonSocialMixingScoreUnitH24.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitH12.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitH4.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitH1.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitM30.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitM15.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitM5.setTitleColor(color, for: .normal)
+        buttonSocialMixingScoreUnitM1.setTitleColor(color, for: .normal)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH24Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*60*24)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitH24.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH12Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*60*12)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitH12.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH4Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*60*4)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitH4.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH1Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*60*1)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitH1.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM30Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*30)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM15Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*15)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM5Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*5)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM1Action(_ sender: Any) {
+        socialMixingScoreUnit = TimeInterval(60*1)
+        buttonSocialMixingScoreUnit(color: .systemGray)
+        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    
     
     private func enableCrashButton() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(simulateCrashInTen))
@@ -130,8 +203,8 @@ class ViewController: UIViewController, SensorDelegate {
     }
     
     // Update social distance score
-    private func updateSocialDistance(_ secondsPerUnit: TimeInterval) {
-        let secondsPerUnit = 60
+    private func updateSocialDistance(_ unit: TimeInterval) {
+        let secondsPerUnit = Int(round(unit))
         let labels = [labelSocialMixingScore00, labelSocialMixingScore01, labelSocialMixingScore02, labelSocialMixingScore03, labelSocialMixingScore04, labelSocialMixingScore05, labelSocialMixingScore06, labelSocialMixingScore07, labelSocialMixingScore08, labelSocialMixingScore09, labelSocialMixingScore10, labelSocialMixingScore11]
         let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 12
         for i in 0...11 {
@@ -190,7 +263,7 @@ class ViewController: UIViewController, SensorDelegate {
         DispatchQueue.main.async {
             self.labelDidMeasureCount.text = "\(self.didMeasure)"
             self.updateDetection()
-            self.updateSocialDistance()
+            self.updateSocialDistance(self.socialMixingScoreUnit)
         }
     }
 

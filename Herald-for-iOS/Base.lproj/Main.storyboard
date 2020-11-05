@@ -217,14 +217,100 @@
                                 <color key="backgroundColor" systemColor="systemGray6Color"/>
                                 <edgeInsets key="layoutMargins" top="2" left="2" bottom="2" right="2"/>
                             </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="kgS-kc-Z4r" userLabel="socialMixingScoreUnit">
+                                <rect key="frame" x="0.0" y="189" width="414" height="27"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c30-g7-2mI" userLabel="socialMixingScoreUnitH24">
+                                        <rect key="frame" x="8" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="24h">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitH24Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="occ-hb-r9S"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vQV-Bi-hTS" userLabel="socialMixingScoreUnitH12">
+                                        <rect key="frame" x="60.5" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="12h">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitH12Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="vzl-sR-3bC"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GYm-NS-Kh1" userLabel="socialMixingScoreUnitH4">
+                                        <rect key="frame" x="113" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="4h">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitH4Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="cYb-NP-1ry"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pey-Ze-TcM" userLabel="socialMixingScoreUnitH1">
+                                        <rect key="frame" x="165.5" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="1h">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitH1Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="FpB-dn-lbG"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QrP-BV-wud" userLabel="socialMixingScoreUnitM30">
+                                        <rect key="frame" x="218.5" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="30m">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitM30Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="VAj-Er-sdQ"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BHp-2W-3zM" userLabel="socialMixingScoreUnitM15">
+                                        <rect key="frame" x="271" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="15m">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitM15Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="cCj-qn-kuD"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MDB-K6-hbc" userLabel="socialMixingScoreUnitM5">
+                                        <rect key="frame" x="323.5" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="5m">
+                                            <color key="titleColor" systemColor="systemGrayColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitM5Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="DpS-X9-1oN"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ss4-H3-kba" userLabel="socialMixingScoreUnitM1">
+                                        <rect key="frame" x="376" y="0.0" width="30" height="27"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <state key="normal" title="1m">
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="buttonSocialMixingScoreUnitM1Action:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="9Sl-41-PT3"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <edgeInsets key="layoutMargins" top="0.0" left="8" bottom="0.0" right="8"/>
+                            </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DETECTION (0)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aMc-Ll-VVc" userLabel="detection">
-                                <rect key="frame" x="20" y="197" width="123.5" height="20.5"/>
+                                <rect key="frame" x="20" y="224" width="123.5" height="20.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="PAYLOADS" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TdI-fU-QMV" userLabel="payloads">
-                                <rect key="frame" x="20" y="225.5" width="374" height="578.5"/>
+                                <rect key="frame" x="20" y="252.5" width="374" height="551.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -238,10 +324,13 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="aMc-Ll-VVc" firstAttribute="top" secondItem="KAb-xc-B24" secondAttribute="bottom" constant="8" id="2B2-WW-t62"/>
+                            <constraint firstItem="aMc-Ll-VVc" firstAttribute="top" secondItem="kgS-kc-Z4r" secondAttribute="bottom" constant="8" id="2B2-WW-t62"/>
                             <constraint firstItem="jt7-VE-xfW" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="3Sf-yK-40c"/>
+                            <constraint firstItem="kgS-kc-Z4r" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="53m-mg-MjR"/>
                             <constraint firstItem="txD-W3-4Y5" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6fT-av-Ti7"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="kgS-kc-Z4r" secondAttribute="trailing" id="7h4-EF-vCb"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="KAb-xc-B24" secondAttribute="trailing" id="AAW-RD-O7y"/>
+                            <constraint firstItem="kgS-kc-Z4r" firstAttribute="top" secondItem="KAb-xc-B24" secondAttribute="bottom" id="DST-5k-K6n"/>
                             <constraint firstItem="65L-a9-t2p" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ENO-Tx-iZm"/>
                             <constraint firstItem="TdI-fU-QMV" firstAttribute="top" secondItem="aMc-Ll-VVc" secondAttribute="bottom" constant="8" symbolic="YES" id="GIu-qh-zaT"/>
                             <constraint firstItem="65L-a9-t2p" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Ge9-zm-POM"/>
@@ -250,6 +339,7 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jt7-VE-xfW" secondAttribute="trailing" symbolic="YES" id="NeW-Tg-AOh"/>
                             <constraint firstItem="kUM-Z2-P2r" firstAttribute="leading" secondItem="jt7-VE-xfW" secondAttribute="leading" id="RKR-qe-qMA"/>
                             <constraint firstItem="txD-W3-4Y5" firstAttribute="top" secondItem="TdI-fU-QMV" secondAttribute="bottom" constant="8" symbolic="YES" id="TGn-Ml-hrw"/>
+                            <constraint firstItem="kgS-kc-Z4r" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="WGO-71-VwL"/>
                             <constraint firstItem="TdI-fU-QMV" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="WTm-Il-8fd"/>
                             <constraint firstItem="65L-a9-t2p" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Y6L-cG-D7Y"/>
                             <constraint firstItem="aMc-Ll-VVc" firstAttribute="leading" secondItem="jt7-VE-xfW" secondAttribute="leading" id="dGF-oa-LqV"/>
@@ -265,6 +355,14 @@
                     </view>
                     <connections>
                         <outlet property="buttonCrash" destination="txD-W3-4Y5" id="VVf-LP-zJo"/>
+                        <outlet property="buttonSocialMixingScoreUnitH1" destination="pey-Ze-TcM" id="kiV-F4-jbc"/>
+                        <outlet property="buttonSocialMixingScoreUnitH12" destination="vQV-Bi-hTS" id="aUb-eM-z83"/>
+                        <outlet property="buttonSocialMixingScoreUnitH24" destination="c30-g7-2mI" id="Myt-nL-Jai"/>
+                        <outlet property="buttonSocialMixingScoreUnitH4" destination="GYm-NS-Kh1" id="WGl-eU-Plu"/>
+                        <outlet property="buttonSocialMixingScoreUnitM1" destination="ss4-H3-kba" id="YtV-gH-bQh"/>
+                        <outlet property="buttonSocialMixingScoreUnitM15" destination="BHp-2W-3zM" id="bZp-c6-Swd"/>
+                        <outlet property="buttonSocialMixingScoreUnitM30" destination="QrP-BV-wud" id="8pk-FL-sim"/>
+                        <outlet property="buttonSocialMixingScoreUnitM5" destination="MDB-K6-hbc" id="u9s-QX-2Nh"/>
                         <outlet property="labelDetection" destination="aMc-Ll-VVc" id="y7u-dc-r1r"/>
                         <outlet property="labelDevice" destination="jt7-VE-xfW" id="yY6-HA-pxx"/>
                         <outlet property="labelDidDetectCount" destination="AIe-zx-Ujw" id="tGk-6E-5n6"/>
@@ -300,8 +398,14 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemGray6Color">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemGrayColor">
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
             <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
