@@ -70,8 +70,8 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         database = ConcreteBLEDatabase()
-        transmitter = ConcreteBLETransmitter(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
-        receiver = ConcreteBLEReceiver(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
+        transmitter = ConcreteBLETransmitter(queue: sensorQueue, delegateQueue: delegateQueue, database: database, payloadDataSupplier: payloadDataSupplier)
+        receiver = ConcreteBLEReceiver(queue: sensorQueue, delegateQueue: delegateQueue, database: database, payloadDataSupplier: payloadDataSupplier)
         super.init()
         database.add(delegate: self)
     }
