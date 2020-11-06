@@ -47,6 +47,8 @@ struct BLESensorConfiguration {
     static let signalCharacteristicActionWriteRSSI = UInt8(2)
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload sharing data length, then payload sharing data
     static let signalCharacteristicActionWritePayloadSharing = UInt8(3)
+    /// Arbitrary immediate write
+    static let signalCharacteristicActionWriteImmediate = UInt8(4)
 }
 
 
@@ -64,12 +66,12 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     private var delegates: [SensorDelegate] = []
     private let database: BLEDatabase
     private let transmitter: BLETransmitter
-    private let receiver: BLEReceiver
+    private let receiver: ConcreteBLEReceiver
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         database = ConcreteBLEDatabase()
-        transmitter = ConcreteBLETransmitter(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
-        receiver = ConcreteBLEReceiver(queue: sensorQueue, database: database, payloadDataSupplier: payloadDataSupplier)
+        transmitter = ConcreteBLETransmitter(queue: sensorQueue, delegateQueue: delegateQueue, database: database, payloadDataSupplier: payloadDataSupplier)
+        receiver = ConcreteBLEReceiver(queue: sensorQueue, delegateQueue: delegateQueue, database: database, payloadDataSupplier: payloadDataSupplier)
         super.init()
         database.add(delegate: self)
     }
@@ -88,6 +90,10 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
         delegates.append(delegate)
         transmitter.add(delegate: delegate)
         receiver.add(delegate: delegate)
+    }
+    
+    func immediateSend(data: Data,_ targetIdentifier: TargetIdentifier) -> Bool {
+        return receiver.immediateSend(data:data,targetIdentifier);
     }
     
     // MARK:- BLEDatabaseDelegate

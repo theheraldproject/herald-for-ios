@@ -34,6 +34,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private var delegates: [SensorDelegate] = []
     /// Dedicated sequential queue for all beacon transmitter and receiver tasks.
     private let queue: DispatchQueue!
+    /// Dedicated sequential queue for delegate tasks.
+    private let delegateQueue: DispatchQueue
     /// Database of peripherals
     private let database: BLEDatabase
     /// Payload data supplier for parsing shared payloads
@@ -60,8 +62,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// operations impacts CoreBluetooth stability. The receiver and transmitter share a common database of devices to enable the transmitter
     /// to register centrals for resolution by the receiver as peripherals to create symmetric connections. The payload data supplier provides
     /// the actual payload data to be transmitted and received via BLE.
-    required init(queue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
+    required init(queue: DispatchQueue, delegateQueue: DispatchQueue, database: BLEDatabase, payloadDataSupplier: PayloadDataSupplier) {
         self.queue = queue
+        self.delegateQueue = delegateQueue
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
@@ -100,6 +103,22 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 disconnect("stop", peripheral)
             }
         }
+    }
+    
+    func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {
+        logger.debug("immediateSend (targetIdentifier=\(targetIdentifier))")
+        let device = database.device(targetIdentifier)
+        logger.debug("immediateSend (peripheral=\(device.identifier))")
+        guard let peripheral = device.peripheral, peripheral.state == .connected else {
+            logger.fault("immediateSend denied, peripheral not connected (peripheral=\(device.identifier))")
+            return false
+        }
+        var toSend = Data([UInt8(BLESensorConfiguration.signalCharacteristicActionWriteImmediate)])
+        var length = Int16(data.count)
+        toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
+        toSend.append(data)
+        peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse)
+        return true;
     }
     
     // MARK:- Scan for peripherals and initiate connection if required
@@ -552,7 +571,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Bluetooth on -> Scan
         if (central.state == .poweredOn) {
             logger.debug("Update state (state=poweredOn))")
-            delegates.forEach({ $0.sensor(.BLE, didUpdateState: .on) })
+            delegateQueue.async {
+                self.delegates.forEach({ $0.sensor(.BLE, didUpdateState: .on) })
+            }
             scan("updateState")
         } else {
             if #available(iOS 10.0, *) {
@@ -576,7 +597,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                         logger.debug("Update state (state=undefined)")
                 }
             }
-            delegates.forEach({ $0.sensor(.BLE, didUpdateState: .off) })
+            delegateQueue.async {
+                self.delegates.forEach({ $0.sensor(.BLE, didUpdateState: .off) })
+            }
         }
     }
     

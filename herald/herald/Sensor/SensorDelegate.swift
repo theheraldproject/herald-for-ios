@@ -17,6 +17,9 @@ public protocol SensorDelegate {
     
     /// Read payload data of other targets recently acquired by a target, e.g. Android peripheral sharing payload data acquired from nearby iOS peripherals.
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier)
+    
+    /// Write signal requests - immediate send
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier)
 
     /// Measure proximity to target, e.g. a sample of RSSI values from BLE peripheral.
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier)
@@ -36,6 +39,7 @@ public extension SensorDelegate {
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didVisit: Location) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {}

@@ -184,4 +184,63 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:05:59+0000")!))
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
     }
+
+    func testContactIdentifierPerformance() throws {
+        let km1 = MatchingKey(repeating: 0, count: 32)
+        self.measure {
+            for _ in 0...1000 {
+                _ = ConcreteSimplePayloadDataSupplier.contactIdentifiers(km1)
+            }
+        }
+    }
+    
+    func testCrossPlatformUInt8() throws {
+        print("value,uint8")
+        for i in 0...255 {
+            let value = UInt8(i)
+            var bigEndian = value.bigEndian
+            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
+            print("\(value),\(data.base64EncodedString())")
+        }
+    }
+
+    func testCrossPlatformUInt16() throws {
+        print("value,uint16")
+        for i in 0...127 {
+            let value = UInt16(i)
+            var bigEndian = value.bigEndian
+            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
+            print("\(value),\(data.base64EncodedString())")
+        }
+        for i in (65536-128)...65535 {
+            let value = UInt16(i)
+            var bigEndian = value.bigEndian
+            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
+            print("\(value),\(data.base64EncodedString())")
+        }
+    }
+    
+    func testCrossPlatformFloat16() throws {
+        print("value,float16")
+        print("-65504,\(F.float16(-65504).base64EncodedString())")
+        print("-0.0000000596046,\(F.float16(-0.0000000596046).base64EncodedString())")
+        print("0,\(F.float16(0).base64EncodedString())")
+        print("0.0000000596046,\(F.float16(0.0000000596046).base64EncodedString())")
+        print("65504,\(F.float16(65504).base64EncodedString())")
+    }
+
+    func testContactIdentifierCrossPlatform() throws {
+        print("day,period,matchingKey,contactKey,contactIdentifier");
+        // Generate secret and matching keys
+        let ks1 = SecretKey(repeating: 0, count: 2048)
+        let km1 = K.matchingKeys(ks1)
+        // Print first 10 days of contact keys for comparison across iOS and Android implementations
+        for day in 0...10 {
+            let kc1 = K.contactKeys(km1[day])
+            for period in 0...240 {
+                let Ic1 = K.contactIdentifier(kc1[period])
+                print("\(day),\(period),\(km1[day].base64EncodedString()),\(kc1[period].base64EncodedString()),\(Ic1.base64EncodedString())")
+            }
+        }
+    }
 }

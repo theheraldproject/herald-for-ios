@@ -230,6 +230,13 @@ class ViewController: UIViewController, SensorDelegate {
             self.updateDetection()
         }
     }
+    
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
+        DispatchQueue.main.async {
+            self.labelDidRead.text = "didReceive: \(didReceive.base64EncodedString()) (\(self.timestamp()))"
+            self.updateDetection()
+        }
+    }
 
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         self.didShare += 1
