@@ -83,63 +83,49 @@ class ViewController: UIViewController, SensorDelegate {
     }
         
     // MARK:- Social mixing score unit buttons
-    private func buttonSocialMixingScoreUnit(color: UIColor) {
-        buttonSocialMixingScoreUnitH24.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitH12.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitH4.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitH1.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitM30.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitM15.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitM5.setTitleColor(color, for: .normal)
-        buttonSocialMixingScoreUnitM1.setTitleColor(color, for: .normal)
+    private func socialMixingScoreUnit(_ setTo: UIButton, active: UIColor = .systemBlue, inactive: UIColor = .systemGray) {
+        var mapping: [UIButton:TimeInterval] = [:]
+        mapping[buttonSocialMixingScoreUnitH24] = TimeInterval(24 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitH12] = TimeInterval(12 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitH4] = TimeInterval(4 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitH1] = TimeInterval(1 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitM30] = TimeInterval(30 * 60)
+        mapping[buttonSocialMixingScoreUnitM15] = TimeInterval(15 * 60)
+        mapping[buttonSocialMixingScoreUnitM5] = TimeInterval(5 * 60)
+        mapping[buttonSocialMixingScoreUnitM1] = TimeInterval(1 * 60)
+        mapping.forEach() { key, value in
+            if key == setTo {
+                key.setTitleColor(active, for: .normal)
+                socialMixingScoreUnit = value
+            } else {
+                key.setTitleColor(inactive, for: .normal)
+            }
+        }
+        updateSocialDistance(socialMixingScoreUnit)
     }
     @IBAction func buttonSocialMixingScoreUnitH24Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*60*24)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitH24.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH24)
     }
     @IBAction func buttonSocialMixingScoreUnitH12Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*60*12)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitH12.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH12)
     }
     @IBAction func buttonSocialMixingScoreUnitH4Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*60*4)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitH4.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH4)
     }
     @IBAction func buttonSocialMixingScoreUnitH1Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*60*1)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitH1.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH1)
     }
     @IBAction func buttonSocialMixingScoreUnitM30Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*30)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM30)
     }
     @IBAction func buttonSocialMixingScoreUnitM15Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*15)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM15)
     }
     @IBAction func buttonSocialMixingScoreUnitM5Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*5)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM5)
     }
     @IBAction func buttonSocialMixingScoreUnitM1Action(_ sender: Any) {
-        socialMixingScoreUnit = TimeInterval(60*1)
-        buttonSocialMixingScoreUnit(color: .systemGray)
-        buttonSocialMixingScoreUnitM30.setTitleColor(.systemBlue, for: .normal)
-        updateSocialDistance(socialMixingScoreUnit)
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM1)
     }
     
     
@@ -206,7 +192,7 @@ class ViewController: UIViewController, SensorDelegate {
     private func updateSocialDistance(_ unit: TimeInterval) {
         let secondsPerUnit = Int(round(unit))
         let labels = [labelSocialMixingScore00, labelSocialMixingScore01, labelSocialMixingScore02, labelSocialMixingScore03, labelSocialMixingScore04, labelSocialMixingScore05, labelSocialMixingScore06, labelSocialMixingScore07, labelSocialMixingScore08, labelSocialMixingScore09, labelSocialMixingScore10, labelSocialMixingScore11]
-        let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 12
+        let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 11
         for i in 0...11 {
             // Compute score for time slot
             let start = Date(timeIntervalSince1970: TimeInterval((epoch + i) * secondsPerUnit))
