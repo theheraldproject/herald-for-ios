@@ -22,14 +22,46 @@ class ViewController: UIViewController, SensorDelegate {
     private var payloads: [TargetIdentifier:String] = [:]
     private var didReadPayloads: [String:Date] = [:]
     private var didSharePayloads: [String:Date] = [:]
-
+    
+    // UI header
     @IBOutlet weak var labelDevice: UILabel!
     @IBOutlet weak var labelPayload: UILabel!
-    @IBOutlet weak var labelDidDetect: UILabel!
-    @IBOutlet weak var labelDidRead: UILabel!
-    @IBOutlet weak var labelDidMeasure: UILabel!
-    @IBOutlet weak var labelDidShare: UILabel!
-    @IBOutlet weak var labelDidVisit: UILabel!
+    
+    // UI didCount table
+    @IBOutlet weak var labelDidDetectCount: UILabel!
+    @IBOutlet weak var labelDidReadCount: UILabel!
+    @IBOutlet weak var labelDidMeasureCount: UILabel!
+    @IBOutlet weak var labelDidShareCount: UILabel!
+    @IBOutlet weak var labelDidVisitCount: UILabel!
+    
+    // MARK:- Social mixing
+    private let socialMixingScore = SocialDistance()
+    private var socialMixingScoreUnit = TimeInterval(60)
+    // Labels to show score over time, each label is a unit
+    @IBOutlet weak var labelSocialMixingScore00: UILabel!
+    @IBOutlet weak var labelSocialMixingScore01: UILabel!
+    @IBOutlet weak var labelSocialMixingScore02: UILabel!
+    @IBOutlet weak var labelSocialMixingScore03: UILabel!
+    @IBOutlet weak var labelSocialMixingScore04: UILabel!
+    @IBOutlet weak var labelSocialMixingScore05: UILabel!
+    @IBOutlet weak var labelSocialMixingScore06: UILabel!
+    @IBOutlet weak var labelSocialMixingScore07: UILabel!
+    @IBOutlet weak var labelSocialMixingScore08: UILabel!
+    @IBOutlet weak var labelSocialMixingScore09: UILabel!
+    @IBOutlet weak var labelSocialMixingScore10: UILabel!
+    @IBOutlet weak var labelSocialMixingScore11: UILabel!
+    // Buttons to set label unit
+    @IBOutlet weak var buttonSocialMixingScoreUnitH24: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitH12: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitH4: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitH1: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM30: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM15: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM5: UIButton!
+    @IBOutlet weak var buttonSocialMixingScoreUnitM1: UIButton!
+    
+    
+    // UI detected payloads
     @IBOutlet weak var labelDetection: UILabel!
     @IBOutlet weak var buttonCrash: UIButton!
     @IBOutlet weak var textViewPayloads: UITextView!
@@ -38,7 +70,8 @@ class ViewController: UIViewController, SensorDelegate {
         super.viewDidLoad()
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
-        
+        sensor.add(delegate: socialMixingScore)
+
         dateFormatter.dateFormat = "MMdd HH:mm:ss"
         
         labelDevice.text = SensorArray.deviceDescription
@@ -48,6 +81,53 @@ class ViewController: UIViewController, SensorDelegate {
         
         enableCrashButton()
     }
+        
+    // MARK:- Social mixing score unit buttons
+    private func socialMixingScoreUnit(_ setTo: UIButton, active: UIColor = .systemBlue, inactive: UIColor = .systemGray) {
+        var mapping: [UIButton:TimeInterval] = [:]
+        mapping[buttonSocialMixingScoreUnitH24] = TimeInterval(24 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitH12] = TimeInterval(12 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitH4] = TimeInterval(4 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitH1] = TimeInterval(1 * 60 * 60)
+        mapping[buttonSocialMixingScoreUnitM30] = TimeInterval(30 * 60)
+        mapping[buttonSocialMixingScoreUnitM15] = TimeInterval(15 * 60)
+        mapping[buttonSocialMixingScoreUnitM5] = TimeInterval(5 * 60)
+        mapping[buttonSocialMixingScoreUnitM1] = TimeInterval(1 * 60)
+        mapping.forEach() { key, value in
+            if key == setTo {
+                key.setTitleColor(active, for: .normal)
+                socialMixingScoreUnit = value
+            } else {
+                key.setTitleColor(inactive, for: .normal)
+            }
+        }
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH24Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH24)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH12Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH12)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH4Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH4)
+    }
+    @IBAction func buttonSocialMixingScoreUnitH1Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitH1)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM30Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM30)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM15Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM15)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM5Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM5)
+    }
+    @IBAction func buttonSocialMixingScoreUnitM1Action(_ sender: Any) {
+        socialMixingScoreUnit(buttonSocialMixingScoreUnitM1)
+    }
+    
     
     private func enableCrashButton() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(simulateCrashInTen))
@@ -79,6 +159,7 @@ class ViewController: UIViewController, SensorDelegate {
         return timestamp
     }
     
+    // Update detected payloads
     private func updateDetection() {
         var payloadShortNames: [String:String] = [:]
         var payloadLastSeenDates: [String:Date] = [:]
@@ -106,13 +187,37 @@ class ViewController: UIViewController, SensorDelegate {
         textViewPayloads.text = payloadShortNameList.joined(separator: "\n")
         labelDetection.text = "DETECTION (\(payloadShortNameList.count))"
     }
+    
+    // Update social distance score
+    private func updateSocialDistance(_ unit: TimeInterval) {
+        let secondsPerUnit = Int(round(unit))
+        let labels = [labelSocialMixingScore00, labelSocialMixingScore01, labelSocialMixingScore02, labelSocialMixingScore03, labelSocialMixingScore04, labelSocialMixingScore05, labelSocialMixingScore06, labelSocialMixingScore07, labelSocialMixingScore08, labelSocialMixingScore09, labelSocialMixingScore10, labelSocialMixingScore11]
+        let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 11
+        for i in 0...11 {
+            // Compute score for time slot
+            let start = Date(timeIntervalSince1970: TimeInterval((epoch + i) * secondsPerUnit))
+            let end = Date(timeIntervalSince1970: TimeInterval((epoch + i + 1) * secondsPerUnit))
+            let score = socialMixingScore.scoreByProximity(start, end, measuredPower: -25, excludeRssiBelow: -70)
+            // Present textual score
+            let scoreForPresentation = Int(round(score * 100)).description
+            labels[i]!.text = scoreForPresentation
+            // Change color according to score
+            if score < 0.1 {
+                labels[i]!.backgroundColor = .systemGreen
+            } else if score < 0.5 {
+                labels[i]!.backgroundColor = .systemOrange
+            } else {
+                labels[i]!.backgroundColor = .systemRed
+            }
+        }
+    }
 
     // MARK:- SensorDelegate
 
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
         self.didDetect += 1
         DispatchQueue.main.async {
-            self.labelDidDetect.text = "didDetect: \(self.didDetect) (\(self.timestamp()))"
+            self.labelDidDetectCount.text = "\(self.didDetect)"
         }
     }
 
@@ -121,14 +226,7 @@ class ViewController: UIViewController, SensorDelegate {
         payloads[fromTarget] = didRead.shortName
         didReadPayloads[didRead.shortName] = Date()
         DispatchQueue.main.async {
-            self.labelDidRead.text = "didRead: \(self.didRead) (\(self.timestamp()))"
-            self.updateDetection()
-        }
-    }
-    
-    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
-        DispatchQueue.main.async {
-            self.labelDidRead.text = "didReceive: \(didReceive.base64EncodedString()) (\(self.timestamp()))"
+            self.labelDidReadCount.text = "\(self.didRead)"
             self.updateDetection()
         }
     }
@@ -138,7 +236,7 @@ class ViewController: UIViewController, SensorDelegate {
         let time = Date()
         didShare.forEach { self.didSharePayloads[$0.shortName] = time }
         DispatchQueue.main.async {
-            self.labelDidShare.text = "didShare: \(self.didShare) (\(self.timestamp()))"
+            self.labelDidShareCount.text = "\(self.didShare)"
             self.updateDetection()
         }
     }
@@ -149,15 +247,16 @@ class ViewController: UIViewController, SensorDelegate {
             didReadPayloads[payloadShortName] = Date()
         }
         DispatchQueue.main.async {
-            self.labelDidMeasure.text = "didMeasure: \(self.didMeasure) (\(self.timestamp()))"
+            self.labelDidMeasureCount.text = "\(self.didMeasure)"
             self.updateDetection()
+            self.updateSocialDistance(self.socialMixingScoreUnit)
         }
     }
 
     func sensor(_ sensor: SensorType, didVisit: Location) {
         self.didVisit += 1;
         DispatchQueue.main.async {
-            self.labelDidVisit.text = "didVisit: \(self.didVisit) (\(self.timestamp()))"
+            self.labelDidVisitCount.text = "\(self.didVisit)"
         }
     }
 }

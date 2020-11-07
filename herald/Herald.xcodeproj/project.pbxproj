@@ -33,6 +33,17 @@
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
+		B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745EF255713C2003567B7 /* SocialDistance.swift */; };
+		B6F745F3255713C2003567B7 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* Sample.swift */; };
+		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
+		B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */; };
+		B6F745FE25571475003567B7 /* XXH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FB25571475003567B7 /* XXH3.swift */; };
+		B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FC25571475003567B7 /* BloomFilter.swift */; };
+		B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */; };
+		B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74605255714C2003567B7 /* SocialDistanceTests.swift */; };
+		B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */; };
+		B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74607255714C2003567B7 /* BloomFilterTests.swift */; };
+		B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74608255714C2003567B7 /* InteractionsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +86,17 @@
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6F745EF255713C2003567B7 /* SocialDistance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistance.swift; sourceTree = "<group>"; };
+		B6F745F0255713C2003567B7 /* Sample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
+		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
+		B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataMatcher.swift; sourceTree = "<group>"; };
+		B6F745FB25571475003567B7 /* XXH3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XXH3.swift; sourceTree = "<group>"; };
+		B6F745FC25571475003567B7 /* BloomFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilter.swift; sourceTree = "<group>"; };
+		B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcher.swift; sourceTree = "<group>"; };
+		B6F74605255714C2003567B7 /* SocialDistanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistanceTests.swift; sourceTree = "<group>"; };
+		B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcherTests.swift; sourceTree = "<group>"; };
+		B6F74607255714C2003567B7 /* BloomFilterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilterTests.swift; sourceTree = "<group>"; };
+		B6F74608255714C2003567B7 /* InteractionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractionsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +149,7 @@
 		B637EF5C251E56320072D238 /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				B6F745EE255713C2003567B7 /* Analysis */,
 				B637EF5D251E56320072D238 /* BLE */,
 				B637EF63251E56320072D238 /* GPS */,
 				B637EF71251E56320072D238 /* Data */,
@@ -134,6 +157,7 @@
 				B637EF65251E56320072D238 /* Sensor.swift */,
 				B637EF6F251E56320072D238 /* SensorArray.swift */,
 				B637EF70251E56320072D238 /* PayloadDataSupplier.swift */,
+				B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */,
 				B637EF78251E56320072D238 /* SensorDelegate.swift */,
 			);
 			path = Sensor;
@@ -206,6 +230,9 @@
 			isa = PBXGroup;
 			children = (
 				B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */,
+				B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */,
+				B6F745FC25571475003567B7 /* BloomFilter.swift */,
+				B6F745FB25571475003567B7 /* XXH3.swift */,
 			);
 			path = Simple;
 			sourceTree = "<group>";
@@ -215,8 +242,22 @@
 			children = (
 				B6D8A56E25229F33000E6CC2 /* Info.plist */,
 				B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */,
+				B6F74607255714C2003567B7 /* BloomFilterTests.swift */,
+				B6F74608255714C2003567B7 /* InteractionsTests.swift */,
+				B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */,
+				B6F74605255714C2003567B7 /* SocialDistanceTests.swift */,
 			);
 			path = HeraldTests;
+			sourceTree = "<group>";
+		};
+		B6F745EE255713C2003567B7 /* Analysis */ = {
+			isa = PBXGroup;
+			children = (
+				B6F745EF255713C2003567B7 /* SocialDistance.swift */,
+				B6F745F0255713C2003567B7 /* Sample.swift */,
+				B6F745F1255713C2003567B7 /* Interactions.swift */,
+			);
+			path = Analysis;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -331,11 +372,15 @@
 				B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */,
 				B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */,
 				B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */,
+				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
+				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
 				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
+				B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */,
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
 				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
+				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
 				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
@@ -346,9 +391,12 @@
 				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
+				B6F745FE25571475003567B7 /* XXH3.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
 				B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */,
+				B6F745F3255713C2003567B7 /* Sample.swift in Sources */,
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
+				B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */,
 				B637EF88251E56320072D238 /* TextFile.swift in Sources */,
 				B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */,
 			);
@@ -359,6 +407,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
+				B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */,
+				B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */,
+				B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */,
+				B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,7 +602,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = HeraldTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -568,7 +620,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = HeraldTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
