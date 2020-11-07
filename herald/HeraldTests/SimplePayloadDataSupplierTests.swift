@@ -185,15 +185,6 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
     }
 
-    func testContactIdentifierPerformance() throws {
-        let km1 = MatchingKey(repeating: 0, count: 32)
-        self.measure {
-            for _ in 0...1000 {
-                _ = ConcreteSimplePayloadDataSupplier.contactIdentifiers(km1)
-            }
-        }
-    }
-    
     func testCrossPlatformUInt8() throws {
         print("value,uint8")
         for i in 0...255 {
@@ -220,14 +211,14 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         }
     }
     
-    func testCrossPlatformFloat16() throws {
-        print("value,float16")
-        print("-65504,\(F.float16(-65504).base64EncodedString())")
-        print("-0.0000000596046,\(F.float16(-0.0000000596046).base64EncodedString())")
-        print("0,\(F.float16(0).base64EncodedString())")
-        print("0.0000000596046,\(F.float16(0.0000000596046).base64EncodedString())")
-        print("65504,\(F.float16(65504).base64EncodedString())")
-    }
+//    func testCrossPlatformBinary16() throws {
+//        print("value,float16")
+//        print("-65504,\(F.binary16(-65504).base64EncodedString())")
+//        print("-0.0000000596046,\(F.binary16(-0.0000000596046).base64EncodedString())")
+//        print("0,\(F.binary16(0).base64EncodedString())")
+//        print("0.0000000596046,\(F.binary16(0.0000000596046).base64EncodedString())")
+//        print("65504,\(F.binary16(65504).base64EncodedString())")
+//    }
 
     func testContactIdentifierCrossPlatform() throws {
         print("day,period,matchingKey,contactKey,contactIdentifier");

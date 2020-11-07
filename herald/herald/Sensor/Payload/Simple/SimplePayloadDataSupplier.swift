@@ -43,11 +43,12 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         // Generate common payload
         // Transmit power is not available on iOS, pre-compute common payload
         let transmitPower: Float = 0
-        let transmitPowerData = F.float16(transmitPower)
+        var transmitPowerBinary16 = F.binary16(transmitPower)
+        let transmitPowerBinary16Data = Data(bytes: &transmitPowerBinary16, count: MemoryLayout.size(ofValue: transmitPowerBinary16))
         // Common payload = commonHeader + transmitPower
         var commonPayload = Data()
         commonPayload.append(commonHeader)
-        commonPayload.append(transmitPowerData)
+        commonPayload.append(transmitPowerBinary16Data)
         self.commonPayload = commonPayload
         
         // Generate matching keys from secret key
@@ -62,11 +63,16 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         return SecretKey(secretKey)
     }
     
-    /// Generate contact identifiers for a matching key
-    public static func contactIdentifiers(_ matchingKey: MatchingKey) -> [ContactIdentifier] {
-        return K.contactKeys(matchingKey).map({ K.contactIdentifier($0) })
+    /// Get matching key for a day
+    public func matchingKey(_ time: Date) -> MatchingKey? {
+        let day = K.day(time)
+        guard day >= 0, day < matchingKeys.count else {
+            logger.fault("Matching key out of day range (time=\(time),day=\(day)))")
+            return nil
+        }
+        return matchingKeys[day]
     }
-    
+        
     /// Generate contact identifier for time
     private func contactIdentifier(_ time: Date) -> ContactIdentifier? {
         let day = K.day(time)
@@ -128,7 +134,6 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         }
         return payloads
     }
-
 }
 
 /// Key derivation functions
@@ -246,7 +251,7 @@ class K {
 }
 
 /// Elementary functions
-class F {
+private class F {
     
     /// Cryptographic hash function : SHA256
     fileprivate static func h(_ data: Data) -> Data {
@@ -278,20 +283,30 @@ class F {
     
     /// Convert 32-bit float to IEE 754 binary16 format 16-bit float
     /// Float16 is introduced in iOS 14
-    static func float16(_ value: Float) -> Float16 {
+    fileprivate static func binary16(_ value: Float) -> Binary16 {
         var source: [Float] = [value]
         var target: [UInt16] = [0]
         var sourceBuffer = vImage_Buffer(data: &source, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
         var targetBuffer = vImage_Buffer(data: &target, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
         vImageConvert_PlanarFtoPlanar16F(&sourceBuffer, &targetBuffer, 0)
-        var binary16 = target[0].bigEndian
-        let float16 = Float16(bytes: &binary16, count: MemoryLayout.size(ofValue: binary16))
-        return float16
+        let binary16 = Binary16(target[0])
+        return binary16
+    }
+
+    /// Convert IEE 754 binary16 format 16-bit float to 32-bit float
+    /// Float16 is introduced in iOS 14
+    fileprivate static func float(_ value: Binary16) -> Float {
+        var source: [UInt16] = [value]
+        var target: [Float] = [0]
+        var sourceBuffer = vImage_Buffer(data: &source, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
+        var targetBuffer = vImage_Buffer(data: &target, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
+        vImageConvert_Planar16FtoPlanarF(&sourceBuffer, &targetBuffer, 0)
+        let float = target[0]
+        return float
     }
 }
 
-/// IEE 754 binary16 format 16-bit float (Float16 is introduced in iOS 14)
-typealias Float16 = Data
+fileprivate typealias Binary16 = UInt16
 fileprivate typealias MatchingKeySeed = Data
 fileprivate typealias ContactKeySeed = Data
 typealias ContactKey = Data
