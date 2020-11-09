@@ -364,6 +364,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     /// Check if device has pending task
+    /// This must be kept in sync with taskInitiateNextAction, which is error prone for
+    /// code maintenance. An alternative implementation will be introduced in the future.
     private func deviceHasPendingTask(_ device: BLEDevice) -> Bool {
         // Resolve operating system
         if device.operatingSystem == .unknown || device.operatingSystem == .restored {
@@ -371,6 +373,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         // Read payload
         if device.payloadData == nil {
+            return true
+        }
+        // Payload update
+        if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
             return true
         }
         // iOS should always be connected
@@ -409,6 +415,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     /// Initiate next action on peripheral based on current state and information available
+    /// This must be kept in sync with deviceHasPendingTask, which is error prone for
+    /// code maintenance. An alternative implementation will be introduced in the future.
     private func taskInitiateNextAction(_ source: String, peripheral: CBPeripheral) {
         let targetIdentifier = TargetIdentifier(peripheral: peripheral)
         let device = database.device(peripheral, delegate: self)
@@ -423,6 +431,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         } else if device.payloadData == nil {
             // 3. Payload
             logger.debug("taskInitiateNextAction (goal=payload,peripheral=\(targetIdentifier))")
+            readPayload("taskInitiateNextAction|" + source, device)
+        } else if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
+            // 4. Payload update
+            logger.debug("taskInitiateNextAction (goal=payloadUpdate,peripheral=\(targetIdentifier),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
             readPayload("taskInitiateNextAction|" + source, device)
         } else if device.operatingSystem != .ios {
             // 5. Disconnect Android
@@ -612,6 +624,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         // Copy data to all devices with the same pseudo address
+        let payloadDataLastUpdatedAt = mostRecentDevice.payloadDataLastUpdatedAt
         let devicesToCopyPayload = devicesWithSamePseudoAddress.filter({ $0.payloadData == nil })
         devicesToCopyPayload.forEach({
             $0.signalCharacteristic = mostRecentDevice.signalCharacteristic
@@ -619,6 +632,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // Only Android devices have a pseudo address
             $0.operatingSystem = .android
             $0.payloadData = payloadData
+            $0.payloadDataLastUpdatedAt = payloadDataLastUpdatedAt
             logger.debug("shareDataAcrossDevices, copied payload data (from=\(mostRecentDevice.description),to=\($0.description))")
         })
         // Get devices with the same payload
@@ -769,7 +783,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         // Android -> Read payload
         if device.operatingSystem == .android {
-            if device.payloadData == nil, let payloadCharacteristic = device.payloadCharacteristic {
+            if let payloadCharacteristic = device.payloadCharacteristic, (device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval) {
                 peripheral.readValue(for: payloadCharacteristic)
             } else {
                 disconnect("didDiscoverCharacteristicsFor|android", peripheral)
