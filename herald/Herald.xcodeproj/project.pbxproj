@@ -33,6 +33,7 @@
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
+		B6C41BE3255951B700F7E9FB /* StatisticsDidReadLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C41BE2255951B700F7E9FB /* StatisticsDidReadLog.swift */; };
 		B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745EF255713C2003567B7 /* SocialDistance.swift */; };
 		B6F745F3255713C2003567B7 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* Sample.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
@@ -85,6 +86,7 @@
 		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		B6C41BE2255951B700F7E9FB /* StatisticsDidReadLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatisticsDidReadLog.swift; path = herald/Sensor/Data/StatisticsDidReadLog.swift; sourceTree = SOURCE_ROOT; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6F745EF255713C2003567B7 /* SocialDistance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistance.swift; sourceTree = "<group>"; };
 		B6F745F0255713C2003567B7 /* Sample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
@@ -222,6 +224,7 @@
 				B637EF75251E56320072D238 /* SensorLogger.swift */,
 				B637EF76251E56320072D238 /* ContactLog.swift */,
 				B637EF77251E56320072D238 /* StatisticsLog.swift */,
+				B6C41BE2255951B700F7E9FB /* StatisticsDidReadLog.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
+				B6C41BE3255951B700F7E9FB /* StatisticsDidReadLog.swift in Sources */,
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
 				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
 				B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */,

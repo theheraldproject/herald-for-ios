@@ -86,6 +86,7 @@ extension CBPeripheralState: CustomStringConvertible {
  Extension to make the time intervals more human readable in code.
  */
 extension TimeInterval {
+    static var never: TimeInterval { get { TimeInterval(Int.max) } }
     static var day: TimeInterval { get { TimeInterval(86400) } }
     static var hour: TimeInterval { get { TimeInterval(3600) } }
     static var minute: TimeInterval { get { TimeInterval(60) } }

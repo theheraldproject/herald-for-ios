@@ -1,5 +1,5 @@
 //
-//  StatisticsLog.swift
+//  StatisticsDidReadLog.swift
 //
 //  Copyright 2020 VMware, Inc.
 //  SPDX-License-Identifier: MIT
@@ -7,11 +7,10 @@
 
 import Foundation
 
-/// CSV contact log for post event analysis and visualisation
-class StatisticsLog: NSObject, SensorDelegate {
+/// CSV log of didRead calls for post event analysis and visualisation
+class StatisticsDidReadLog: NSObject, SensorDelegate {
     private let textFile: TextFile
     private let payloadData: PayloadData
-    private var identifierToPayload: [TargetIdentifier:String] = [:]
     private var payloadToTime: [String:Date] = [:]
     private var payloadToSample: [String:Sample] = [:]
     
@@ -24,13 +23,6 @@ class StatisticsLog: NSObject, SensorDelegate {
         return TextFile.csv(value)
     }
     
-    private func add(identifier: TargetIdentifier) {
-        guard let payload = identifierToPayload[identifier] else {
-            return
-        }
-        add(payload: payload)
-    }
-
     private func add(payload: String) {
         guard let time = payloadToTime[payload], let sample = payloadToSample[payload] else {
             payloadToTime[payload] = Date()
@@ -69,12 +61,7 @@ class StatisticsLog: NSObject, SensorDelegate {
     // MARK:- SensorDelegate
     
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
-        identifierToPayload[fromTarget] = didRead.shortName
-        add(identifier: fromTarget)
-    }
-    
-    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
-        add(identifier: fromTarget)
+        add(payload: didRead.shortName)
     }
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {

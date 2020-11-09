@@ -36,10 +36,11 @@ struct BLESensorConfiguration {
     /// Maximum number of concurrent BLE connections
     static let concurrentConnectionQuota = 12
     /// Manufacturer data is being used on Android to store pseudo device address
-    static let manufacturerIdForSensor = UInt16(65530);
+    static let manufacturerIdForSensor = UInt16(65530)
     /// Advert refresh time interval on Android devices
-    static let androidAdvertRefreshTimeInterval = TimeInterval.minute * 15;
-
+    static let androidAdvertRefreshTimeInterval = TimeInterval.minute * 15
+    /// Payload update at regular intervals
+    static let payloadDataUpdateTimeInterval = TimeInterval.never
 
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
     static let signalCharacteristicActionWritePayload = UInt8(1)

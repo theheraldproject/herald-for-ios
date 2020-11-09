@@ -225,6 +225,10 @@ class BLEDevice : NSObject {
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
         }}
+    /// Time interval since last payload data update, this is used to identify devices that require a payload update.
+    var timeIntervalSinceLastPayloadDataUpdate: TimeInterval { get {
+            Date().timeIntervalSince(payloadDataLastUpdatedAt)
+        }}
     /// Time interval since last advert detected, this is used to detect concurrent connection quota and prioritise disconnections
     var timeIntervalSinceLastAdvert: TimeInterval { get {
         Date().timeIntervalSince(lastAdvertAt)
