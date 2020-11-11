@@ -45,7 +45,13 @@ public typealias PayloadData = Data
 
 public extension PayloadData {
     var shortName: String {
-        return String(subdata(in: 3..<count-3).base64EncodedString().prefix(6))
+        guard count > 0 else {
+            return ""
+        }
+        guard count > 3 else {
+            return base64EncodedString()
+        }
+        return String(subdata(in: 3..<count).base64EncodedString().prefix(6))
     }
 }
 

@@ -234,4 +234,11 @@ class SimplePayloadDataSupplierTests: XCTestCase {
             }
         }
     }
+    
+    func testPayloadData() throws {
+        for i in 0...600 {
+            let payloadData = PayloadData(repeating: 0, count: i)
+            print("\(i) -> \(payloadData.shortName)")
+        }
+    }
 }
