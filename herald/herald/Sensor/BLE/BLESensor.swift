@@ -12,8 +12,11 @@ protocol BLESensor : Sensor {
 }
 
 /// Defines BLE sensor configuration data, e.g. service and characteristic UUIDs
-struct BLESensorConfiguration {
+public struct BLESensorConfiguration {
     static let logLevel: SensorLoggerLevel = .debug;
+    
+    // MARK:- BLE service and characteristic UUID, and manufacturer ID
+    
     /// Service UUID for beacon service. This is a fixed UUID to enable iOS devices to find each other even
     /// in background mode. Android devices will need to find Apple devices first using the manufacturer code
     /// then discover services to identify actual beacons.
@@ -26,30 +29,39 @@ struct BLESensorConfiguration {
     static let iosSignalCharacteristicUUID = CBUUID(string: "0eb0d5f2-eae4-4a9a-8af3-a4adb02d4363")
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     static let payloadCharacteristicUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
-    /// Time delay between notifications for subscribers.
-    static let notificationDelay = DispatchTimeInterval.seconds(2)
-    /// Time delay between advert restart
-    static let advertRestartTimeInterval = TimeInterval.hour
-    /// Expiry time for shared payloads, to ensure only recently seen payloads are shared
-    /// Must be > payloadSharingTimeInterval to share pending payloads
-    static let payloadSharingExpiryTimeInterval = TimeInterval.minute * 5
-    /// Maximum number of concurrent BLE connections
-    static let concurrentConnectionQuota = 12
     /// Manufacturer data is being used on Android to store pseudo device address
     static let manufacturerIdForSensor = UInt16(65530)
-    /// Advert refresh time interval on Android devices
-    static let androidAdvertRefreshTimeInterval = TimeInterval.minute * 15
-    /// Payload update at regular intervals
-    static let payloadDataUpdateTimeInterval = TimeInterval.never
 
+    // MARK:- BLE signal characteristic action codes
+    
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
     static let signalCharacteristicActionWritePayload = UInt8(1)
     /// Signal characteristic action code for write RSSI, expect 1 byte action code followed by 4 byte little-endian Int32 integer value for RSSI value
     static let signalCharacteristicActionWriteRSSI = UInt8(2)
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload sharing data length, then payload sharing data
     static let signalCharacteristicActionWritePayloadSharing = UInt8(3)
-    /// Arbitrary immediate write
+    /// Signal characteristic action code for arbitrary immediate write
     static let signalCharacteristicActionWriteImmediate = UInt8(4)
+
+    // MARK:- BLE event timing
+    
+    /// Time delay between notifications for subscribers.
+    static let notificationDelay = DispatchTimeInterval.seconds(2)
+    /// Time delay between advert restart
+    static let advertRestartTimeInterval = TimeInterval.hour
+    /// Maximum number of concurrent BLE connections
+    static let concurrentConnectionQuota = 12
+    /// Advert refresh time interval on Android devices
+    static let androidAdvertRefreshTimeInterval = TimeInterval.minute * 15
+    
+    // MARK:- App configurable BLE features
+
+    /// Payload update at regular intervals, in addition to default HERALD communication process.
+    /// - Use this to enable regular payload reads according to app payload lifespan.
+    /// - Set to .never to disable this function.
+    /// - Payload updates are reported to SensorDelegate as didRead.
+    /// - Setting take immediate effect, no need to restart BLESensor, can also be applied while BLESensor is active.
+    public static var payloadDataUpdateTimeInterval = TimeInterval.never
 }
 
 
