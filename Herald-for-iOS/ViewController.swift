@@ -8,33 +8,33 @@
 import UIKit
 import Herald
 
-class ViewController: UIViewController, SensorDelegate {
+class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate {
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: Sensor!
     private let dateFormatter = DateFormatter()
-    private let payloadPrefixLength = 6;
-    private var didDetect = 0
-    private var didRead = 0
-    private var didMeasure = 0
-    private var didShare = 0
-    private var didVisit = 0
-    private var payloads: [TargetIdentifier:String] = [:]
-    private var didReadPayloads: [String:Date] = [:]
-    private var didSharePayloads: [String:Date] = [:]
-    
+    private let dateFormatterTime = DateFormatter()
+
     // UI header
     @IBOutlet weak var labelDevice: UILabel!
     @IBOutlet weak var labelPayload: UILabel!
     
-    // UI didCount table
+    // MARK:- Events
+
+    private var didDetect = 0
+    private var didRead = 0
+    private var didMeasure = 0
+    private var didShare = 0
+    private var didReceive = 0
+    // Labels to show counts
     @IBOutlet weak var labelDidDetectCount: UILabel!
     @IBOutlet weak var labelDidReadCount: UILabel!
     @IBOutlet weak var labelDidMeasureCount: UILabel!
     @IBOutlet weak var labelDidShareCount: UILabel!
-    @IBOutlet weak var labelDidVisitCount: UILabel!
+    @IBOutlet weak var labelDidReceiveCount: UILabel!
     
     // MARK:- Social mixing
+    
     private let socialMixingScore = SocialDistance()
     private var socialMixingScoreUnit = TimeInterval(60)
     // Labels to show score over time, each label is a unit
@@ -60,29 +60,39 @@ class ViewController: UIViewController, SensorDelegate {
     @IBOutlet weak var buttonSocialMixingScoreUnitM5: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitM1: UIButton!
     
+    // MARK:- Detected payloads
     
-    // UI detected payloads
-    @IBOutlet weak var labelDetection: UILabel!
+    private var targetIdentifiers: [TargetIdentifier:PayloadData] = [:]
+    private var payloads: [PayloadData:Target] = [:]
+    private var targets: [Target] = []
+    @IBOutlet weak var tableViewTargets: UITableView!
+    
+    // MARK:- Crash app
+    
     @IBOutlet weak var buttonCrash: UIButton!
-    @IBOutlet weak var textViewPayloads: UITextView!
+    
+    // MARK:- UIViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
-
-        dateFormatter.dateFormat = "MMdd HH:mm:ss"
         
+        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        dateFormatterTime.dateFormat = "HH:mm:ss"
+
         labelDevice.text = SensorArray.deviceDescription
-        if let payloadData = (appDelegate.sensor as? SensorArray)?.payloadData {
+        if let payloadData = appDelegate.sensor?.payloadData {
             labelPayload.text = "PAYLOAD : \(payloadData.shortName)"
         }
-        
+        tableViewTargets.dataSource = self
+        tableViewTargets.delegate = self
         enableCrashButton()
     }
         
-    // MARK:- Social mixing score unit buttons
+    // MARK:- Social mixing score
+    
     private func socialMixingScoreUnit(_ setTo: UIButton, active: UIColor = .systemBlue, inactive: UIColor = .systemGray) {
         var mapping: [UIButton:TimeInterval] = [:]
         mapping[buttonSocialMixingScoreUnitH24] = TimeInterval(24 * 60 * 60)
@@ -128,6 +138,37 @@ class ViewController: UIViewController, SensorDelegate {
         socialMixingScoreUnit(buttonSocialMixingScoreUnitM1)
     }
     
+    // Update social distance score
+    private func updateSocialDistance(_ unit: TimeInterval) {
+        let secondsPerUnit = Int(round(unit))
+        let labels = [labelSocialMixingScore00, labelSocialMixingScore01, labelSocialMixingScore02, labelSocialMixingScore03, labelSocialMixingScore04, labelSocialMixingScore05, labelSocialMixingScore06, labelSocialMixingScore07, labelSocialMixingScore08, labelSocialMixingScore09, labelSocialMixingScore10, labelSocialMixingScore11]
+        let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 11
+        for i in 0...11 {
+            // Compute score for time slot
+            let start = Date(timeIntervalSince1970: TimeInterval((epoch + i) * secondsPerUnit))
+            let end = Date(timeIntervalSince1970: TimeInterval((epoch + i + 1) * secondsPerUnit))
+            let score = socialMixingScore.scoreByProximity(start, end, measuredPower: -25, excludeRssiBelow: -70)
+            // Present textual score
+            let scoreForPresentation = Int(round(score * 100)).description
+            labels[i]!.text = scoreForPresentation
+            // Change color according to score
+            if score < 0.1 {
+                labels[i]!.backgroundColor = .systemGreen
+            } else if score < 0.5 {
+                labels[i]!.backgroundColor = .systemOrange
+            } else {
+                labels[i]!.backgroundColor = .systemRed
+            }
+        }
+    }
+    
+    // Update targets table
+    private func updateTargets() {
+        targets = payloads.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
+        tableViewTargets.reloadData()
+    }
+
+    // MARK:- Crash app
     
     private func enableCrashButton() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(simulateCrashInTen))
@@ -153,65 +194,6 @@ class ViewController: UIViewController, SensorDelegate {
         }
     }
 
-    
-    private func timestamp() -> String {
-        let timestamp = dateFormatter.string(from: Date())
-        return timestamp
-    }
-    
-    // Update detected payloads
-    private func updateDetection() {
-        var payloadShortNames: [String:String] = [:]
-        var payloadLastSeenDates: [String:Date] = [:]
-        didReadPayloads.forEach() { payloadShortName, date in
-            payloadShortNames[payloadShortName] = "read"
-            payloadLastSeenDates[payloadShortName] = didReadPayloads[payloadShortName]
-        }
-        didSharePayloads.forEach() { payloadShortName, date in
-            if payloadShortNames[payloadShortName] == nil {
-                payloadShortNames[payloadShortName] = "shared"
-            } else {
-                payloadShortNames[payloadShortName] = "read,shared"
-            }
-            if let didSharePayloadDate = didSharePayloads[payloadShortName], let didReadPayloadDate = didReadPayloads[payloadShortName], didSharePayloadDate > didReadPayloadDate {
-                payloadLastSeenDates[payloadShortName] = didSharePayloadDate
-            }
-        }
-        var payloadShortNameList: [String] = []
-        payloadShortNames.keys.forEach() { payloadShortName in
-            if let method = payloadShortNames[payloadShortName], let lastSeenDate = payloadLastSeenDates[payloadShortName] {
-                payloadShortNameList.append("\(payloadShortName) [\(method)] (\(dateFormatter.string(from: lastSeenDate)))")
-            }
-        }
-        payloadShortNameList.sort()
-        textViewPayloads.text = payloadShortNameList.joined(separator: "\n")
-        labelDetection.text = "DETECTION (\(payloadShortNameList.count))"
-    }
-    
-    // Update social distance score
-    private func updateSocialDistance(_ unit: TimeInterval) {
-        let secondsPerUnit = Int(round(unit))
-        let labels = [labelSocialMixingScore00, labelSocialMixingScore01, labelSocialMixingScore02, labelSocialMixingScore03, labelSocialMixingScore04, labelSocialMixingScore05, labelSocialMixingScore06, labelSocialMixingScore07, labelSocialMixingScore08, labelSocialMixingScore09, labelSocialMixingScore10, labelSocialMixingScore11]
-        let epoch = Int(Date().timeIntervalSince1970).dividedReportingOverflow(by: secondsPerUnit).partialValue - 11
-        for i in 0...11 {
-            // Compute score for time slot
-            let start = Date(timeIntervalSince1970: TimeInterval((epoch + i) * secondsPerUnit))
-            let end = Date(timeIntervalSince1970: TimeInterval((epoch + i + 1) * secondsPerUnit))
-            let score = socialMixingScore.scoreByProximity(start, end, measuredPower: -25, excludeRssiBelow: -70)
-            // Present textual score
-            let scoreForPresentation = Int(round(score * 100)).description
-            labels[i]!.text = scoreForPresentation
-            // Change color according to score
-            if score < 0.1 {
-                labels[i]!.backgroundColor = .systemGreen
-            } else if score < 0.5 {
-                labels[i]!.backgroundColor = .systemOrange
-            } else {
-                labels[i]!.backgroundColor = .systemRed
-            }
-        }
-    }
-
     // MARK:- SensorDelegate
 
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
@@ -223,41 +205,120 @@ class ViewController: UIViewController, SensorDelegate {
 
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         self.didRead += 1
-        payloads[fromTarget] = didRead.shortName
-        didReadPayloads[didRead.shortName] = Date()
+        targetIdentifiers[fromTarget] = didRead
+        if let target = payloads[didRead] {
+            target.didRead = Date()
+        } else {
+            payloads[didRead] = Target(targetIdentifier: fromTarget, payloadData: didRead)
+        }
         DispatchQueue.main.async {
             self.labelDidReadCount.text = "\(self.didRead)"
-            self.updateDetection()
+            self.updateTargets()
         }
     }
 
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         self.didShare += 1
-        let time = Date()
-        didShare.forEach { self.didSharePayloads[$0.shortName] = time }
+        didShare.forEach { didRead in
+            targetIdentifiers[fromTarget] = didRead
+            if let target = payloads[didRead] {
+                target.didRead = Date()
+            } else {
+                payloads[didRead] = Target(targetIdentifier: fromTarget, payloadData: didRead)
+            }
+        }
         DispatchQueue.main.async {
             self.labelDidShareCount.text = "\(self.didShare)"
-            self.updateDetection()
+            self.updateTargets()
         }
     }
 
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
-        self.didMeasure += 1;
-        if let payloadShortName = payloads[fromTarget] {
-            didReadPayloads[payloadShortName] = Date()
+        self.didMeasure += 1
+        if let didRead = targetIdentifiers[fromTarget], let target = payloads[didRead] {
+            target.targetIdentifier = fromTarget
+            target.proximity = didMeasure
         }
         DispatchQueue.main.async {
             self.labelDidMeasureCount.text = "\(self.didMeasure)"
-            self.updateDetection()
+            self.updateTargets()
             self.updateSocialDistance(self.socialMixingScoreUnit)
         }
     }
 
-    func sensor(_ sensor: SensorType, didVisit: Location) {
-        self.didVisit += 1;
-        DispatchQueue.main.async {
-            self.labelDidVisitCount.text = "\(self.didVisit)"
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
+        self.didReceive += 1
+        if let didRead = targetIdentifiers[fromTarget], let target = payloads[didRead] {
+            target.targetIdentifier = fromTarget
+            target.received = didReceive
         }
+        DispatchQueue.main.async {
+            self.labelDidReceiveCount.text = "\(self.didReceive)"
+            self.updateTargets()
+        }
+    }
+    
+    // MARK:- UITableViewDataSource
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "DETECTION (\(targets.count))"
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return targets.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "targetIdentifier", for: indexPath)
+        let target = targets[indexPath.row]
+        let method = "read" + (target.didShare == nil ? "" : ",share")
+        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
+        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]"
+        cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
+        return cell
+    }
+
+    // MARK:- UITableViewDelegate
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let target = targets[indexPath.row]
+        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
+            return
+        }
+        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
+        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
     }
 }
 
+/// Detected target
+private class Target {
+    var targetIdentifier: TargetIdentifier
+    var payloadData: PayloadData
+    var lastUpdatedAt: Date
+    var proximity: Proximity? {
+        didSet {
+            lastUpdatedAt = Date()
+            didMeasure = lastUpdatedAt
+        }}
+    var received: Data? {
+        didSet {
+            lastUpdatedAt = Date()
+            didReceive = lastUpdatedAt
+        }}
+    var didRead: Date {
+        didSet {
+            lastUpdatedAt = didRead
+        }}
+    var didMeasure: Date?
+    var didShare: Date? {
+        didSet {
+            lastUpdatedAt = didRead
+        }}
+    var didReceive: Date?
+    init(targetIdentifier: TargetIdentifier, payloadData: PayloadData) {
+        self.targetIdentifier = targetIdentifier
+        self.payloadData = payloadData
+        didRead = Date()
+        lastUpdatedAt = didRead
+    }
+}
