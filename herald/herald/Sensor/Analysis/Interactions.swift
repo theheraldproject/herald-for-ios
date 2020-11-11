@@ -188,8 +188,10 @@ public class Encounter {
         let f0 = dateFormatter.string(from: timestamp)
         let f1 = proximity.value.description
         let f2 = proximity.unit.rawValue
-        let f3 = payload.base64EncodedString()
-        return "\(f0),\(f1),\(f2),\(f3)"
+        let f3 = proximity.calibration?.value.description ?? ""
+        let f4 = proximity.calibration?.unit.rawValue ?? ""
+        let f5 = payload.base64EncodedString()
+        return "\(f0),\(f1),\(f2),\(f3),\(f4),\(f5)"
     }}
     
     /// Create encounter instance from source data
@@ -202,7 +204,7 @@ public class Encounter {
     /// Create encounter instance from log entry
     init?(_ row: String) {
         let fields = row.split(separator: ",")
-        guard fields.count >= 4 else {
+        guard fields.count >= 6 else {
             return nil
         }
         let dateFormatter = DateFormatter()
@@ -217,8 +219,12 @@ public class Encounter {
         guard let proximityUnit = ProximityMeasurementUnit.init(rawValue: String(fields[2])) else {
             return nil
         }
-        self.proximity = Proximity(unit: proximityUnit, value: proximityValue);
-        guard let payload = PayloadData(base64Encoded: String(fields[3])) else {
+        var calibration: Calibration? = nil
+        if let calibrationValue = Double(String(fields[3])), let calibrationUnit = CalibrationMeasurementUnit.init(rawValue: String(fields[4])) {
+            calibration = Calibration(unit: calibrationUnit, value: calibrationValue)
+        }
+        self.proximity = Proximity(unit: proximityUnit, value: proximityValue, calibration: calibration)
+        guard let payload = PayloadData(base64Encoded: String(fields[5])) else {
             return nil
         }
         self.payload = payload

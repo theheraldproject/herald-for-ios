@@ -124,7 +124,7 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
             guard let rssi = device.rssi else {
                 return
             }
-            let proximity = Proximity(unit: .RSSI, value: Double(rssi))
+            let proximity = Proximity(unit: .RSSI, value: Double(rssi), calibration: device.calibration)
             logger.debug("didMeasure (device=\(device.identifier),payloadData=\(device.payloadData?.shortName ?? "nil"),proximity=\(proximity.description))")
             delegateQueue.async {
                 self.delegates.forEach { $0.sensor(.BLE, didMeasure: proximity, fromTarget: device.identifier) }
