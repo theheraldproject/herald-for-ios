@@ -13,8 +13,6 @@ protocol BLESensor : Sensor {
 
 /// Defines BLE sensor configuration data, e.g. service and characteristic UUIDs
 public struct BLESensorConfiguration {
-    static let logLevel: SensorLoggerLevel = .debug;
-    
     // MARK:- BLE service and characteristic UUID, and manufacturer ID
     
     /// Service UUID for beacon service. This is a fixed UUID to enable iOS devices to find each other even
@@ -59,6 +57,9 @@ public struct BLESensorConfiguration {
     
     // MARK:- App configurable BLE features
 
+    /// Log level for BLESensor
+    public static var logLevel: SensorLoggerLevel = .debug;
+    
     /// Payload update at regular intervals, in addition to default HERALD communication process.
     /// - Use this to enable regular payload reads according to app payload lifespan.
     /// - Set to .never to disable this function.
