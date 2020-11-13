@@ -217,6 +217,8 @@ class BLEDevice : NSObject {
             // Reset lastDisconnectedAt
             lastDisconnectedAt = nil
         }}
+    /// Track Herald initiated connection attempts - workaround for iOS peripheral caching incorrect state bug
+    var lastConnectionInitiationAttempt: Date?
     /// Track disconnected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastDisconnectedAt: Date?
     /// Last advert timestamp, inferred from payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt
