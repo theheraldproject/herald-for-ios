@@ -21,7 +21,7 @@ protocol SensorLogger {
     func fault(_ message: String)
 }
 
-enum SensorLoggerLevel: String {
+public enum SensorLoggerLevel: String {
     case debug, info, fault
 }
 

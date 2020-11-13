@@ -81,9 +81,14 @@ public struct Proximity {
     let unit: ProximityMeasurementUnit
     /// Measured value, e.g. raw RSSI value.
     let value: Double
+    /// Calibration data (optional), e.g. transmit power
+    let calibration: Calibration?
     /// Get plain text description of proximity data
     public var description: String { get {
-        unit.rawValue + ":" + value.description
+        guard let calibration = calibration else {
+            return "\(unit.rawValue):\(value.description)"
+        }
+        return "\(unit.rawValue):\(value.description)[\(calibration.description)]"
     }}
 }
 
@@ -93,6 +98,24 @@ public enum ProximityMeasurementUnit : String {
     case RSSI
     /// Roundtrip time, e.g. Audio signal echo time duration as proximity estimator.
     case RTT
+}
+
+/// Calibration data for interpreting proximity value between sensor and target, e.g. Transmit power for BLE.
+public struct Calibration {
+    /// Unit of measurement, e.g. transmit power
+    let unit: CalibrationMeasurementUnit
+    /// Measured value, e.g. transmit power in BLE advert
+    let value: Double
+    /// Get plain text description of calibration data
+    public var description: String { get {
+        unit.rawValue + ":" + value.description
+    }}
+}
+
+/// Measurement unit for calibrating the proximity transmission data values, e.g. BLE transmit power
+public enum CalibrationMeasurementUnit : String {
+    /// Bluetooth transmit power for describing expected RSSI at 1 metre for interpretation of measured RSSI value.
+    case BLETransmitPower
 }
 
 // MARK:- Location data

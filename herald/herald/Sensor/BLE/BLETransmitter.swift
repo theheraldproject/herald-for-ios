@@ -312,7 +312,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         // 0-0 : actionCode
                         // 1-2 : rssi value (Int16)
                         if let rssi = data.int16(1) {
-                            let proximity = Proximity(unit: .RSSI, value: Double(rssi))
+                            let proximity = Proximity(unit: .RSSI, value: Double(rssi), calibration: targetDevice.calibration)
                             logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
                             peripheral.respond(to: request, withResult: .success)
                             targetDevice.operatingSystem = .android

@@ -200,6 +200,13 @@ class BLEDevice : NSObject {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .txPower)
         }}
+    /// Transmit power as calibration data
+    var calibration: Calibration? { get {
+        guard let txPower = txPower else {
+            return nil
+        }
+        return Calibration(unit: .BLETransmitPower, value: Double(txPower))
+    }}
     /// Track discovered at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastDiscoveredAt: Date = Date.distantPast
     /// Track connect request at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
