@@ -27,7 +27,7 @@ class SocialDistanceTests: XCTestCase {
         XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 1/60)
 
         // Close enough to count at 100% contribution
-        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: -56), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
+        socialDistance.append(Encounter(Proximity(unit: .RSSI, value: 0), PayloadData(repeating: 0, count: 1), timestamp: K.date("2020-09-24T00:01:00+0000")!)!)
         XCTAssertEqual(socialDistance.scoreByProximity(K.date("2020-09-24T00:00:00+0000")!, K.date("2020-09-24T01:00:00+0000")!), 2/60)
 
     }
