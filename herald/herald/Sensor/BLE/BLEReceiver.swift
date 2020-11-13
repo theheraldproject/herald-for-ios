@@ -463,8 +463,24 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             device.lastConnectRequestedAt = Date()
             self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
                 if $0.state != .connected {
-                    self.central.connect($0)
+                    // Check to see if Herald has initiated a connection attempt before
+                    if let lastAttempt = device.lastConnectionInitiationAttempt {
+                        // Has Herald already initiated a connect attempt?
+                        if (Date() > lastAttempt + BLESensorConfiguration.connectionAttemptTimeout) {
+                            // If timeout reached, force disconnect
+                            device.lastConnectionInitiationAttempt = nil
+                            self.disconnect("connect|" + source, $0)
+                        } else {
+                            // If not timed out yet, do nothing
+                            // DO NOTHING
+                        }
+                    } else {
+                        // If not, connect now
+                        device.lastConnectionInitiationAttempt = Date()
+                        self.central.connect($0)
+                    }
                 } else {
+                    device.lastConnectionInitiationAttempt = nil
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
             }
