@@ -18,8 +18,9 @@ public struct BLESensorConfiguration {
     /// Service UUID for beacon service. This is a fixed UUID to enable iOS devices to find each other even
     /// in background mode. Android devices will need to find Apple devices first using the manufacturer code
     /// then discover services to identify actual beacons.
-    /// - Generic networking 16-bit UUID
-    static let serviceUUID = CBUUID(string: "1201")
+    /// - Service and characteristic UUIDs are V4 UUIDs that have been randomly generated and tested
+    /// for uniqueness by conducting web searches to ensure it returns no results.
+    static let serviceUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
     static let androidSignalCharacteristicUUID = CBUUID(string: "f617b813-092e-437a-8324-e09a80821a11")
