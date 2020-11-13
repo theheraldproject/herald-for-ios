@@ -248,7 +248,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
 
     func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
         self.didReceive += 1
-        if let didRead = targetIdentifiers[fromTarget], let target = payloads[didRead] {
+        let didRead = PayloadData(didReceive)
+        if let target = payloads[didRead] {
+            targetIdentifiers[fromTarget] = didRead
             target.targetIdentifier = fromTarget
             target.received = didReceive
         }
