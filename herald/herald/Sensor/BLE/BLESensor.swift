@@ -55,6 +55,8 @@ public struct BLESensorConfiguration {
     static let concurrentConnectionQuota = 12
     /// Advert refresh time interval on Android devices
     static let androidAdvertRefreshTimeInterval = TimeInterval.minute * 15
+    /// Herald internal connection expiry timeout
+    static let connectionAttemptTimeout = TimeInterval(8)
     
     // MARK:- App configurable BLE features
 
