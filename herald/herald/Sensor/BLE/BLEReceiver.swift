@@ -418,31 +418,30 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// This must be kept in sync with deviceHasPendingTask, which is error prone for
     /// code maintenance. An alternative implementation will be introduced in the future.
     private func taskInitiateNextAction(_ source: String, peripheral: CBPeripheral) {
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
         let device = database.device(peripheral, delegate: self)
         if device.rssi == nil {
             // 1. RSSI
-            logger.debug("taskInitiateNextAction (goal=rssi,peripheral=\(targetIdentifier))")
+            logger.debug("taskInitiateNextAction (goal=rssi,device=\(device))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
         } else if device.signalCharacteristic == nil || device.payloadCharacteristic == nil {
             // 2. Characteristics
-            logger.debug("taskInitiateNextAction (goal=characteristics,peripheral=\(targetIdentifier))")
+            logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
             discoverServices("taskInitiateNextAction|" + source, peripheral)
         } else if device.payloadData == nil {
             // 3. Payload
-            logger.debug("taskInitiateNextAction (goal=payload,peripheral=\(targetIdentifier))")
+            logger.debug("taskInitiateNextAction (goal=payload,device=\(device))")
             readPayload("taskInitiateNextAction|" + source, device)
         } else if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
             // 4. Payload update
-            logger.debug("taskInitiateNextAction (goal=payloadUpdate,peripheral=\(targetIdentifier),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+            logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
             readPayload("taskInitiateNextAction|" + source, device)
         } else if device.operatingSystem != .ios {
             // 5. Disconnect Android
-            logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),peripheral=\(targetIdentifier))")
+            logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),device=\(device))")
             disconnect("taskInitiateNextAction|" + source, peripheral)
         } else {
             // 6. Scan
-            logger.debug("taskInitiateNextAction (goal=scan,peripheral=\(targetIdentifier))")
+            logger.debug("taskInitiateNextAction (goal=scan,device=\(device))")
             scheduleScan("taskInitiateNextAction|" + source)
         }
     }
@@ -468,19 +467,21 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                         // Has Herald already initiated a connect attempt?
                         if (Date() > lastAttempt + BLESensorConfiguration.connectionAttemptTimeout) {
                             // If timeout reached, force disconnect
+                            self.logger.fault("connect, timeout forcing disconnect (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             device.lastConnectionInitiationAttempt = nil
-                            self.disconnect("connect|" + source, $0)
+                            self.queue.async { self.central.cancelPeripheralConnection(peripheral) }
                         } else {
-                            // If not timed out yet, do nothing
-                            // DO NOTHING
+                            // If not timed out yet, keep trying
+                            self.logger.debug("connect, retrying (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
+                            self.central.connect($0)
                         }
                     } else {
                         // If not, connect now
+                        self.logger.debug("connect, initiation (source=\(source),device=\(device))")
                         device.lastConnectionInitiationAttempt = Date()
                         self.central.connect($0)
                     }
                 } else {
-                    device.lastConnectionInitiationAttempt = nil
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
             }

@@ -209,6 +209,8 @@ class BLEDevice : NSObject {
     }}
     /// Track discovered at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastDiscoveredAt: Date = Date.distantPast
+    /// Track Herald initiated connection attempts - workaround for iOS peripheral caching incorrect state bug
+    var lastConnectionInitiationAttempt: Date?
     /// Track connect request at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastConnectRequestedAt: Date = Date.distantPast
     /// Track connected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
@@ -216,11 +218,16 @@ class BLEDevice : NSObject {
         didSet {
             // Reset lastDisconnectedAt
             lastDisconnectedAt = nil
+            // Reset lastConnectionInitiationAttempt
+            lastConnectionInitiationAttempt = nil
         }}
-    /// Track Herald initiated connection attempts - workaround for iOS peripheral caching incorrect state bug
-    var lastConnectionInitiationAttempt: Date?
     /// Track disconnected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
-    var lastDisconnectedAt: Date?
+    var lastDisconnectedAt: Date? {
+        didSet {
+            // Reset lastConnectionInitiationAttempt
+            lastConnectionInitiationAttempt = nil
+        }
+    }
     /// Last advert timestamp, inferred from payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt
     var lastAdvertAt: Date { get {
             max(createdAt, lastDiscoveredAt, payloadDataLastUpdatedAt, rssiLastUpdatedAt)
