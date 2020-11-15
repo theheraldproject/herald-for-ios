@@ -117,7 +117,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         var length = Int16(data.count)
         toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
         toSend.append(data)
-        peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse)
+        queue.async { peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse) }
         return true;
     }
     
@@ -541,10 +541,18 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             discoverServices("readPayload", peripheral)
             return
         }
+        // De-duplicate read payload requests from multiple asynchronous calls
+        let timeIntervalSinceLastReadPayloadRequestedAt = Date().timeIntervalSince(device.lastReadPayloadRequestedAt)
+        guard timeIntervalSinceLastReadPayloadRequestedAt > 2 else {
+            logger.fault("readPayload denied, duplicate request (source=\(source),peripheral=\(device.identifier),elapsed=\(timeIntervalSinceLastReadPayloadRequestedAt)")
+            return
+        }
+        // Initiate read payload
+        device.lastReadPayloadRequestedAt = Date()
         if device.operatingSystem == .android, let peripheral = device.peripheral {
             discoverServices("readPayload|android", peripheral)
         } else {
-            peripheral.readValue(for: payloadCharacteristic)
+            queue.async { peripheral.readValue(for: payloadCharacteristic) }
         }
     }
 
@@ -558,7 +566,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         logger.debug("wakeTransmitter (source=\(source),peripheral=\(device.identifier),write=\(characteristic.properties.contains(.write))")
-        peripheral.writeValue(emptyData, for: characteristic, type: .withResponse)
+        queue.async { peripheral.writeValue(self.emptyData, for: characteristic, type: .withResponse) }
     }
     
     // MARK:- BLEDatabaseDelegate
@@ -760,7 +768,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         for service in services {
             if (service.uuid == BLESensorConfiguration.serviceUUID) {
                 logger.debug("didDiscoverServices, found sensor service (device=\(device))")
-                peripheral.discoverCharacteristics(nil, for: service)
+                queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return
             }
         }
@@ -789,7 +797,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 let write = characteristic.properties.contains(.write)
                 device.operatingSystem = .ios
                 device.signalCharacteristic = characteristic
-                peripheral.setNotifyValue(true, for: characteristic)
+                queue.async { peripheral.setNotifyValue(true, for: characteristic) }
                 logger.debug("didDiscoverCharacteristicsFor, found ios signal characteristic (device=\(device),notify=\(notify),write=\(write))")
             case BLESensorConfiguration.payloadCharacteristicUUID:
                 device.payloadCharacteristic = characteristic
@@ -801,7 +809,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Android -> Read payload
         if device.operatingSystem == .android {
             if let payloadCharacteristic = device.payloadCharacteristic, (device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval) {
-                peripheral.readValue(for: payloadCharacteristic)
+                queue.async { peripheral.readValue(for: payloadCharacteristic) }
             } else {
                 disconnect("didDiscoverCharacteristicsFor|android", peripheral)
             }
