@@ -56,7 +56,7 @@ public struct BLESensorConfiguration {
     /// Advert refresh time interval on Android devices
     static let androidAdvertRefreshTimeInterval = TimeInterval.minute * 15
     /// Herald internal connection expiry timeout
-    static let connectionAttemptTimeout = TimeInterval(90)
+    static let connectionAttemptTimeout = TimeInterval(12)
     
     // MARK:- App configurable BLE features
 
@@ -68,7 +68,7 @@ public struct BLESensorConfiguration {
     /// - Set to .never to disable this function.
     /// - Payload updates are reported to SensorDelegate as didRead.
     /// - Setting take immediate effect, no need to restart BLESensor, can also be applied while BLESensor is active.
-    public static var payloadDataUpdateTimeInterval = TimeInterval(30)
+    public static var payloadDataUpdateTimeInterval = TimeInterval.never
 }
 
 

@@ -468,20 +468,21 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                         // Has Herald already initiated a connect attempt?
                         if (Date() > lastAttempt + BLESensorConfiguration.connectionAttemptTimeout) {
                             // If timeout reached, force disconnect
-                            self.logger.fault("connect timeout, force disconnect (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
+                            self.logger.fault("connect, timeout forcing disconnect (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             device.lastConnectionInitiationAttempt = nil
-                            self.disconnect("connect|" + source, $0)
+                            self.disconnect("connect|timeout|" + source, $0)
                         } else {
-                            // If not timed out yet, do nothing
-                            // DO NOTHING
+                            // If not timed out yet, keep trying
+                            self.logger.debug("connect, retrying (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
+                            self.central.connect($0)
                         }
                     } else {
                         // If not, connect now
+                        self.logger.debug("connect, initiation (source=\(source),device=\(device))")
                         device.lastConnectionInitiationAttempt = Date()
                         self.central.connect($0)
                     }
                 } else {
-                    device.lastConnectionInitiationAttempt = nil
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
             }
