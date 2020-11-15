@@ -469,7 +469,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                             // If timeout reached, force disconnect
                             self.logger.fault("connect, timeout forcing disconnect (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             device.lastConnectionInitiationAttempt = nil
-                            self.disconnect("connect|timeout|" + source, $0)
+                            self.queue.async { self.central.cancelPeripheralConnection(peripheral) }
                         } else {
                             // If not timed out yet, keep trying
                             self.logger.debug("connect, retrying (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
