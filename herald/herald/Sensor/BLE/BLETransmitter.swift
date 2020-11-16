@@ -275,7 +275,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                 if data.count == 0 {
                     // Receiver writes blank data on detection of transmitter to bring iOS transmitter back from suspended state
                     logger.debug("didReceiveWrite (central=\(targetIdentifier),action=wakeTransmitter)")
-                    peripheral.respond(to: request, withResult: .success)
+                    queue.async { peripheral.respond(to: request, withResult: .success) }
                 } else if let actionCode = data.uint8(0) {
                     switch actionCode {
                     case BLESensorConfiguration.signalCharacteristicActionWritePayload:
@@ -293,17 +293,17 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (3 + payloadDataCount) {
                                 let payloadData = PayloadData(data.subdata(in: 3..<data.count))
                                 logger.debug("didReceiveWrite -> didRead=\(payloadData.shortName),fromTarget=\(targetIdentifier)")
-                                peripheral.respond(to: request, withResult: .success)
+                                queue.async { peripheral.respond(to: request, withResult: .success) }
                                 targetDevice.operatingSystem = .android
                                 targetDevice.receiveOnly = true
                                 targetDevice.payloadData = payloadData
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
-                                peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                                queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                             }
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writePayload)")
-                            peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                            queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                         }
                     case BLESensorConfiguration.signalCharacteristicActionWriteRSSI:
                         // Receive-only Android device writing its RSSI to make its proximity known
@@ -314,13 +314,13 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         if let rssi = data.int16(1) {
                             let proximity = Proximity(unit: .RSSI, value: Double(rssi), calibration: targetDevice.calibration)
                             logger.debug("didReceiveWrite -> didMeasure=\(proximity.description),fromTarget=\(targetIdentifier)")
-                            peripheral.respond(to: request, withResult: .success)
+                            queue.async { peripheral.respond(to: request, withResult: .success) }
                             targetDevice.operatingSystem = .android
                             targetDevice.receiveOnly = true
                             targetDevice.rssi = BLE_RSSI(rssi)
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writeRSSI)")
-                            peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                            queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                         }
                     case BLESensorConfiguration.signalCharacteristicActionWritePayloadSharing:
                         // Android device sharing detected iOS devices with this iOS device to enable background detection
@@ -334,7 +334,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                             if data.count == (5 + payloadDataCount) {
                                 let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 5..<data.count))
                                 logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
-                                peripheral.respond(to: request, withResult: .success)
+                                queue.async { peripheral.respond(to: request, withResult: .success) }
                                 delegateQueue.async {
                                     self.delegates.forEach { $0.sensor(.BLE, didShare: payloadSharingData, fromTarget: targetIdentifier) }
                                 }
@@ -349,11 +349,11 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayloadSharing)")
-                                peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                                queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                             }
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=writePayloadSharing)")
-                            peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                            queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                         }
                     case BLESensorConfiguration.signalCharacteristicActionWriteImmediate:
                         // Used for custom app sharing data that is time sensitive. E.g. timing sync data
@@ -365,25 +365,25 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         if let immediateDataCount = data.int16(1) {
                             if data.count == (3 + immediateDataCount) {
                                 let datasubset = data.subdata(in: 3..<data.count)
-                                peripheral.respond(to: request, withResult: .success)
+                                queue.async { peripheral.respond(to: request, withResult: .success) }
                                 delegateQueue.async {
                                     self.delegates.forEach { $0.sensor(.BLE, didReceive: datasubset, fromTarget: targetIdentifier) }
                                 }
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=immediateSend)")
-                                peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                                queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                             }
                         } else {
                             logger.fault("didReceiveWrite, invalid request (central=\(targetIdentifier),action=immediateSend)")
-                            peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                            queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                         }
                     default:
                         logger.fault("didReceiveWrite (central=\(targetIdentifier),action=unknown,actionCode=\(actionCode))")
-                        peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                        queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
                     }
                 }
             } else {
-                peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                queue.async { peripheral.respond(to: request, withResult: .invalidAttributeValueLength) }
             }
         }
         notifySubscribers("didReceiveWrite")
@@ -399,14 +399,14 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             let data = payloadDataSupplier.payload(PayloadTimestamp())
             guard request.offset < data.count else {
                 logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.count))")
-                peripheral.respond(to: request, withResult: .invalidOffset)
+                queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }
                 return
             }
             request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
-            peripheral.respond(to: request, withResult: .success)
+            queue.async { peripheral.respond(to: request, withResult: .success) }
         default:
             logger.fault("Read (central=\(central.description),characteristic=unknown)")
-            peripheral.respond(to: request, withResult: .requestNotSupported)
+            queue.async { peripheral.respond(to: request, withResult: .requestNotSupported) }
         }
         notifySubscribers("didReceiveRead")
     }

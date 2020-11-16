@@ -221,6 +221,8 @@ class BLEDevice : NSObject {
             // Reset lastConnectionInitiationAttempt
             lastConnectionInitiationAttempt = nil
         }}
+    /// Track read payload request at timestamp, used by readPayload to de-duplicate requests from asynchronous calls
+    var lastReadPayloadRequestedAt: Date = Date.distantPast
     /// Track disconnected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastDisconnectedAt: Date? {
         didSet {
