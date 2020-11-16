@@ -50,7 +50,7 @@ public struct BLESensorConfiguration {
     /// Time delay between notifications for subscribers.
     static let notificationDelay = DispatchTimeInterval.seconds(2)
     /// Time delay between advert restart
-    static let advertRestartTimeInterval = TimeInterval.hour
+    static let advertRestartTimeInterval = TimeInterval.minute * 5
     /// Maximum number of concurrent BLE connections
     static let concurrentConnectionQuota = 12
     /// Advert refresh time interval on Android devices
@@ -68,7 +68,7 @@ public struct BLESensorConfiguration {
     /// - Set to .never to disable this function.
     /// - Payload updates are reported to SensorDelegate as didRead.
     /// - Setting take immediate effect, no need to restart BLESensor, can also be applied while BLESensor is active.
-    public static var payloadDataUpdateTimeInterval = TimeInterval.never
+    public static var payloadDataUpdateTimeInterval = TimeInterval(15)
 }
 
 
