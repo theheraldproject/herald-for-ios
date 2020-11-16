@@ -401,6 +401,16 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         pending.forEach() { device in
             logger.debug("taskIosMultiplex, pending (device=\(device.description),downTime=\(device.timeIntervalSinceLastConnectRequestedAt))")
         }
+        // Retry all pending connections if there is surplus capacity
+        if connected.count < BLESensorConfiguration.concurrentConnectionQuota {
+            pending.forEach() { device in
+                guard let toBeConnected = device.peripheral else {
+                    return
+                }
+                connect("taskIosMultiplex|retry", toBeConnected);
+            }
+        }
+        // Initiate multiplexing when capacity has been reached
         guard connected.count > BLESensorConfiguration.concurrentConnectionQuota, pending.count > 0, let deviceToBeDisconnected = connected.first, let peripheralToBeDisconnected = deviceToBeDisconnected.peripheral, deviceToBeDisconnected.timeIntervalBetweenLastConnectedAndLastAdvert > TimeInterval.minute else {
             return
         }
@@ -410,7 +420,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             guard let toBeConnected = device.peripheral else {
                 return
             }
-            connect("taskIosMultiplex", toBeConnected);
+            connect("taskIosMultiplex|multiplex", toBeConnected);
         }
     }
     
