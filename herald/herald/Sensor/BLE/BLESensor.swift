@@ -50,7 +50,7 @@ public struct BLESensorConfiguration {
     /// Time delay between notifications for subscribers.
     static let notificationDelay = DispatchTimeInterval.seconds(2)
     /// Time delay between advert restart
-    static let advertRestartTimeInterval = TimeInterval.hour * 12
+    static let advertRestartTimeInterval = TimeInterval.hour
     /// Maximum number of concurrent BLE connections
     static let concurrentConnectionQuota = 12
     /// Advert refresh time interval on Android devices
