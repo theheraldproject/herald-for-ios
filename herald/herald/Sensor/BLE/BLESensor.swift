@@ -69,6 +69,13 @@ public struct BLESensorConfiguration {
     /// - Payload updates are reported to SensorDelegate as didRead.
     /// - Setting take immediate effect, no need to restart BLESensor, can also be applied while BLESensor is active.
     public static var payloadDataUpdateTimeInterval = TimeInterval.never
+    
+    /// Filter duplicate payload data and suppress sensor(didRead:fromTarget) delegate calls
+    /// - Set to .never to disable this feature
+    /// - Set time interval N to filter duplicate payload data seen in last N seconds
+    /// - Example : 60 means filter duplicates in last minute
+    /// - Filters all occurrences of payload data from all targets
+    public static var filterDuplicatePayloadData = TimeInterval.never
 }
 
 
@@ -87,6 +94,8 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     private let database: BLEDatabase
     private let transmitter: BLETransmitter
     private let receiver: ConcreteBLEReceiver
+    // Record payload data to enable de-duplication
+    private var didReadPayloadData: [PayloadData:Date] = [:]
 
     init(_ payloadDataSupplier: PayloadDataSupplier) {
         database = ConcreteBLEDatabase()
@@ -146,6 +155,18 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
             guard let payloadData = device.payloadData else {
                 return
             }
+            // De-duplicate payload in recent time
+            if BLESensorConfiguration.filterDuplicatePayloadData != .never {
+                let removePayloadDataBefore = Date() - BLESensorConfiguration.filterDuplicatePayloadData
+                let recentDidReadPayloadData = didReadPayloadData.filter({ $0.value >= removePayloadDataBefore })
+                didReadPayloadData = recentDidReadPayloadData
+                if let lastReportedAt = didReadPayloadData[payloadData] {
+                    logger.debug("didRead, filtered duplicate (device=\(device.identifier),payloadData=\(payloadData.shortName),lastReportedAt=\(lastReportedAt.description))")
+                    return
+                }
+                didReadPayloadData[payloadData] = Date()
+            }
+            // Notify delegates
             logger.debug("didRead (device=\(device.identifier),payloadData=\(payloadData.shortName))")
             delegateQueue.async {
                 self.delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: device.identifier) }
