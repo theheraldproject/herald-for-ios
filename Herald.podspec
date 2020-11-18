@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "Herald"
-  spec.version      = "1.1.0-beta1"
+  spec.version      = "1.1.0-beta2"
   spec.summary      = "Reliable Bluetooth communication library for iOS"
 
   spec.description  = <<-DESC
@@ -21,5 +21,8 @@ Herald supports iOS, Android, and embedded devices.
 
   spec.source        = { :git => "https://github.com/vmware/herald-for-ios.git", :tag => "v#{spec.version}" }
   spec.source_files  = "herald/herald/**/*.{h,m,swift}"
+
+  pod_target_xcconfig = { "EXCLUDED_ARCHS[sdk=iphonesimulator*]" => "arm64" }
+  user_target_xcconfig = { "EXCLUDED_ARCHS[sdk=iphonesimulator*]" => "arm64" }
 
 end
