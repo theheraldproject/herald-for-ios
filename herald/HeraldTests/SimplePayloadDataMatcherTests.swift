@@ -23,24 +23,30 @@ class SimplePayloadDataMatcherTests: XCTestCase {
         
         for second in 0...(24*60*60)-1 {
             let time = day0.advanced(by: TimeInterval(second))
-            let payloadData1 = pds1.payload(time)
-            let payloadData2 = pds2.payload(time)
+            let payloadData1 = pds1.payload(time, device: nil)
+            let payloadData2 = pds2.payload(time, device: nil)
+            
+            XCTAssertNotNil(payloadData1)
+            XCTAssertNotNil(payloadData2)
             
             // Match should pass as secret key is the same
-            XCTAssertTrue(pdm1.matches(time, payloadData1))
+            XCTAssertTrue(pdm1.matches(time, payloadData1!))
             // Match should fail as secret key is different
-            XCTAssertFalse(pdm1.matches(time, payloadData2))
+            XCTAssertFalse(pdm1.matches(time, payloadData2!))
         }
 
         for second in 0...(24*60*60)-1 {
             let time = day1.advanced(by: TimeInterval(second))
-            let payloadData1 = pds1.payload(time)
-            let payloadData2 = pds2.payload(time)
+            let payloadData1 = pds1.payload(time, device: nil)
+            let payloadData2 = pds2.payload(time, device: nil)
+            
+            XCTAssertNotNil(payloadData1)
+            XCTAssertNotNil(payloadData2)
             
             // Match should fail as secret key is the same but day is different
-            XCTAssertFalse(pdm1.matches(time, payloadData1))
+            XCTAssertFalse(pdm1.matches(time, payloadData1!))
             // Match should fail as secret key is different and day is different
-            XCTAssertFalse(pdm1.matches(time, payloadData2))
+            XCTAssertFalse(pdm1.matches(time, payloadData2!))
         }
 
     }

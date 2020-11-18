@@ -22,6 +22,9 @@ protocol BLEDatabase {
 
     /// Get or create device for collating information from asynchronous BLE operations.
     func device(_ payload: PayloadData) -> BLEDevice
+    
+    /// Get if a device exists
+    func hasDevice(_ payload: PayloadData) -> Bool
 
     /// Get all devices
     func devices() -> [BLEDevice]
@@ -105,6 +108,13 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
         placeholder.payloadData = payload
         return placeholder
     }
+    
+    func hasDevice(_ payload: PayloadData) -> Bool {
+        if database.values.filter({ $0.payloadData == payload }).first != nil {
+            return true
+        }
+        return false
+    }
 
     func delete(_ identifier: TargetIdentifier) {
         guard let device = database[identifier] else {
@@ -129,15 +139,9 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
 
 // MARK:- BLEDatabase data
 
-class BLEDevice : NSObject {
-    /// Device registratiion timestamp
-    let createdAt: Date
-    /// Last time anything changed, e.g. attribute update
-    var lastUpdatedAt: Date
+public class BLEDevice : Device {
     /// Last time a wake up call was received from this device (iOS only)
     var lastNotifiedAt: Date = Date.distantPast
-    /// Ephemeral device identifier, e.g. peripheral identifier UUID
-    let identifier: TargetIdentifier
     /// Pseudo device address for tracking devices that change device identifier constantly like the Samsung A10, A20 and Note 8
     var pseudoDeviceAddress: BLEPseudoDeviceAddress? {
         didSet {
@@ -159,6 +163,11 @@ class BLEDevice : NSObject {
         }}
     /// Service characteristic for reading payload data
     var payloadCharacteristic: CBCharacteristic? {
+        didSet {
+            lastUpdatedAt = Date()
+            delegate.device(self, didUpdate: .payloadCharacteristic)
+        }}
+    var legacyPayloadCharacteristic: CBCharacteristic? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .payloadCharacteristic)
@@ -270,15 +279,13 @@ class BLEDevice : NSObject {
         return lastAdvertAt.timeIntervalSince(lastConnectedAt)
         }}
     
-    override var description: String { get {
+    public override var description: String { get {
         return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil"),address=\(pseudoDeviceAddress?.data.base64EncodedString() ?? "nil")]"
         }}
     
     init(_ identifier: TargetIdentifier, delegate: BLEDeviceDelegate) {
-        self.createdAt = Date()
-        self.identifier = identifier
         self.delegate = delegate
-        lastUpdatedAt = createdAt
+        super.init(identifier);
     }
 }
 

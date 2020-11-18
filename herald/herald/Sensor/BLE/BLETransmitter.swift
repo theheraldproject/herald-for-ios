@@ -53,6 +53,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     /// Beacon service and characteristics being broadcasted by the transmitter.
     private var signalCharacteristic: CBMutableCharacteristic?
     private var payloadCharacteristic: CBMutableCharacteristic?
+    private var legacyPayloadCharacteristic: CBMutableCharacteristic?
     private var advertisingStartedAt: Date = Date.distantPast
     /// Dummy data for writing to the receivers to trigger state restoration or resume from suspend state to background state.
     private let emptyData = Data(repeating: 0, count: 0)
@@ -74,11 +75,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
-        // Create a peripheral that supports state restoration
-        self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
-            CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
-            CBPeripheralManagerOptionShowPowerAlertKey : true
-        ])
+        
     }
     
     func add(delegate: SensorDelegate) {
@@ -87,11 +84,20 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     func start() {
         logger.debug("start")
+        
+        // Create a peripheral that supports state restoration
+        if peripheral == nil {
+            self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
+                CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
+                CBPeripheralManagerOptionShowPowerAlertKey : true
+            ])
+        }
+        
         guard peripheral.state == .poweredOn else {
             logger.fault("start denied, not powered on")
             return
         }
-        if signalCharacteristic != nil, payloadCharacteristic != nil {
+        if signalCharacteristic != nil, payloadCharacteristic != nil, legacyPayloadCharacteristic != nil {
             logger.debug("starting advert with existing characteristics")
             if !peripheral.isAdvertising {
                 startAdvertising(withNewCharacteristics: false)
@@ -115,8 +121,12 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     func stop() {
         logger.debug("stop")
+        guard peripheral != nil else {
+            return
+        }
         guard peripheral.isAdvertising else {
             logger.fault("stop denied, already stopped (source=%s)")
+            self.peripheral = nil
             return
         }
         stopAdvertising()
@@ -124,14 +134,20 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     private func startAdvertising(withNewCharacteristics: Bool) {
         logger.debug("startAdvertising (withNewCharacteristics=\(withNewCharacteristics))")
-        if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil {
+        if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil || legacyPayloadCharacteristic == nil {
             signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
+            legacyPayloadCharacteristic = BLESensorConfiguration.legacyPayloadCharacteristic
         }
         let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
         signalCharacteristic?.value = nil
         payloadCharacteristic?.value = nil
-        service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
+	if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
+            legacyPayloadCharacteristic.value = nil
+            service.characteristics = [signalCharacteristic!, payloadCharacteristic!, legacyPayloadCharacteristic]
+	} else {
+            service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
+	}
         queue.async {
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
@@ -144,6 +160,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         logger.debug("stopAdvertising()")
         queue.async {
             self.peripheral.stopAdvertising()
+            self.peripheral = nil
         }
         notifyTimer?.cancel()
         notifyTimer = nil
@@ -272,6 +289,16 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             let targetDevice = database.device(targetIdentifier)
             logger.debug("didReceiveWrite (central=\(targetIdentifier))")
             if let data = request.value {
+                guard request.characteristic.uuid != legacyPayloadCharacteristic?.uuid else {
+                    logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writeLegacyPayload)")
+                    
+                    // we don't do anything with the payload.
+                    // Herald relies only on reads. Therefore when legacy writes we ignore.
+                    // However, to maintain legacy data as expected, payload is still written after read.
+                    // See BLEReceiver writeLegacyPayload
+                    queue.async { peripheral.respond(to: request, withResult: .success) }
+                    continue
+                }
                 if data.count == 0 {
                     // Receiver writes blank data on detection of transmitter to bring iOS transmitter back from suspended state
                     logger.debug("didReceiveWrite (central=\(targetIdentifier),action=wakeTransmitter)")
@@ -396,7 +423,12 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         switch request.characteristic.uuid {
         case BLESensorConfiguration.payloadCharacteristicUUID:
             logger.debug("Read (central=\(central.description),characteristic=payload,offset=\(request.offset))")
-            let data = payloadDataSupplier.payload(PayloadTimestamp())
+            let pd = payloadDataSupplier.payload(PayloadTimestamp(), device: central)
+            guard let data = pd else {
+                logger.fault("Read, no payload data supplied (central=\(central.description),characteristic=payload,offset=\(request.offset),data=BLANK)")
+                queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }
+                return
+            }
             guard request.offset < data.count else {
                 logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.count))")
                 queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }

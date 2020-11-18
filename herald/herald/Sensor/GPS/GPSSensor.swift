@@ -28,7 +28,6 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
         self.rangeForBeacon = rangeForBeacon
         super.init()
         locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
         locationManager.requestAlwaysAuthorization()
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = desiredAccuracy
@@ -86,6 +85,40 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
     }
     
     // MARK:- CLLocationManagerDelegate
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        var state = SensorState.off
+        
+        if status == CLAuthorizationStatus.authorizedWhenInUse ||
+            status == CLAuthorizationStatus.authorizedAlways {
+            state = .on
+        }
+        if status == CLAuthorizationStatus.notDetermined {
+            locationManager.requestAlwaysAuthorization()
+            locationManager.stopUpdatingLocation()
+            locationManager.startUpdatingLocation()
+        }
+        if status != CLAuthorizationStatus.notDetermined {
+            delegates.forEach({ $0.sensor(.GPS, didUpdateState: state) })
+        }
+    }
+
+    @available(iOS 14.0, *)
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        var state = SensorState.off
+        if manager.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse ||
+            manager.authorizationStatus == CLAuthorizationStatus.authorizedAlways {
+            state = .on
+        }
+        if manager.authorizationStatus == CLAuthorizationStatus.notDetermined {
+            locationManager.requestAlwaysAuthorization()
+            locationManager.stopUpdatingLocation()
+            locationManager.startUpdatingLocation()
+        }
+        if manager.authorizationStatus != CLAuthorizationStatus.notDetermined {
+            delegates.forEach({ $0.sensor(.GPS, didUpdateState: state) })
+        }
+    }
     
 //    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 //        logger.debug("locationManager:didUpdateLocations(locations=\(locations.description))")
