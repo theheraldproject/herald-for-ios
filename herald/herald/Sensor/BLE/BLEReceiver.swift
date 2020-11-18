@@ -333,23 +333,44 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      Connect to devices and maintain concurrent connection quota
      */
     private func taskConnect() {
+        // Get recently discovered devices
         let didDiscover = taskConnectScanResults()
+        // Identify recently discovered devices with pending tasks : connect -> nextTask
         let hasPendingTask = didDiscover.filter({ deviceHasPendingTask($0) })
+        // Identify all connected (iOS) devices to trigger refresh : connect -> nextTask
         let toBeRefreshed = database.devices().filter({ !hasPendingTask.contains($0) && $0.peripheral?.state == .connected })
+        // Identify all unconnected devices with unknown operating system, these are
+        // created by ConcreteBLETransmitter on characteristic write, to ensure all
+        // centrals that connect to this peripheral are recorded, to enable this central
+        // to attempt connection to the peripheral, thus establishing a bi-directional
+        // connection. This is essential for iOS-iOS background detection, where the
+        // discovery of phoneB by phoneA, and a connection from A to B, will trigger
+        // B to connect to A, thus assuming location permission has been enabled, it
+        // will only require screen ON at either phone to trigger bi-directional connection.
+        let asymmetric = database.devices().filter({ !hasPendingTask.contains($0) && $0.operatingSystem == .unknown && $0.peripheral?.state != .connected })
+        // Connect to recently discovered devices with pending tasks
         hasPendingTask.forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
             connect("taskConnect|hasPending", peripheral);
         }
+        // Refresh connection to existing devices to trigger next task
         toBeRefreshed.forEach() { device in
             guard let peripheral = device.peripheral else {
                 return
             }
             connect("taskConnect|refresh", peripheral);
         }
+        // Connect to unknown devices that have written to this peripheral
+        asymmetric.forEach() { device in
+            guard let peripheral = device.peripheral else {
+                return
+            }
+            connect("taskConnect|asymmetric", peripheral);
+        }
     }
-    
+
     /// Empty scan results to produce a list of recently discovered devices for connection and processing
     private func taskConnectScanResults() -> [BLEDevice] {
         var set: Set<BLEDevice> = []
