@@ -164,7 +164,20 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     
     // Update targets table
     private func updateTargets() {
-        targets = payloads.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
+        // De-duplicate targets based on short name and last updated at time stamp
+        var shortNames: [String:Target] = [:]
+        payloads.forEach() { payload, target in
+            let shortName = payload.shortName
+            guard let duplicate = shortNames[shortName] else {
+                shortNames[shortName] = target
+                return
+            }
+            if duplicate.lastUpdatedAt < target.lastUpdatedAt {
+                shortNames[shortName] = target
+            }
+        }
+        // Get target list in alphabetical order
+        targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
         tableViewTargets.reloadData()
     }
 
@@ -274,8 +287,20 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         let cell = tableView.dequeueReusableCell(withIdentifier: "targetIdentifier", for: indexPath)
         let target = targets[indexPath.row]
         let method = "read" + (target.didShare == nil ? "" : ",share")
+        var didReadTimeInterval: String? = nil
+        if let mean = target.didReadTimeInterval.mean {
+            didReadTimeInterval = String(format: "%.1f", mean)
+        }
+        var didMeasureTimeInterval: String? = nil
+        if let mean = target.didMeasureTimeInterval.mean {
+            didMeasureTimeInterval = String(format: "%.1f", mean)
+        }
+        var timeIntervals: String? = nil
+        if let r = didReadTimeInterval, let m = didMeasureTimeInterval {
+            timeIntervals = " (R:\(r)s,M:\(m)s)"
+        }
         let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
-        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]"
+        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]\(timeIntervals ?? "")"
         cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
         return cell
     }
@@ -299,7 +324,11 @@ private class Target {
     var lastUpdatedAt: Date
     var proximity: Proximity? {
         didSet {
-            lastUpdatedAt = Date()
+            let date = Date()
+            if let lastUpdate = didMeasure {
+                didMeasureTimeInterval.add(date.timeIntervalSince(lastUpdate))
+            }
+            lastUpdatedAt = date
             didMeasure = lastUpdatedAt
         }}
     var received: Data? {
@@ -308,10 +337,15 @@ private class Target {
             didReceive = lastUpdatedAt
         }}
     var didRead: Date {
+        willSet(date) {
+            didReadTimeInterval.add(date.timeIntervalSince(didRead))
+        }
         didSet {
             lastUpdatedAt = didRead
         }}
+    let didReadTimeInterval = Sample()
     var didMeasure: Date?
+    let didMeasureTimeInterval = Sample()
     var didShare: Date? {
         didSet {
             lastUpdatedAt = didRead
