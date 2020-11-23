@@ -67,7 +67,7 @@ public struct BLESensorConfiguration {
     public static var logLevel: SensorLoggerLevel = .debug
     
     /// Are Location Permissions enabled in the app, and thus awake on screen on enabled
-    public static var awakeOnLocationEnabled: Bool = false
+    public static var awakeOnLocationEnabled: Bool = true
     
     /// Payload update at regular intervals, in addition to default HERALD communication process.
     /// - Use this to enable regular payload reads according to app payload lifespan.
