@@ -68,10 +68,14 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
-        self.central = CBCentralManager(delegate: self, queue: queue, options: [
-            CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
-            // Set this to false to stop iOS from displaying an alert if the app is opened while bluetooth is off.
-            CBCentralManagerOptionShowPowerAlertKey : true])
+        
+        if central == nil {
+            self.central = CBCentralManager(delegate: self, queue: queue, options: [
+                CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
+                // Set this to false to stop iOS from displaying an alert if the app is opened while bluetooth is off.
+                CBCentralManagerOptionShowPowerAlertKey : false]
+            )
+        }
         database.add(delegate: self)
     }
     
@@ -89,6 +93,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     func stop() {
         logger.debug("stop")
+        guard central != nil else {
+            return
+        }
         guard central.isScanning else {
             logger.fault("stop denied, already stopped")
             return
@@ -96,7 +103,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Stop scanning
         scanTimer?.cancel()
         scanTimer = nil
-        queue.async { self.central.stopScan() }
+        queue.async {
+            self.central.stopScan()
+        }
         // Cancel all connections, the resulting didDisconnect and didFailToConnect
         database.devices().forEach() { device in
             if let peripheral = device.peripheral, peripheral.state != .disconnected {
@@ -265,7 +274,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      Remove devices that have not been updated for over an hour, as the UUID is likely to have changed after being out of range for over 20 minutes, so it will require discovery.
      */
     private func taskRemoveExpiredDevices() {
-        let devicesToRemove = database.devices().filter { Date().timeIntervalSince($0.lastUpdatedAt) > (20 * TimeInterval.minute) }
+        let devicesToRemove = database.devices().filter { Date().timeIntervalSince($0.lastUpdatedAt) > BLESensorConfiguration.peripheralCleanInterval }
         devicesToRemove.forEach() { device in
             logger.debug("taskRemoveExpiredDevices (remove=\(device))")
             database.delete(device.identifier)
@@ -567,7 +576,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.fault("readPayload denied, peripheral not connected (source=\(source),peripheral=\(device.identifier))")
             return
         }
-        guard let payloadCharacteristic = device.payloadCharacteristic else {
+        guard let payloadCharacteristic = device.payloadCharacteristic != nil ? device.payloadCharacteristic : device.legacyPayloadCharacteristic  else {
             logger.fault("readPayload denied, device missing payload characteristic (source=\(source),peripheral=\(device.identifier))")
             discoverServices("readPayload", peripheral)
             return
@@ -585,6 +594,32 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         } else {
             queue.async { peripheral.readValue(for: payloadCharacteristic) }
         }
+    }
+    
+    /// legacy protocol device, existing code will have the central \ receiver write to the peripheral after it has requested to read its payload
+    
+    private func writeLegacyPayload(_ source: String, peripheral: CBPeripheral) {
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("writeLegacyPayload (source=\(source),peripheral=\(device.identifier))")
+        
+        guard device.rssi != nil else {
+            logger.fault("writeLegacyPayload denied (source=\(source), rssi should be present in \(device.identifier) before write")
+            return
+        }
+        guard let characteristic = device.legacyPayloadCharacteristic else {
+            logger.fault("writeLegacyPayload denied (source=\(source),peripheral=\(device.identifier) legacyPayloadCharacteristic not present)")
+            return
+        }
+        let result : PayloadData? = payloadDataSupplier.legacyPayload(PayloadTimestamp(), device: device)
+        queue.async {
+            guard let payloadToWrite = result else {
+                self.logger.fault("writeLegacyPayload denied (source=\(source),peripheral=\(device.identifier) failed to obtain legacy payload value)")
+                return
+            }
+            self.logger.debug("writeLegacyPayload (source=\(source),peripheral=\(device.identifier) writing...)")
+            peripheral.writeValue(payloadToWrite, for: characteristic, type: .withResponse)
+        }
+        
     }
 
     /**
@@ -768,6 +803,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // Invalidate characteristics
             device.signalCharacteristic = nil
             device.payloadCharacteristic = nil
+            device.legacyPayloadCharacteristic = nil
             // Reconnect
             connect("didDisconnectPeripheral", peripheral)
         }
@@ -833,14 +869,28 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             case BLESensorConfiguration.payloadCharacteristicUUID:
                 device.payloadCharacteristic = characteristic
                 logger.debug("didDiscoverCharacteristicsFor, found payload characteristic (device=\(device))")
+            case BLESensorConfiguration.legacyPayloadCharacteristicUUID:
+                if characteristics.count == 1 {
+                    device.legacyPayloadCharacteristic = characteristic
+                    logger.debug("didDiscoverCharacteristicsFor, found legacy payload characteristic (device=\(device))")
+                } else {
+                    logger.debug("didDiscoverCharacteristicsFor, found legacy payload characteristic but discarding as there are more characteristics, assuming new ble (device=\(device))")
+                }
             default:
                 logger.fault("didDiscoverCharacteristicsFor, found unknown characteristic (device=\(device),characteristic=\(characteristic.uuid))")
             }
         }
         // Android -> Read payload
         if device.operatingSystem == .android {
-            if let payloadCharacteristic = device.payloadCharacteristic, (device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval) {
-                queue.async { peripheral.readValue(for: payloadCharacteristic) }
+            var payloadCharacteristic = device.payloadCharacteristic
+            if payloadCharacteristic == nil {
+                payloadCharacteristic = device.legacyPayloadCharacteristic
+                if nil != device.legacyPayloadCharacteristic {
+                    writeLegacyPayload("didDiscoverCharacteristicsFor|android", peripheral: peripheral)
+                }
+            }
+            if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval, let characteristicToRead = payloadCharacteristic {
+                queue.async { peripheral.readValue(for: characteristicToRead) }
             } else {
                 disconnect("didDiscoverCharacteristicsFor|android", peripheral)
             }
@@ -876,6 +926,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         device.signalCharacteristic = nil
         device.payloadCharacteristic = nil
+        device.legacyPayloadCharacteristic = nil
         if peripheral.state == .connected {
             discoverServices("didModifyServices", peripheral)
         } else if peripheral.state != .connecting {
@@ -906,7 +957,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         case BLESensorConfiguration.androidSignalCharacteristicUUID:
             // Should not happen as Android signal is not notifying
             logger.fault("didUpdateValueFor (device=\(device),characteristic=androidSignalCharacteristic,error=\(String(describing: error)))")
-        case BLESensorConfiguration.payloadCharacteristicUUID:
+        case BLESensorConfiguration.payloadCharacteristicUUID, BLESensorConfiguration.legacyPayloadCharacteristicUUID:
             // Read payload data
             logger.debug("didUpdateValueFor (device=\(device),characteristic=payloadCharacteristic,error=\(String(describing: error)))")
             if let data = characteristic.value {
