@@ -68,6 +68,14 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
+        
+        if central == nil {
+            self.central = CBCentralManager(delegate: self, queue: queue, options: [
+                CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
+                // Set this to false to stop iOS from displaying an alert if the app is opened while bluetooth is off.
+                CBCentralManagerOptionShowPowerAlertKey : false]
+            )
+        }
         database.add(delegate: self)
     }
     
@@ -77,13 +85,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     func start() {
         logger.debug("start")
-        
-        if central == nil {
-            self.central = CBCentralManager(delegate: self, queue: queue, options: [
-                                                CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
-                                                // Set this to false to stop iOS from displaying an alert if the app is opened while bluetooth is off.
-                                                CBCentralManagerOptionShowPowerAlertKey : false])
-        }
         // Start scanning
         if central.state == .poweredOn {
             scan("start")
@@ -97,7 +98,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         guard central.isScanning else {
             logger.fault("stop denied, already stopped")
-            central = nil
             return
         }
         // Stop scanning
@@ -105,7 +105,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         scanTimer = nil
         queue.async {
             self.central.stopScan()
-            self.central = nil
         }
         // Cancel all connections, the resulting didDisconnect and didFailToConnect
         database.devices().forEach() { device in

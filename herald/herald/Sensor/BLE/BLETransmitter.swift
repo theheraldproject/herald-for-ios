@@ -76,6 +76,13 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
         
+        // Create a peripheral that supports state restoration
+        if peripheral == nil {
+            self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
+                CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
+                CBPeripheralManagerOptionShowPowerAlertKey : true
+            ])
+        }
     }
     
     func add(delegate: SensorDelegate) {
@@ -84,14 +91,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     func start() {
         logger.debug("start")
-        
-        // Create a peripheral that supports state restoration
-        if peripheral == nil {
-            self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
-                CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
-                CBPeripheralManagerOptionShowPowerAlertKey : true
-            ])
-        }
         
         guard peripheral.state == .poweredOn else {
             logger.fault("start denied, not powered on")
@@ -126,7 +125,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         }
         guard peripheral.isAdvertising else {
             logger.fault("stop denied, already stopped (source=%s)")
-            self.peripheral = nil
             return
         }
         stopAdvertising()
@@ -160,7 +158,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         logger.debug("stopAdvertising()")
         queue.async {
             self.peripheral.stopAdvertising()
-            self.peripheral = nil
         }
         notifyTimer?.cancel()
         notifyTimer = nil
