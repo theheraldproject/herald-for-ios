@@ -300,7 +300,7 @@ typealias BLE_RSSI = Int
 typealias BLE_TxPower = Int
 
 class BLEPseudoDeviceAddress {
-    let address: Int
+    let address: Int64
     let data: Data
     var description: String { get {
         return "BLEPseudoDeviceAddress(address=\(address),data=\(data.base64EncodedString()))"
@@ -322,6 +322,6 @@ class BLEPseudoDeviceAddress {
         guard let longValue = longValueData.int64(0) else {
             return nil
         }
-        address = Int(longValue)
+        address = Int64(longValue)
     }
 }
