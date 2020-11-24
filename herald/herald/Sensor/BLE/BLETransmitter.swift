@@ -76,6 +76,13 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
         
+        // Create a peripheral that supports state restoration
+        if peripheral == nil {
+            self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
+                CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
+                CBPeripheralManagerOptionShowPowerAlertKey : true
+            ])
+        }
     }
     
     func add(delegate: SensorDelegate) {
@@ -84,14 +91,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     func start() {
         logger.debug("start")
-        
-        // Create a peripheral that supports state restoration
-        if peripheral == nil {
-            self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
-                CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
-                CBPeripheralManagerOptionShowPowerAlertKey : true
-            ])
-        }
         
         guard peripheral.state == .poweredOn else {
             logger.fault("start denied, not powered on")
@@ -126,7 +125,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         }
         guard peripheral.isAdvertising else {
             logger.fault("stop denied, already stopped (source=%s)")
-            self.peripheral = nil
             return
         }
         stopAdvertising()
@@ -142,12 +140,12 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
         signalCharacteristic?.value = nil
         payloadCharacteristic?.value = nil
-	if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
+        if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
             legacyPayloadCharacteristic.value = nil
             service.characteristics = [signalCharacteristic!, payloadCharacteristic!, legacyPayloadCharacteristic]
-	} else {
+        } else {
             service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
-	}
+        }
         queue.async {
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
@@ -160,7 +158,6 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         logger.debug("stopAdvertising()")
         queue.async {
             self.peripheral.stopAdvertising()
-            self.peripheral = nil
         }
         notifyTimer?.cancel()
         notifyTimer = nil
