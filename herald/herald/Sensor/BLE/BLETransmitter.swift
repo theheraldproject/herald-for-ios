@@ -75,12 +75,12 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
-        
         // Create a peripheral that supports state restoration
         if peripheral == nil {
             self.peripheral = CBPeripheralManager(delegate: self, queue: queue, options: [
                 CBPeripheralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLETransmitter",
-                CBPeripheralManagerOptionShowPowerAlertKey : true
+                // Set this to false to stop iOS from displaying an alert if the app is opened while bluetooth is off.
+                CBPeripheralManagerOptionShowPowerAlertKey : false
             ])
         }
     }
@@ -91,7 +91,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     func start() {
         logger.debug("start")
-        
+        guard peripheral != nil else {
+            return
+        }
         guard peripheral.state == .poweredOn else {
             logger.fault("start denied, not powered on")
             return

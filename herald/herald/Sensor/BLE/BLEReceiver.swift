@@ -68,7 +68,6 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         self.database = database
         self.payloadDataSupplier = payloadDataSupplier
         super.init()
-        
         if central == nil {
             self.central = CBCentralManager(delegate: self, queue: queue, options: [
                 CBCentralManagerOptionRestoreIdentifierKey : "Sensor.BLE.ConcreteBLEReceiver",
@@ -85,6 +84,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     func start() {
         logger.debug("start")
+        guard central != nil else {
+            return
+        }
         // Start scanning
         if central.state == .poweredOn {
             scan("start")
