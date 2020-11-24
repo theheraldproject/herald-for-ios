@@ -18,27 +18,27 @@ public class Sample {
     /**
      Minimum sample value.
      */
-    var min:Double? = nil
+    public var min:Double? = nil
     /**
      Maximum sample value.
      */
-    var max:Double? = nil
+    public var max:Double? = nil
     /**
      Sample size.
      */
-    var count:Int64 { get { n } }
+    public var count:Int64 { get { n } }
     /**
      Mean sample value.
      */
-    var mean:Double? { get { n > 0 ? m1 : nil } }
+    public var mean:Double? { get { n > 0 ? m1 : nil } }
     /**
      Sample variance.
      */
-    var variance:Double? { get { n > 1 ? m2 / Double(n - 1) : nil } }
+    public var variance:Double? { get { n > 1 ? m2 / Double(n - 1) : nil } }
     /**
      Sample standard deviation.
      */
-    var standardDeviation:Double? { get { n > 1 ? sqrt(m2 / Double(n - 1)) : nil } }
+    public var standardDeviation:Double? { get { n > 1 ? sqrt(m2 / Double(n - 1)) : nil } }
     
     /**
      String representation of mean, standard deviation, min and max
@@ -52,7 +52,7 @@ public class Sample {
         return "count=" + sCount + ",mean=" + sMean + ",sd=" + sStandardDeviation + ",min=" + sMin + ",max=" + sMax
         } }
     
-    init() {
+    public init() {
     }
     
     init(_ x: Double, _ f: Int64) {
@@ -63,7 +63,7 @@ public class Sample {
     }
     
     /// Add sample value x.
-    func add(_ x:Double) {
+    public func add(_ x:Double) {
         // Sample value accumulation algorithm avoids reiterating sample to compute variance.
         let n1 = n
         n += 1
