@@ -12,7 +12,7 @@ import UIKit
 public class SensorArray : NSObject, Sensor {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
     private var sensorArray: [Sensor] = []
-    public let payloadData: PayloadData
+    public let payloadData: PayloadData?
     public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
     
     private var concreteBle: ConcreteBLESensor?;
@@ -28,21 +28,30 @@ public class SensorArray : NSObject, Sensor {
         //   This is only necessary to enable iOS-iOS background BLE advert discovery, and
         //   service discovery, to enable characteristic read / write / notify with other
         //   iOS and Android devices.
-        sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        if (BLESensorConfiguration.awakeOnLocationEnabled) {
+            sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        }
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)
         sensorArray.append(concreteBle!)
         // Payload data at initiation time for identifying this device in the logs
-        payloadData = payloadDataSupplier.payload(PayloadTimestamp())
+        payloadData = payloadDataSupplier.payload(PayloadTimestamp(), device: nil)
         super.init()
         
+        if let payloadData = payloadData {
+        
         // Loggers
-        add(delegate: ContactLog(filename: "contacts.csv"))
-        add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
-        add(delegate: StatisticsDidReadLog(filename: "statistics_didRead.csv", payloadData: payloadData))
-        add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
-        _ = BatteryLog(filename: "battery.csv")
+        #if DEBUG
+            add(delegate: ContactLog(filename: "contacts.csv"))
+            add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
+            add(delegate: StatisticsDidReadLog(filename: "statistics_didRead.csv", payloadData: payloadData))
+            add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
+            _ = BatteryLog(filename: "battery.csv")
+        #endif
         logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
+        } else {
+            logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
+        }
     }
     
     public func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {

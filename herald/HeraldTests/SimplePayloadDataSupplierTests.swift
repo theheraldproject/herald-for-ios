@@ -158,31 +158,31 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         let pds1 = ConcreteSimplePayloadDataSupplier(protocolAndVersion: 0, countryCode: 0, stateCode: 0, secretKey: ks1)
 
         // Payload is 23 bytes long
-        XCTAssertNotNil(pds1.payload(K.date("2020-09-24T00:00:00+0000")!))
-        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!).count, 23)
+        XCTAssertNotNil(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil)?.count, 23)
 
         // Same payload in same period
-        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:00:00+0000")!))
-        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:05:59+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-24T00:05:59+0000")!, device: nil))
         // Different payloads in different periods
-        XCTAssertNotEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!), pds1.payload(K.date("2020-09-24T00:06:00+0000")!))
+        XCTAssertNotEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-24T00:06:00+0000")!, device: nil))
 
         // Same payload in different periods before epoch
-        XCTAssertEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!), pds1.payload(K.date("2020-09-23T00:06:00+0000")!))
-        XCTAssertEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!), pds1.payload(K.date("2020-09-23T23:54:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-23T00:06:00+0000")!, device: nil))
+        XCTAssertEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-23T23:54:00+0000")!, device: nil))
         // Valid payload on first epoch period
-        XCTAssertNotEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!), pds1.payload(K.date("2020-09-23T23:54:01+0000")!))
+        XCTAssertNotEqual(pds1.payload(K.date("2020-09-23T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-23T23:54:01+0000")!, device: nil))
 
         // Same payload in same periods on epoch + 2000 days
-        XCTAssertEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!), pds1.payload(K.date("2026-03-17T00:00:00+0000")!))
-        XCTAssertEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!), pds1.payload(K.date("2026-03-17T00:05:59+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-17T00:00:00+0000")!, device: nil))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-17T00:05:59+0000")!, device: nil))
         // Different payloads in different periods on epoch + 2000 days
-        XCTAssertNotEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!), pds1.payload(K.date("2026-03-17T00:06:00+0000")!))
+        XCTAssertNotEqual(pds1.payload(K.date("2026-03-17T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-17T00:06:00+0000")!, device: nil))
 
         // Same payload in different periods after epoch + 2001 days
-        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
-        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:05:59+0000")!))
-        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!), pds1.payload(K.date("2026-03-18T00:06:00+0000")!))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-18T00:06:00+0000")!, device: nil))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-18T00:05:59+0000")!, device: nil))
+        XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-18T00:06:00+0000")!, device: nil))
     }
 
     func testCrossPlatformUInt8() throws {

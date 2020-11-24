@@ -110,7 +110,11 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     
     // MARK:- SimplePayloadDataSupplier
     
-    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
+    public func legacyPayload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
+        return nil
+    }
+    
+    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
         var payloadData = PayloadData()
         payloadData.append(commonPayload)
         if let contactIdentifier = contactIdentifier(timestamp) {

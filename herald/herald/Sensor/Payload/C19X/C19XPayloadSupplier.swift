@@ -22,7 +22,11 @@ public class ConcretePayloadDataSupplier : C19XPayloadDataSupplier {
         beaconCodes = ConcreteBeaconCodes(dayCodes)
     }
     
-    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
+    public func legacyPayload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
+        return nil
+    }
+    
+    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
         guard let beaconCode = beaconCodes.get(timestamp) else {
             return emptyPayloadData
         }
