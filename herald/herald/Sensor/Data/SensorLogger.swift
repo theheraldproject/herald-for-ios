@@ -22,7 +22,7 @@ protocol SensorLogger {
 }
 
 public enum SensorLoggerLevel: String {
-    case debug, info, fault
+    case off, debug, info, fault
 }
 
 class ConcreteSensorLogger: NSObject, SensorLogger {
@@ -44,13 +44,16 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
     }
     
     private func suppress(_ level: SensorLoggerLevel) -> Bool {
+        if (BLESensorConfiguration.logLevel == .off) {
+            return true
+        }
         switch level {
         case .debug:
-            return (BLESensorConfiguration.logLevel == .info || BLESensorConfiguration.logLevel == .fault);
+            return (BLESensorConfiguration.logLevel == .info || BLESensorConfiguration.logLevel == .fault)
         case .info:
-            return (BLESensorConfiguration.logLevel == .fault);
+            return (BLESensorConfiguration.logLevel == .fault)
         default:
-            return false;
+            return false
         }
     }
     
@@ -76,6 +79,8 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
                 os_log("%s", log: log, type: .info, message)
             case .fault:
                 os_log("%s", log: log, type: .fault, message)
+            default:
+                return
             }
             return
         }

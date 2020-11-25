@@ -286,21 +286,20 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "targetIdentifier", for: indexPath)
         let target = targets[indexPath.row]
-        let method = "read" + (target.didShare == nil ? "" : ",share")
-        var didReadTimeInterval: String? = nil
+        var method = "Read"
         if let mean = target.didReadTimeInterval.mean {
-            didReadTimeInterval = String(format: "%.1f", mean)
+            let didReadTimeInterval = String(format: "%.1f", mean)
+            method = "\(method)=\(didReadTimeInterval)s"
         }
-        var didMeasureTimeInterval: String? = nil
         if let mean = target.didMeasureTimeInterval.mean {
-            didMeasureTimeInterval = String(format: "%.1f", mean)
+            let didMeasureTimeInterval = String(format: "%.1f", mean)
+            method = "\(method),Measure=\(didMeasureTimeInterval)s"
         }
-        var timeIntervals: String? = nil
-        if let r = didReadTimeInterval, let m = didMeasureTimeInterval {
-            timeIntervals = " (R:\(r)s,M:\(m)s)"
+        if target.didShare != nil {
+            method = "\(method),Share"
         }
         let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
-        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]\(timeIntervals ?? "")"
+        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]"
         cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
         return cell
     }
