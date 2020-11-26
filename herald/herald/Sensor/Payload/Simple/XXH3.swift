@@ -2,7 +2,7 @@
 //  XXH3.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 //  Adapted from xxHash-Swift created by Daisuke T
 //  Copyright © 2019 xxHash-Swift. All rights reserved.
