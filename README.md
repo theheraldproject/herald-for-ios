@@ -6,7 +6,7 @@ Continuous proximity detection across iOS and Android devices in background mode
 
 Copyright 2020 VMware, Inc.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 
 See LICENSE.txt and NOTICE.txt for details.
 
@@ -42,13 +42,13 @@ This is a new, original, free and open source cross-platform proximity detection
 - One or more distance measurement per 30 second window for devices within epidemiologically relevant range (8 metres) for accurate infection risk estimation and case isolation; coverage is > 99.5% of 30 second windows for 2 to 3 devices, and 93% - 96% of windows for 9 to 10 devices.
 - RSSI measurements for distance estimation is 98.5% accurate within epidemiologically relevant range (8 metres).
 - Device identification payload agnostic to support both centralised, and decentralised approaches, as well as retrospective integration into existing solutions.
-- MIT license and open source for ease of integration, reuse and transparency.
+- Apache-2.0 licensed and open source for ease of integration, reuse and transparency.
 
 ## Hardware requirements
 
 - Operating system
 
-  - iOS 9.3+, tested up to iOS 13.7.
+  - iOS 9.3+, tested up to iOS 14.2.
   - Android 5.0+, tested up to Android 10.0 (API level 29).
 
 - Hardware
@@ -62,7 +62,7 @@ You will need the following items for evaluation (some of our tested versions in
 
 - Hardware
   - Apple computer (MacBook Pro Late 2013 to Late 2019) running macOS Catalina (10.15.4).
-  - One or more Apple iPhones (iPhone 4S, SE, 5, 6, 7, X, 11) running iOS (9.3 to 13.7).
+  - One or more Apple iPhones (iPhone 4S, SE, 5, 6, 7, X, 11) running iOS (9.3 to 14.2).
   - One or more Android phones (Samsung A10, A20, A70, J6, S10) running Android (8.0 to 10.0).
 - Software
   - Xcode (11.7) for building and deploying the iOS app to test devices.
