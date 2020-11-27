@@ -29,7 +29,7 @@ public class SensorArray : NSObject, Sensor {
         //   service discovery, to enable characteristic read / write / notify with other
         //   iOS and Android devices.
         if (BLESensorConfiguration.awakeOnLocationEnabled) {
-            sensorArray.append(ConcreteGPSSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+            sensorArray.append(ConcreteAwakeSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         }
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)
