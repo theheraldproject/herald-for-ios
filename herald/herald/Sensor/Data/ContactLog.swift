@@ -50,7 +50,11 @@ class ContactLog: NSObject, SensorDelegate {
         }
     }
     
-    func sensor(_ sensor: SensorType, didVisit: Location) {
-        textFile.write(timestamp() + "," + sensor.rawValue + ",,,,,,5," + csv(didVisit.description))
+    func sensor(_ sensor: SensorType, didVisit: Location?) {
+        var visitString = ""
+        if let dv = didVisit {
+            visitString = dv.description
+        }
+        textFile.write(timestamp() + "," + sensor.rawValue + ",,,,,,5," + csv(visitString))
     }
 }

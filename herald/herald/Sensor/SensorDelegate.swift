@@ -25,7 +25,7 @@ public protocol SensorDelegate {
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier)
     
     /// Detection of time spent at location, e.g. at specific restaurant between 02/06/2020 19:00 and 02/06/2020 21:00
-    func sensor(_ sensor: SensorType, didVisit: Location)
+    func sensor(_ sensor: SensorType, didVisit: Location?)
     
     /// Measure proximity to target with payload data. Combines didMeasure and didRead into a single convenient delegate method
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData)
@@ -41,7 +41,7 @@ public extension SensorDelegate {
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {}
-    func sensor(_ sensor: SensorType, didVisit: Location) {}
+    func sensor(_ sensor: SensorType, didVisit: Location?) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {}
     func sensor(_ sensor: SensorType, didUpdateState: SensorState) {}
 }
@@ -52,12 +52,18 @@ public extension SensorDelegate {
 public enum SensorType : String {
     /// Bluetooth Low Energy (BLE)
     case BLE
-    /// GPS location sensor
+    /// Bluetooth Mesh (5.0+)
+    case BLMESH
+    /// Awake location sensor - uses Location API to be alerted to screen on events
+    case AWAKE
+    /// GPS location sensor - not used by default in Herald
     case GPS
     /// Physical beacon, e.g. iBeacon
     case BEACON
     /// Ultrasound audio beacon.
     case ULTRASOUND
+    /// Other - Incase of an extension between minor versions of Herald
+    case OTHER
 }
 
 /// Sensor state

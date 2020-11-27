@@ -14,7 +14,7 @@
 		B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF60251E56320072D238 /* BLEUtilities.swift */; };
 		B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF61251E56320072D238 /* BLETransmitter.swift */; };
 		B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF62251E56320072D238 /* BLEReceiver.swift */; };
-		B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* GPSSensor.swift */; };
+		B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* AwakeSensor.swift */; };
 		B637EF7F251E56320072D238 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF65251E56320072D238 /* Sensor.swift */; };
 		B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */; };
 		B637EF81251E56320072D238 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6A251E56320072D238 /* DayCodes.swift */; };
@@ -68,7 +68,7 @@
 		B637EF60251E56320072D238 /* BLEUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
 		B637EF61251E56320072D238 /* BLETransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
 		B637EF62251E56320072D238 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
-		B637EF64251E56320072D238 /* GPSSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPSSensor.swift; sourceTree = "<group>"; };
+		B637EF64251E56320072D238 /* AwakeSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AwakeSensor.swift; sourceTree = "<group>"; };
 		B637EF65251E56320072D238 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
 		B637EF6A251E56320072D238 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 			children = (
 				B6F745EE255713C2003567B7 /* Analysis */,
 				B637EF5D251E56320072D238 /* BLE */,
-				B637EF63251E56320072D238 /* GPS */,
+				B637EF63251E56320072D238 /* Location */,
 				B637EF71251E56320072D238 /* Data */,
 				B637EF66251E56320072D238 /* Payload */,
 				B637EF65251E56320072D238 /* Sensor.swift */,
@@ -180,12 +180,12 @@
 			path = BLE;
 			sourceTree = "<group>";
 		};
-		B637EF63251E56320072D238 /* GPS */ = {
+		B637EF63251E56320072D238 /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				B637EF64251E56320072D238 /* GPSSensor.swift */,
+				B637EF64251E56320072D238 /* AwakeSensor.swift */,
 			);
-			path = GPS;
+			path = Location;
 			sourceTree = "<group>";
 		};
 		B637EF66251E56320072D238 /* Payload */ = {
@@ -390,7 +390,7 @@
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
-				B637EF7E251E56320072D238 /* GPSSensor.swift in Sources */,
+				B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
 				B637EF81251E56320072D238 /* DayCodes.swift in Sources */,
