@@ -2,7 +2,7 @@
 //  SonarPayloadSupplier.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
@@ -25,7 +25,11 @@ public class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
         return Data(bytes: &mutableSelf, count: MemoryLayout.size(ofValue: mutableSelf))
     }
     
-    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp()) -> PayloadData {
+    public func legacyPayload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
+        return nil
+    }
+    
+    public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
         var payloadData = PayloadData()
         // First 3 bytes are reserved in SONAR
         payloadData.append(Data(repeating: 0, count: 3))

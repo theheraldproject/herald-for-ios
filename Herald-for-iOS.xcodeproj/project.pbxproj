@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B61C44D5251B3792006D085F /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61C44D3251B3785006D085F /* Herald.framework */; };
-		B61C44D6251B3792006D085F /* Herald.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B61C44D3251B3785006D085F /* Herald.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B68215BD251E789C0091DE22 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B68215BB251E78840091DE22 /* Herald.framework */; };
+		B68215BE251E789C0091DE22 /* Herald.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B68215BB251E78840091DE22 /* Herald.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9324CADA7500F45AEE /* AppDelegate.swift */; };
 		B692CA9824CADA7500F45AEE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B692CA9724CADA7500F45AEE /* ViewController.swift */; };
 		B692CA9B24CADA7500F45AEE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B692CA9924CADA7500F45AEE /* Main.storyboard */; };
@@ -18,12 +18,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B61C44D2251B3785006D085F /* PBXContainerItemProxy */ = {
+		B68215BA251E78840091DE22 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B61C44CE251B3785006D085F /* Herald.xcodeproj */;
+			containerPortal = B68215B6251E78840091DE22 /* Herald.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B644F2692513ED2000E2E1A0;
+			remoteGlobalIDString = B637EF50251E55E60072D238;
 			remoteInfo = Herald;
+		};
+		B6D8A5892523714C000E6CC2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B68215B6251E78840091DE22 /* Herald.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B650151B25229D480070F774;
+			remoteInfo = HeraldTests;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -34,7 +41,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B61C44D6251B3792006D085F /* Herald.framework in Embed Frameworks */,
+				B68215BE251E789C0091DE22 /* Herald.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,7 +49,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B61C44CE251B3785006D085F /* Herald.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Herald.xcodeproj; path = herald/Herald.xcodeproj; sourceTree = "<group>"; };
+		B68215B6251E78840091DE22 /* Herald.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Herald.xcodeproj; path = herald/Herald.xcodeproj; sourceTree = "<group>"; };
 		B6894BC3251B33E500BDFB1E /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6894BD0251B356000BDFB1E /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B692CA9024CADA7500F45AEE /* Herald-for-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Herald-for-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,21 +67,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B61C44D5251B3792006D085F /* Herald.framework in Frameworks */,
+				B68215BD251E789C0091DE22 /* Herald.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B61C44CF251B3785006D085F /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B61C44D3251B3785006D085F /* Herald.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		B644F2AF2513EFC700E2E1A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -84,10 +83,19 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B68215B7251E78840091DE22 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B68215BB251E78840091DE22 /* Herald.framework */,
+				B6D8A58A2523714C000E6CC2 /* HeraldTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		B692CA8724CADA7500F45AEE = {
 			isa = PBXGroup;
 			children = (
-				B61C44CE251B3785006D085F /* Herald.xcodeproj */,
+				B68215B6251E78840091DE22 /* Herald.xcodeproj */,
 				B692CA9224CADA7500F45AEE /* Herald-for-iOS */,
 				B692CA9124CADA7500F45AEE /* Products */,
 				B644F2AF2513EFC700E2E1A0 /* Frameworks */,
@@ -166,8 +174,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = B61C44CF251B3785006D085F /* Products */;
-					ProjectRef = B61C44CE251B3785006D085F /* Herald.xcodeproj */;
+					ProductGroup = B68215B7251E78840091DE22 /* Products */;
+					ProjectRef = B68215B6251E78840091DE22 /* Herald.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -178,11 +186,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		B61C44D3251B3785006D085F /* Herald.framework */ = {
+		B68215BB251E78840091DE22 /* Herald.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = Herald.framework;
-			remoteRef = B61C44D2251B3785006D085F /* PBXContainerItemProxy */;
+			remoteRef = B68215BA251E78840091DE22 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B6D8A58A2523714C000E6CC2 /* HeraldTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = HeraldTests.xctest;
+			remoteRef = B6D8A5892523714C000E6CC2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -352,7 +367,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				DEVELOPMENT_TEAM = Z4G2H2H6CW;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -372,7 +387,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NRR4P5W72;
+				DEVELOPMENT_TEAM = Z4G2H2H6CW;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;

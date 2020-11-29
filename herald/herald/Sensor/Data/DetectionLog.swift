@@ -2,7 +2,7 @@
 //  DetectionLog.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
@@ -50,9 +50,6 @@ class DetectionLog: NSObject, SensorDelegate {
     
     // MARK:- SensorDelegate
     
-    func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
-    }
-    
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         queue.async {
             if self.payloads.insert(didRead.shortName).inserted {
@@ -60,9 +57,6 @@ class DetectionLog: NSObject, SensorDelegate {
                 self.write()
             }
         }
-    }
-    
-    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
     }
     
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
@@ -75,9 +69,4 @@ class DetectionLog: NSObject, SensorDelegate {
             }
         }
     }
-    
-    func sensor(_ sensor: SensorType, didVisit: Location) {
-    }
-    
-
 }

@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import UIKit
@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
 
     // Payload data supplier, sensor and contact log
     var payloadDataSupplier: PayloadDataSupplier?
-    var sensor: Sensor?
+    var sensor: SensorArray?
 
     /// Generate unique and consistent device identifier for testing detection and tracking
     private func identifier() -> Int32 {
@@ -38,6 +38,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
         sensor?.start()
+        
+        // EXAMPLE immediate data send function (note: NOT wrapped with Herald header)
+        //let targetIdentifier: TargetIdentifier? // ... set its value
+        //let success: Bool = sensor!.immediateSend(data: Data(), targetIdentifier!)
         
         return true
     }
@@ -74,6 +78,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         logger.info(sensor.rawValue + ",didRead=" + didRead.shortName + ",fromTarget=" + fromTarget.description)
     }
     
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
+        logger.info(sensor.rawValue + ",didReceive=" + didReceive.base64EncodedString() + ",fromTarget=" + fromTarget.description)
+    }
+    
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let payloads = didShare.map { $0.shortName }
         logger.info(sensor.rawValue + ",didShare=" + payloads.description + ",fromTarget=" + fromTarget.description)
@@ -83,8 +91,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         logger.info(sensor.rawValue + ",didMeasure=" + didMeasure.description + ",fromTarget=" + fromTarget.description)
     }
     
-    func sensor(_ sensor: SensorType, didVisit: Location) {
-        logger.info(sensor.rawValue + ",didVisit=" + didVisit.description)
+    func sensor(_ sensor: SensorType, didVisit: Location?) {
+        logger.info(sensor.rawValue + ",didVisit=" + String(describing: didVisit))
     }
     
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {

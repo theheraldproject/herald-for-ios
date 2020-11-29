@@ -2,7 +2,7 @@
 //  ContactLog.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
@@ -50,9 +50,11 @@ class ContactLog: NSObject, SensorDelegate {
         }
     }
     
-    func sensor(_ sensor: SensorType, didVisit: Location) {
-        textFile.write(timestamp() + "," + sensor.rawValue + ",,,,,,5," + csv(didVisit.description))
+    func sensor(_ sensor: SensorType, didVisit: Location?) {
+        var visitString = ""
+        if let dv = didVisit {
+            visitString = dv.description
+        }
+        textFile.write(timestamp() + "," + sensor.rawValue + ",,,,,,5," + csv(visitString))
     }
-    
-
 }

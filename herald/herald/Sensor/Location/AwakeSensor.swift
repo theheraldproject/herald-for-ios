@@ -1,24 +1,24 @@
 //
-//  GPSSensor.swift
+//  AwakeSensor.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
 import CoreLocation
 
-protocol GPSSensor : Sensor {
+protocol AwakeSensor : Sensor {
 }
 
 /**
- GPS and location sensor based on CoreLocation.
+ Screen awake sensor based on CoreLocation. Does NOT make use of the GPS position
  Requires : Signing & Capabilities : BackgroundModes : LocationUpdates = YES
  Requires : Info.plist : Privacy - Location When In Use Usage Description
  Requires : Info.plist : Privacy - Location Always and When In Use Usage Description
  */
-class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteGPSSensor")
+class ConcreteAwakeSensor : NSObject, AwakeSensor, CLLocationManagerDelegate {
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteAwakeSensor")
     private var delegates: [SensorDelegate] = []
     private let locationManager = CLLocationManager()
     private let rangeForBeacon: UUID?
@@ -28,7 +28,6 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
         self.rangeForBeacon = rangeForBeacon
         super.init()
         locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
         locationManager.requestAlwaysAuthorization()
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = desiredAccuracy
@@ -87,11 +86,46 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
     
     // MARK:- CLLocationManagerDelegate
     
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        logger.debug("locationManager:didUpdateLocations(locations=\(locations.description))")
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        var state = SensorState.off
+        
+        if status == CLAuthorizationStatus.authorizedWhenInUse ||
+            status == CLAuthorizationStatus.authorizedAlways {
+            state = .on
+        }
+        if status == CLAuthorizationStatus.notDetermined {
+            locationManager.requestAlwaysAuthorization()
+            locationManager.stopUpdatingLocation()
+            locationManager.startUpdatingLocation()
+        }
+        if status != CLAuthorizationStatus.notDetermined {
+            delegates.forEach({ $0.sensor(.AWAKE, didUpdateState: state) })
+        }
+    }
+
+    @available(iOS 14.0, *)
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        var state = SensorState.off
+        if manager.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse ||
+            manager.authorizationStatus == CLAuthorizationStatus.authorizedAlways {
+            state = .on
+        }
+        if manager.authorizationStatus == CLAuthorizationStatus.notDetermined {
+            locationManager.requestAlwaysAuthorization()
+            locationManager.stopUpdatingLocation()
+            locationManager.startUpdatingLocation()
+        }
+        if manager.authorizationStatus != CLAuthorizationStatus.notDetermined {
+            delegates.forEach({ $0.sensor(.AWAKE, didUpdateState: state) })
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        logger.debug("locationManager:didUpdateLocations()")
 //        guard locations.count > 0 else {
 //            return
 //        }
+          // Commented out as we don't use or need the actual location of a device in Herald for the on awake event
 //        locations.forEach() { location in
 //            let location = Location(
 //                value: WGS84PointLocationReference(
@@ -101,5 +135,6 @@ class ConcreteGPSSensor : NSObject, GPSSensor, CLLocationManagerDelegate {
 //                time: (start: location.timestamp, end: location.timestamp))
 //            delegates.forEach { $0.sensor(.GPS, didVisit: location) }
 //        }
-//    }
+        delegates.forEach { $0.sensor(.AWAKE, didVisit: nil) }
+    }
 }

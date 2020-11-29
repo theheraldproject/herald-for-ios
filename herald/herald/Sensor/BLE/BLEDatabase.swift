@@ -2,7 +2,7 @@
 //  BLEDatabase.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
@@ -22,6 +22,9 @@ protocol BLEDatabase {
 
     /// Get or create device for collating information from asynchronous BLE operations.
     func device(_ payload: PayloadData) -> BLEDevice
+    
+    /// Get if a device exists
+    func hasDevice(_ payload: PayloadData) -> Bool
 
     /// Get all devices
     func devices() -> [BLEDevice]
@@ -105,6 +108,13 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
         placeholder.payloadData = payload
         return placeholder
     }
+    
+    func hasDevice(_ payload: PayloadData) -> Bool {
+        if database.values.filter({ $0.payloadData == payload }).first != nil {
+            return true
+        }
+        return false
+    }
 
     func delete(_ identifier: TargetIdentifier) {
         guard let device = database[identifier] else {
@@ -129,15 +139,9 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
 
 // MARK:- BLEDatabase data
 
-class BLEDevice : NSObject {
-    /// Device registratiion timestamp
-    let createdAt: Date
-    /// Last time anything changed, e.g. attribute update
-    var lastUpdatedAt: Date
+public class BLEDevice : Device {
     /// Last time a wake up call was received from this device (iOS only)
     var lastNotifiedAt: Date = Date.distantPast
-    /// Ephemeral device identifier, e.g. peripheral identifier UUID
-    let identifier: TargetIdentifier
     /// Pseudo device address for tracking devices that change device identifier constantly like the Samsung A10, A20 and Note 8
     var pseudoDeviceAddress: BLEPseudoDeviceAddress? {
         didSet {
@@ -159,6 +163,11 @@ class BLEDevice : NSObject {
         }}
     /// Service characteristic for reading payload data
     var payloadCharacteristic: CBCharacteristic? {
+        didSet {
+            lastUpdatedAt = Date()
+            delegate.device(self, didUpdate: .payloadCharacteristic)
+        }}
+    var legacyPayloadCharacteristic: CBCharacteristic? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .payloadCharacteristic)
@@ -200,8 +209,17 @@ class BLEDevice : NSObject {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .txPower)
         }}
+    /// Transmit power as calibration data
+    var calibration: Calibration? { get {
+        guard let txPower = txPower else {
+            return nil
+        }
+        return Calibration(unit: .BLETransmitPower, value: Double(txPower))
+    }}
     /// Track discovered at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastDiscoveredAt: Date = Date.distantPast
+    /// Track Herald initiated connection attempts - workaround for iOS peripheral caching incorrect state bug
+    var lastConnectionInitiationAttempt: Date?
     /// Track connect request at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastConnectRequestedAt: Date = Date.distantPast
     /// Track connected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
@@ -209,9 +227,18 @@ class BLEDevice : NSObject {
         didSet {
             // Reset lastDisconnectedAt
             lastDisconnectedAt = nil
+            // Reset lastConnectionInitiationAttempt
+            lastConnectionInitiationAttempt = nil
         }}
+    /// Track read payload request at timestamp, used by readPayload to de-duplicate requests from asynchronous calls
+    var lastReadPayloadRequestedAt: Date = Date.distantPast
     /// Track disconnected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
-    var lastDisconnectedAt: Date?
+    var lastDisconnectedAt: Date? {
+        didSet {
+            // Reset lastConnectionInitiationAttempt
+            lastConnectionInitiationAttempt = nil
+        }
+    }
     /// Last advert timestamp, inferred from payloadDataLastUpdatedAt, payloadSharingDataLastUpdatedAt, rssiLastUpdatedAt
     var lastAdvertAt: Date { get {
             max(createdAt, lastDiscoveredAt, payloadDataLastUpdatedAt, rssiLastUpdatedAt)
@@ -224,6 +251,10 @@ class BLEDevice : NSObject {
     /// Time interval since last attribute value update, this is used to identify devices that may have expired and should be removed from the database.
     var timeIntervalSinceLastUpdate: TimeInterval { get {
             Date().timeIntervalSince(lastUpdatedAt)
+        }}
+    /// Time interval since last payload data update, this is used to identify devices that require a payload update.
+    var timeIntervalSinceLastPayloadDataUpdate: TimeInterval { get {
+            Date().timeIntervalSince(payloadDataLastUpdatedAt)
         }}
     /// Time interval since last advert detected, this is used to detect concurrent connection quota and prioritise disconnections
     var timeIntervalSinceLastAdvert: TimeInterval { get {
@@ -248,15 +279,13 @@ class BLEDevice : NSObject {
         return lastAdvertAt.timeIntervalSince(lastConnectedAt)
         }}
     
-    override var description: String { get {
+    public override var description: String { get {
         return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil"),address=\(pseudoDeviceAddress?.data.base64EncodedString() ?? "nil")]"
         }}
     
     init(_ identifier: TargetIdentifier, delegate: BLEDeviceDelegate) {
-        self.createdAt = Date()
-        self.identifier = identifier
         self.delegate = delegate
-        lastUpdatedAt = createdAt
+        super.init(identifier);
     }
 }
 
@@ -278,7 +307,7 @@ typealias BLE_RSSI = Int
 typealias BLE_TxPower = Int
 
 class BLEPseudoDeviceAddress {
-    let address: Int
+    let address: Int64
     let data: Data
     var description: String { get {
         return "BLEPseudoDeviceAddress(address=\(address),data=\(data.base64EncodedString()))"
@@ -300,6 +329,6 @@ class BLEPseudoDeviceAddress {
         guard let longValue = longValueData.int64(0) else {
             return nil
         }
-        address = Int(longValue)
+        address = Int64(longValue)
     }
 }

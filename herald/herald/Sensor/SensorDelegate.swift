@@ -2,7 +2,7 @@
 //  SensorDelegate.swift
 //
 //  Copyright 2020 VMware, Inc.
-//  SPDX-License-Identifier: MIT
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
@@ -17,12 +17,15 @@ public protocol SensorDelegate {
     
     /// Read payload data of other targets recently acquired by a target, e.g. Android peripheral sharing payload data acquired from nearby iOS peripherals.
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier)
+    
+    /// Write signal requests - immediate send
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier)
 
     /// Measure proximity to target, e.g. a sample of RSSI values from BLE peripheral.
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier)
     
     /// Detection of time spent at location, e.g. at specific restaurant between 02/06/2020 19:00 and 02/06/2020 21:00
-    func sensor(_ sensor: SensorType, didVisit: Location)
+    func sensor(_ sensor: SensorType, didVisit: Location?)
     
     /// Measure proximity to target with payload data. Combines didMeasure and didRead into a single convenient delegate method
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData)
@@ -36,8 +39,9 @@ public extension SensorDelegate {
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {}
-    func sensor(_ sensor: SensorType, didVisit: Location) {}
+    func sensor(_ sensor: SensorType, didVisit: Location?) {}
     func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {}
     func sensor(_ sensor: SensorType, didUpdateState: SensorState) {}
 }
@@ -48,12 +52,18 @@ public extension SensorDelegate {
 public enum SensorType : String {
     /// Bluetooth Low Energy (BLE)
     case BLE
-    /// GPS location sensor
+    /// Bluetooth Mesh (5.0+)
+    case BLMESH
+    /// Awake location sensor - uses Location API to be alerted to screen on events
+    case AWAKE
+    /// GPS location sensor - not used by default in Herald
     case GPS
     /// Physical beacon, e.g. iBeacon
     case BEACON
     /// Ultrasound audio beacon.
     case ULTRASOUND
+    /// Other - Incase of an extension between minor versions of Herald
+    case OTHER
 }
 
 /// Sensor state
@@ -77,10 +87,21 @@ public struct Proximity {
     let unit: ProximityMeasurementUnit
     /// Measured value, e.g. raw RSSI value.
     let value: Double
+    /// Calibration data (optional), e.g. transmit power
+    let calibration: Calibration?
     /// Get plain text description of proximity data
     public var description: String { get {
-        unit.rawValue + ":" + value.description
+        guard let calibration = calibration else {
+            return "\(unit.rawValue):\(value.description)"
+        }
+        return "\(unit.rawValue):\(value.description)[\(calibration.description)]"
     }}
+    
+    init(unit: ProximityMeasurementUnit, value: Double, calibration: Calibration? = nil) {
+        self.unit = unit
+        self.value = value
+        self.calibration = calibration
+    }
 }
 
 /// Measurement unit for interpreting the proximity data values.
@@ -89,6 +110,24 @@ public enum ProximityMeasurementUnit : String {
     case RSSI
     /// Roundtrip time, e.g. Audio signal echo time duration as proximity estimator.
     case RTT
+}
+
+/// Calibration data for interpreting proximity value between sensor and target, e.g. Transmit power for BLE.
+public struct Calibration {
+    /// Unit of measurement, e.g. transmit power
+    let unit: CalibrationMeasurementUnit
+    /// Measured value, e.g. transmit power in BLE advert
+    let value: Double
+    /// Get plain text description of calibration data
+    public var description: String { get {
+        unit.rawValue + ":" + value.description
+    }}
+}
+
+/// Measurement unit for calibrating the proximity transmission data values, e.g. BLE transmit power
+public enum CalibrationMeasurementUnit : String {
+    /// Bluetooth transmit power for describing expected RSSI at 1 metre for interpretation of measured RSSI value.
+    case BLETransmitPower
 }
 
 // MARK:- Location data
