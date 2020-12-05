@@ -132,6 +132,19 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         return true;
     }
     
+    func immediateSendAll(data: Data) -> Bool {
+        var toSend = Data([UInt8(BLESensorConfiguration.signalCharacteristicActionWriteImmediate)])
+        var length = Int16(data.count)
+        toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
+        toSend.append(data)
+        
+        let devicesToSendTo = database.devices().filter { $0.peripheral != nil && $0.peripheral!.state == .connected }
+        devicesToSendTo.forEach() { device in
+            queue.async { device.peripheral!.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse) }
+        }
+        return true;
+    }
+    
     // MARK:- Scan for peripherals and initiate connection if required
     
     /// All work starts from scan loop.

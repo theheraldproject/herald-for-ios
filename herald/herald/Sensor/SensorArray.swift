@@ -58,6 +58,10 @@ public class SensorArray : NSObject, Sensor {
         return concreteBle!.immediateSend(data: data,targetIdentifier);
     }
     
+    public func immediateSendAll(data: Data) -> Bool {
+        return concreteBle!.immediateSendAll(data: data);
+    }
+    
     public func add(delegate: SensorDelegate) {
         sensorArray.forEach { $0.add(delegate: delegate) }
     }

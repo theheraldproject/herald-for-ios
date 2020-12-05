@@ -139,6 +139,10 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
         return receiver.immediateSend(data:data,targetIdentifier);
     }
     
+    func immediateSendAll(data: Data) -> Bool {
+        return receiver.immediateSendAll(data:data);
+    }
+    
     // MARK:- BLEDatabaseDelegate
     
     func bleDatabase(didCreate device: BLEDevice) {
