@@ -8,10 +8,10 @@
 import UIKit
 import Herald
 
-class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate {
+class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    private var sensor: Sensor!
+    private var sensor: SensorArray!
     private let dateFormatter = DateFormatter()
     private let dateFormatterTime = DateFormatter()
 
@@ -59,6 +59,10 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     @IBOutlet weak var buttonSocialMixingScoreUnitM15: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitM5: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitM1: UIButton!
+    // Immediate send elements
+    @IBOutlet weak var textMessageToSend: UITextField!
+    @IBOutlet weak var buttonMessageSend: UIButton!
+    @IBOutlet weak var labelMessageReceived: UILabel!
     
     // MARK:- Detected payloads
     
@@ -81,6 +85,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         
         dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         dateFormatterTime.dateFormat = "HH:mm:ss"
+        
+        textMessageToSend.delegate = self
+        textMessageToSend.text = "ping"
 
         labelDevice.text = SensorArray.deviceDescription
         if let payloadData = appDelegate.sensor?.payloadData {
@@ -180,6 +187,29 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
         tableViewTargets.reloadData()
     }
+    
+    // MARK:- Immediate Send
+    @IBAction func didClickSend(_ sender: UIButton) {
+        guard let text = textMessageToSend.text else {
+            return
+        }
+        if text.count == 0 {
+            return
+        }
+        guard let sensor = sensor else {
+            return
+        }
+        let ok = sensor.immediateSendAll(data: text.data(using: .utf8)!)
+        if !ok {
+            labelMessageReceived.text = "Failed to send"
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
+    }
+
 
     // MARK:- Crash app
     
@@ -259,17 +289,24 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         }
     }
 
+    // Immediate send data (text in demo app), NOT payload data
     func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
         self.didReceive += 1
-        let didRead = PayloadData(didReceive)
-        if let target = payloads[didRead] {
-            targetIdentifiers[fromTarget] = didRead
-            target.targetIdentifier = fromTarget
-            target.received = didReceive
-        }
+        let didRead = String(bytes: didReceive, encoding: .utf8)
         DispatchQueue.main.async {
+            guard let read = didRead else {
+                self.labelMessageReceived.text = "<garbled>"
+                return
+            }
+            self.labelMessageReceived.text = read
             self.labelDidReceiveCount.text = "\(self.didReceive)"
             self.updateTargets()
+            // The following is for an easy demo flow
+            if read == "ping" {
+                self.textMessageToSend.text = "pong"
+            } else if read == "pond" {
+                self.textMessageToSend.text = "ping"
+            }
         }
     }
     
