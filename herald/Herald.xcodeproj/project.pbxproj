@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D4FE257C470B0097DD92 /* BeaconPayloadDataSupplier.swift */; };
+		6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */; };
+		6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D509257C4F750097DD92 /* ExtendedData.swift */; };
 		6FE142FB2565C39A0084A59C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE142FA2565C39A0084A59C /* Device.swift */; };
 		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B637EF79251E56320072D238 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5E251E56320072D238 /* BLESensor.swift */; };
@@ -59,6 +62,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6F52D4FE257C470B0097DD92 /* BeaconPayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BeaconPayloadDataSupplier.swift; path = herald/Sensor/Payload/Beacon/BeaconPayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
+		6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconPayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		6F52D509257C4F750097DD92 /* ExtendedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedData.swift; path = herald/Sensor/Payload/Extended/ExtendedData.swift; sourceTree = SOURCE_ROOT; };
 		6FE142FA2565C39A0084A59C /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Device.swift; path = herald/Sensor/Device.swift; sourceTree = SOURCE_ROOT; };
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B637EF53251E55E60072D238 /* Herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Herald.h; sourceTree = "<group>"; };
@@ -122,6 +128,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6F52D4FB257C46D30097DD92 /* Beacon */ = {
+			isa = PBXGroup;
+			children = (
+				6F52D4FE257C470B0097DD92 /* BeaconPayloadDataSupplier.swift */,
+			);
+			path = Beacon;
+			sourceTree = "<group>";
+		};
+		6F52D508257C4F4A0097DD92 /* Extended */ = {
+			isa = PBXGroup;
+			children = (
+				6F52D509257C4F750097DD92 /* ExtendedData.swift */,
+			);
+			path = Extended;
+			sourceTree = "<group>";
+		};
 		B637EF46251E55E60072D238 = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +213,8 @@
 		B637EF66251E56320072D238 /* Payload */ = {
 			isa = PBXGroup;
 			children = (
+				6F52D508257C4F4A0097DD92 /* Extended */,
+				6F52D4FB257C46D30097DD92 /* Beacon */,
 				B650151225229CED0070F774 /* Simple */,
 				B637EF67251E56320072D238 /* Sonar */,
 				B637EF69251E56320072D238 /* C19X */,
@@ -252,6 +276,7 @@
 				B6F74608255714C2003567B7 /* InteractionsTests.swift */,
 				B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */,
 				B6F74605255714C2003567B7 /* SocialDistanceTests.swift */,
+				6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -381,6 +406,7 @@
 				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
+				6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */,
 				B6C41BE3255951B700F7E9FB /* StatisticsDidReadLog.swift in Sources */,
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
 				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
@@ -400,6 +426,7 @@
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				6FE142FB2565C39A0084A59C /* Device.swift in Sources */,
 				B6F745FE25571475003567B7 /* XXH3.swift in Sources */,
+				6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
 				B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */,
 				B6F745F3255713C2003567B7 /* Sample.swift in Sources */,
@@ -416,6 +443,7 @@
 			files = (
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
 				B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */,
+				6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */,
 				B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */,
 				B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */,
 				B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */,
