@@ -12,6 +12,7 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: SensorArray!
+    private var foreground: Bool = true
     private let dateFormatter = DateFormatter()
     private let dateFormatterTime = DateFormatter()
 
@@ -96,7 +97,26 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         tableViewTargets.dataSource = self
         tableViewTargets.delegate = self
         enableCrashButton()
+        
+        // Detect app moving to foreground and background
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
+
+    @objc func willEnterForeground() {
+        foreground = true
+        logger.debug("app (state=foreground)")
+        updateCounts()
+        updateTargets()
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    
+    @objc func didEnterBackground() {
+        foreground = false
+        logger.debug("app (state=background)")
+    }
+    
         
     // MARK:- Social mixing score
     
@@ -169,23 +189,36 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         }
     }
     
-    // Update targets table
-    private func updateTargets() {
-        // De-duplicate targets based on short name and last updated at time stamp
-        var shortNames: [String:Target] = [:]
-        payloads.forEach() { payload, target in
-            let shortName = payload.shortName
-            guard let duplicate = shortNames[shortName] else {
-                shortNames[shortName] = target
-                return
-            }
-            if duplicate.lastUpdatedAt < target.lastUpdatedAt {
-                shortNames[shortName] = target
-            }
+    /// Update counts
+    private func updateCounts() {
+        DispatchQueue.main.async {
+            self.labelDidDetectCount.text = "\(self.didDetect)"
+            self.labelDidReadCount.text = "\(self.didRead)"
+            self.labelDidMeasureCount.text = "\(self.didMeasure)"
+            self.labelDidShareCount.text = "\(self.didShare)"
+            self.labelDidReceiveCount.text = "\(self.didReceive)"
         }
-        // Get target list in alphabetical order
-        targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
-        tableViewTargets.reloadData()
+    }
+    
+    /// Update targets table
+    private func updateTargets() {
+        DispatchQueue.main.async {
+            // De-duplicate targets based on short name and last updated at time stamp
+            var shortNames: [String:Target] = [:]
+            self.payloads.forEach() { payload, target in
+                let shortName = payload.shortName
+                guard let duplicate = shortNames[shortName] else {
+                    shortNames[shortName] = target
+                    return
+                }
+                if duplicate.lastUpdatedAt < target.lastUpdatedAt {
+                    shortNames[shortName] = target
+                }
+            }
+            // Get target list in alphabetical order
+            self.targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
+            self.tableViewTargets.reloadData()
+        }
     }
     
     // MARK:- Immediate Send
@@ -241,6 +274,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
 
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
         self.didDetect += 1
+        guard foreground else {
+            return
+        }
         DispatchQueue.main.async {
             self.labelDidDetectCount.text = "\(self.didDetect)"
         }
@@ -253,6 +289,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
             target.didRead = Date()
         } else {
             payloads[didRead] = Target(targetIdentifier: fromTarget, payloadData: didRead)
+        }
+        guard foreground else {
+            return
         }
         DispatchQueue.main.async {
             self.labelDidReadCount.text = "\(self.didRead)"
@@ -270,6 +309,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
                 payloads[didRead] = Target(targetIdentifier: fromTarget, payloadData: didRead)
             }
         }
+        guard foreground else {
+            return
+        }
         DispatchQueue.main.async {
             self.labelDidShareCount.text = "\(self.didShare)"
             self.updateTargets()
@@ -281,6 +323,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         if let didRead = targetIdentifiers[fromTarget], let target = payloads[didRead] {
             target.targetIdentifier = fromTarget
             target.proximity = didMeasure
+        }
+        guard foreground else {
+            return
         }
         DispatchQueue.main.async {
             self.labelDidMeasureCount.text = "\(self.didMeasure)"
@@ -299,14 +344,19 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
                 return
             }
             self.labelMessageReceived.text = read
-            self.labelDidReceiveCount.text = "\(self.didReceive)"
-            self.updateTargets()
             // The following is for an easy demo flow
             if read == "ping" {
                 self.textMessageToSend.text = "pong"
-            } else if read == "pond" {
+            } else if read == "pong" {
                 self.textMessageToSend.text = "ping"
             }
+        }
+        guard foreground else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.labelDidReceiveCount.text = "\(self.didReceive)"
+            self.updateTargets()
         }
     }
     
