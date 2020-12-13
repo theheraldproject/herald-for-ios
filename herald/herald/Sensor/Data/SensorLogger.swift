@@ -91,11 +91,11 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
     }
     
     func info(_ message: String) {
-        log(.debug, message)
+        log(.info, message)
     }
     
     func fault(_ message: String) {
-        log(.debug, message)
+        log(.fault, message)
     }
     
 }

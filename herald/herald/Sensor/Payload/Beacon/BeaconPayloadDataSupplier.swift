@@ -26,12 +26,12 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
     public init(countryCode: UInt16, stateCode: UInt16, code: UInt32) {
         // Generate common header
         // All data is big endian
-        var protocolAndVersionBigEndian = ConcreteBeaconPayloadDataSupplierV1.protocolAndVersion.bigEndian
-        let protocolAndVersionData = Data(bytes: &protocolAndVersionBigEndian, count: MemoryLayout.size(ofValue: protocolAndVersionBigEndian))
-        var countryCodeBigEndian = countryCode.bigEndian
-        let countryCodeData = Data(bytes: &countryCodeBigEndian, count: MemoryLayout.size(ofValue: countryCodeBigEndian))
-        var stateCodeBigEndian = stateCode.bigEndian
-        let stateCodeData = Data(bytes: &stateCodeBigEndian, count: MemoryLayout.size(ofValue: stateCodeBigEndian))
+        var protocolAndVersionValue = ConcreteBeaconPayloadDataSupplierV1.protocolAndVersion.bigEndian
+        let protocolAndVersionData = Data(bytes: &protocolAndVersionValue, count: MemoryLayout.size(ofValue: protocolAndVersionValue))
+        var countryCodeValue = countryCode.littleEndian
+        let countryCodeData = Data(bytes: &countryCodeValue, count: MemoryLayout.size(ofValue: countryCodeValue))
+        var stateCodeValue = stateCode.littleEndian
+        let stateCodeData = Data(bytes: &stateCodeValue, count: MemoryLayout.size(ofValue: stateCodeValue))
         // Common header = protocolAndVersion + countryCode + stateCode
         var commonHeader = Data()
         commonHeader.append(protocolAndVersionData)
@@ -40,8 +40,8 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
         self.commonHeader = commonHeader
 
         // Generate beacon payload
-        var codeBigEndian = code.bigEndian
-        self.codePayload = Data(bytes: &codeBigEndian, count: MemoryLayout.size(ofValue: codeBigEndian))
+        var codeValue = code.littleEndian
+        self.codePayload = Data(bytes: &codeValue, count: MemoryLayout.size(ofValue: codeValue))
         // Beacon payload = commonHeader + Beacon Registration Code + Extended Data
         var fullPayload = Data()
         fullPayload.append(commonHeader)

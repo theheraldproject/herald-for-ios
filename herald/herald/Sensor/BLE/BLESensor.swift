@@ -61,6 +61,19 @@ public struct BLESensorConfiguration {
     /// Herald internal connection expiry timeout
     public static var connectionAttemptTimeout = TimeInterval(12)
     
+    // MARK:- Venue check-in configuration
+    /// The amount of time after which a diary venue event will stay in the log file (may be shown in the UI as 'pending' before this limit)
+    public static var venueCheckInTimeLimit = TimeInterval.minute * 2
+    /// The amount of time after which a venue presence diary event will be said to have been finished
+    public static var venueCheckOutTimeLimit = TimeInterval.minute * 5
+    // TODO consider a variable 'sensitivity' RSSI slider here, local to this person, as a preference
+    /// The default number of days to save venue diary visits for, set by preference of the user. May be nil (no limit) or 0 (don't record anything, ever)
+    public static var venueDiaryDefaultRecordingDays : UInt8? = 31
+    /// If sharing a venue diary (E.g. via email to contact tracers), the number of days by default to share. nil means all. 0 means none
+    public static var venueDiaryDefaultShareDays : UInt8? = 14
+    /// If sharing a venue diary (E.g. via email to contact tracers), the email address to send the diary to by default when 'share' is clicked
+    public static var venueDiaryDefaultShareEmail : String? = nil
+    
     // MARK:- App configurable BLE features
 
     /// Log level for BLESensor

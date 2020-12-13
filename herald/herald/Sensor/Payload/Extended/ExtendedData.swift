@@ -23,7 +23,18 @@ public protocol ExtendedData {
     func payload() -> PayloadData?
 }
 
-public enum ExtendedDataSegmentCode : UInt8 {
+public typealias ExtendedDataSegmentCode = UInt8
+
+/// CURRENT complete list, across all version, with CURRENT names
+public enum ExtendedDataSegmentCodes : UInt8 {
+    case TextPremises = 0x10
+    case TextLocation = 0x11
+    case TextArea = 0x12
+    case LocationUrl = 0x13
+}
+
+/// V1 codes, with names and codes at the time
+public enum ExtendedDataSegmentCodesV1 : UInt8 {
     case TextPremises = 0x10
     case TextLocation = 0x11
     case TextArea = 0x12
@@ -38,6 +49,10 @@ public class ConcreteExtendedDataV1 : ExtendedData {
         payloadData = Data() // empty
     }
     
+    public init(_ unparsedData: PayloadData) {
+        self.payloadData = unparsedData
+    }
+    
     public func payload() -> PayloadData? {
         return payloadData
     }
@@ -47,13 +62,13 @@ public class ConcreteExtendedDataV1 : ExtendedData {
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: UInt8) {
-        payloadData.append(code.rawValue.bigEndian)
+        payloadData.append(code.bigEndian)
         payloadData.append(UInt8(0x01).bigEndian)
         payloadData.append(value.bigEndian)
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: UInt16) {
-        payloadData.append(code.rawValue.bigEndian)
+        payloadData.append(code.bigEndian)
         payloadData.append(UInt8(0x02).bigEndian)
         payloadData.append(UInt8(value >> 8).bigEndian)
         payloadData.append(UInt8(value & 0x00FF).bigEndian)
@@ -61,7 +76,7 @@ public class ConcreteExtendedDataV1 : ExtendedData {
     
     @available(iOS 14.0, *)
     public func addSection(code: ExtendedDataSegmentCode, value: Float16) {
-        payloadData.append(code.rawValue.bigEndian)
+        payloadData.append(code.bigEndian)
         payloadData.append(UInt8(0x02).bigEndian)
         
         var input: [Float16] = [value]
@@ -75,7 +90,7 @@ public class ConcreteExtendedDataV1 : ExtendedData {
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: Float32) {
-        payloadData.append(code.rawValue.bigEndian)
+        payloadData.append(code.bigEndian)
         payloadData.append(UInt8(0x04).bigEndian)
         
         var input: [Float] = [value]
@@ -90,13 +105,13 @@ public class ConcreteExtendedDataV1 : ExtendedData {
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: String) {
-        payloadData.append(code.rawValue.bigEndian)
+        payloadData.append(code.bigEndian)
         payloadData.append(UInt8(value.count).bigEndian)
         payloadData.append(value.data(using: .utf8)!)
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: Data) {
-        payloadData.append(code.rawValue.bigEndian)
+        payloadData.append(code.bigEndian)
         payloadData.append(UInt8(value.count).bigEndian)
         payloadData.append(value)
     }
