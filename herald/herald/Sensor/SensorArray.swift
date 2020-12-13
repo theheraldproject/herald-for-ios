@@ -16,7 +16,7 @@ public class SensorArray : NSObject, Sensor {
     public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
     
     private var concreteBle: ConcreteBLESensor?;
-
+    
     public init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
         // Location sensor is necessary for enabling background BLE advert detection
@@ -37,20 +37,35 @@ public class SensorArray : NSObject, Sensor {
         // Payload data at initiation time for identifying this device in the logs
         payloadData = payloadDataSupplier.payload(PayloadTimestamp(), device: nil)
         super.init()
-        
+        logger.debug("device (os=\(UIDevice.current.systemName)\(UIDevice.current.systemVersion),model=\(deviceModel()))")
+
         if let payloadData = payloadData {
-        
-        // Loggers
-        #if DEBUG
+            
+            // Loggers
+            #if DEBUG
             add(delegate: ContactLog(filename: "contacts.csv"))
             add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
-            add(delegate: StatisticsDidReadLog(filename: "statistics_didRead.csv", payloadData: payloadData))
             add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
             _ = BatteryLog(filename: "battery.csv")
-        #endif
-        logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
+            if BLESensorConfiguration.payloadDataUpdateTimeInterval != .never {
+                add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
+            }
+            #endif
+            logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
         } else {
             logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
+        }
+    }
+    
+    private func deviceModel() -> String {
+        var deviceInformation = utsname()
+        uname(&deviceInformation)
+        let mirror = Mirror(reflecting: deviceInformation.machine)
+        return mirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else {
+                return identifier
+            }
+            return identifier + String(UnicodeScalar(UInt8(value)))
         }
     }
     

@@ -98,7 +98,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.fault("start denied, not powered on")
             return
         }
-        if signalCharacteristic != nil, payloadCharacteristic != nil, legacyPayloadCharacteristic != nil {
+        if signalCharacteristic != nil, payloadCharacteristic != nil, (BLESensorConfiguration.legacyPayloadCharacteristicUUID == nil || legacyPayloadCharacteristic != nil) {
             logger.debug("starting advert with existing characteristics")
             if !peripheral.isAdvertising {
                 startAdvertising(withNewCharacteristics: false)
