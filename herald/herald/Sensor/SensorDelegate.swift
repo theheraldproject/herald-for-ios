@@ -97,7 +97,7 @@ public struct Proximity {
         return "\(unit.rawValue):\(value.description)[\(calibration.description)]"
     }}
     
-    init(unit: ProximityMeasurementUnit, value: Double, calibration: Calibration? = nil) {
+    public init(unit: ProximityMeasurementUnit, value: Double, calibration: Calibration? = nil) {
         self.unit = unit
         self.value = value
         self.calibration = calibration

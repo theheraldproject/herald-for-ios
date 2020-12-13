@@ -433,11 +433,21 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let target = targets[indexPath.row]
-        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
-            return
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "targetvc") as? UIViewController {
+            self.present(viewController, animated: true, completion: {
+                self.logger.debug("completion callback - phone")
+                //viewController.presentationController?.delegate = self
+                if let tdvc = viewController as? TargetDetailsViewController {
+                    tdvc.display(target.targetIdentifier, payload: target.payloadData)
+                }
+            })
         }
-        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
-        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
+//        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
+//            return
+//        }
+//        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
+//        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
     }
 }
 

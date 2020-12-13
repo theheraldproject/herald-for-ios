@@ -320,7 +320,7 @@ public class VenueEncounter {
     }}
     
     /// Create encounter instance from source data
-    init?(_ didMeasure: Proximity, _ withPayload: PayloadData, timestamp: Date = Date()) throws {
+    public init?(_ didMeasure: Proximity, _ withPayload: PayloadData, timestamp: Date = Date()) throws {
         self.timestamp = timestamp
         self.proximity = didMeasure
         self.payload = withPayload

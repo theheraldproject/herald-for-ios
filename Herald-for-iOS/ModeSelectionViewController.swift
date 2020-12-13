@@ -45,6 +45,7 @@ class ModeSelectionViewController: UIViewController, UIAdaptivePresentationContr
     /// MARK: UIAdaptivePresentationControllerDelegate
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         self.logger.debug("presentationControllerDidDismiss")
+        // TODO ensure this doesn't get called if a popup from a subview if cancelled
         self.appDelegate.stopBluetooth()
     }
 }

@@ -14,12 +14,15 @@ extension Date {
 
 }
 extension Data {
-    struct HexEncodingOptions: OptionSet {
-        let rawValue: Int
-        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
+    public struct HexEncodingOptions: OptionSet {
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+        public let rawValue: Int
+        public static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
     }
 
-    func hexEncodedString(options: HexEncodingOptions = []) -> String {
+    public func hexEncodedString(options: HexEncodingOptions = []) -> String {
         let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
         return map { String(format: format, $0) }.joined()
     }
