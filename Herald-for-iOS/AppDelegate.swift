@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         
     }
     
-    func endPhone() {
+    func stopPhone() {
         sensor?.stop()
     }
     
@@ -73,8 +73,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         sensor?.start()
     }
     
-    func endBeacon() {
+    func stopBeacon() {
         sensor?.stop()
+    }
+    
+    public func stopBluetooth() {
+        if phoneMode {
+            stopPhone()
+        } else {
+            stopBeacon()
+        }
     }
     
     // MARK:- UIApplicationDelegate
@@ -97,11 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         logger.debug("applicationWillTerminate")
-        if phoneMode {
-            stopPhone()
-        } else {
-            stopBeacon()
-        }
+//        stopBluetooth()
     }
     
     // MARK:- SensorDelegate

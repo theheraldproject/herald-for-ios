@@ -8,7 +8,7 @@
 import UIKit
 import Herald
 
-class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: SensorArray!
@@ -80,6 +80,10 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Now enable phone mode - initialises SensorArray
+        appDelegate.startPhone()
+        
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
@@ -102,6 +106,7 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        
     }
 
     @objc func willEnterForeground() {
