@@ -8,7 +8,8 @@
 import UIKit
 import Herald
 
-class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, VenueDiaryDelegate {
+    
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: SensorArray!
@@ -33,6 +34,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     @IBOutlet weak var labelDidMeasureCount: UILabel!
     @IBOutlet weak var labelDidShareCount: UILabel!
     @IBOutlet weak var labelDidReceiveCount: UILabel!
+    
+    // MARK:- Venue Diary
+    var venueDiary: VenueDiary?
     
     // MARK:- Social mixing
     
@@ -80,9 +84,21 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Now enable phone mode - initialises SensorArray
+        appDelegate.startPhone()
+        
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
+        
+        
+        // Added diary logger
+        if nil == venueDiary {
+            venueDiary = VenueDiary()
+        }
+        venueDiary!.add(self)
+        sensor.add(delegate: venueDiary!)
         
         dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         dateFormatterTime.dateFormat = "HH:mm:ss"
@@ -102,6 +118,7 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        
     }
 
     @objc func willEnterForeground() {
@@ -269,6 +286,12 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
             exit(1)
         }
     }
+    
+    // MARK:- VenueDiaryDelegate
+    func venue(_ didUpdate: VenueDiaryEvent) {
+        // highlight item as Venue in the UI
+        logger.debug("venue didUpdate")
+    }
 
     // MARK:- SensorDelegate
 
@@ -386,7 +409,22 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
             method = "\(method),Share"
         }
         let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
-        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]"
+        let shortName = target.payloadData.shortName
+        var txt = "\(shortName) [\(method)]"
+        venueDiary?.listRecordableEvents().forEach({ (evt) in
+            self.logger.debug("listRecordableEvents item")
+            guard let eventPayload = evt.payload else {
+                return
+            }
+            if eventPayload.shortName == shortName {
+                txt += " [Venue]"
+                // TODO set text to venue name, if providede
+                // TODO include area of venue on test UI too
+            } else {
+                self.logger.debug("listRecordableEvents  - shortNames don't match: \(shortName) vs. \(eventPayload.shortName)")
+            }
+        })
+        cell.textLabel?.text = txt
         cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
         return cell
     }
@@ -395,11 +433,21 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let target = targets[indexPath.row]
-        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
-            return
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "targetvc") as? UIViewController {
+            self.present(viewController, animated: true, completion: {
+                self.logger.debug("completion callback - phone")
+                //viewController.presentationController?.delegate = self
+                if let tdvc = viewController as? TargetDetailsViewController {
+                    tdvc.display(target.targetIdentifier, payload: target.payloadData)
+                }
+            })
         }
-        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
-        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
+//        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
+//            return
+//        }
+//        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
+//        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
     }
 }
 

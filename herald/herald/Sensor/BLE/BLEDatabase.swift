@@ -326,7 +326,7 @@ class BLEPseudoDeviceAddress {
         data = Data(manufacturerData.subdata(in: 2..<8))
         var longValueData = Data(repeating: 0, count: 2)
         longValueData.append(data)
-        guard let longValue = longValueData.int64(0) else {
+        guard let longValue = longValueData.uint64(0) else {
             return nil
         }
         address = Int64(longValue)

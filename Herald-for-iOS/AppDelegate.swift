@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     // Payload data supplier, sensor and contact log
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: SensorArray?
+    
+    var phoneMode = true
 
     /// Generate unique and consistent device identifier for testing detection and tracking
     private func identifier() -> Int32 {
@@ -34,6 +36,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
+        return true
+    }
+    
+    func startPhone() {
+        phoneMode = true
         payloadDataSupplier = MockSonarPayloadSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
@@ -43,7 +50,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         //let targetIdentifier: TargetIdentifier? // ... set its value
         //let success: Bool = sensor!.immediateSend(data: Data(), targetIdentifier!)
         
-        return true
+    }
+    
+    func stopPhone() {
+        sensor?.stop()
+    }
+    
+    func startBeacon(_ payloadSupplier: PayloadDataSupplier) {
+        phoneMode = false
+        sensor = SensorArray(payloadSupplier)
+        
+        // Add ourselves as delegate
+        sensor?.add(delegate: self)
+        sensor?.start()
+    }
+    
+    func stopBeacon() {
+        sensor?.stop()
+    }
+    
+    public func stopBluetooth() {
+        if phoneMode {
+            stopPhone()
+        } else {
+            stopBeacon()
+        }
     }
     
     // MARK:- UIApplicationDelegate
@@ -66,6 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         logger.debug("applicationWillTerminate")
+//        stopBluetooth()
     }
     
     // MARK:- SensorDelegate
