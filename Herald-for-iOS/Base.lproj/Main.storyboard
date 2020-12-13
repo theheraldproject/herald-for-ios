@@ -526,21 +526,44 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Beacon Mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fMa-Ay-BgZ">
-                                <rect key="frame" x="134" y="171" width="105" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Select your venue:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fMa-Ay-BgZ">
+                                <rect key="frame" x="20" y="79" width="141" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <pickerView contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CXA-00-YrW">
+                                <rect key="frame" x="20" y="108" width="374" height="50"/>
+                            </pickerView>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lK3-fN-gXy">
+                                <rect key="frame" x="20" y="183" width="374" height="30"/>
+                                <state key="normal" title="Begin Beaconing"/>
+                                <connections>
+                                    <action selector="beginBeaconing:" destination="3CM-JC-4yq" eventType="touchUpInside" id="tUq-ke-X1v"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="IcR-vd-w7y"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="fMa-Ay-BgZ" firstAttribute="top" secondItem="IcR-vd-w7y" secondAttribute="top" constant="35" id="6MK-Cw-I8H"/>
+                            <constraint firstItem="lK3-fN-gXy" firstAttribute="leading" secondItem="IcR-vd-w7y" secondAttribute="leading" constant="20" id="Ijo-YV-8K6"/>
+                            <constraint firstItem="fMa-Ay-BgZ" firstAttribute="leading" secondItem="IcR-vd-w7y" secondAttribute="leading" constant="20" id="K8a-Cu-rTR"/>
+                            <constraint firstItem="IcR-vd-w7y" firstAttribute="trailing" secondItem="lK3-fN-gXy" secondAttribute="trailing" constant="20" id="ShC-20-nhN"/>
+                            <constraint firstItem="CXA-00-YrW" firstAttribute="leading" secondItem="IcR-vd-w7y" secondAttribute="leading" constant="20" id="Ueb-Qu-bTx"/>
+                            <constraint firstItem="IcR-vd-w7y" firstAttribute="trailing" secondItem="CXA-00-YrW" secondAttribute="trailing" constant="20" id="eNF-VK-UTa"/>
+                            <constraint firstItem="CXA-00-YrW" firstAttribute="top" secondItem="fMa-Ay-BgZ" secondAttribute="bottom" constant="8" symbolic="YES" id="h98-4m-Pry"/>
+                            <constraint firstItem="lK3-fN-gXy" firstAttribute="top" secondItem="CXA-00-YrW" secondAttribute="bottom" constant="25" id="k7p-Pw-dHD"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="buttonStart" destination="lK3-fN-gXy" id="5L1-9d-N61"/>
+                        <outlet property="pickerVenue" destination="CXA-00-YrW" id="AQd-h8-IIZ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="X6B-5n-dKG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="842" y="867"/>
+            <point key="canvasLocation" x="840.57971014492762" y="866.51785714285711"/>
         </scene>
     </scenes>
     <resources>

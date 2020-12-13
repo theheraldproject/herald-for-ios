@@ -8,7 +8,8 @@
 import UIKit
 import Herald
 
-class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, VenueDiaryDelegate {
+    
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var sensor: SensorArray!
@@ -33,6 +34,9 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     @IBOutlet weak var labelDidMeasureCount: UILabel!
     @IBOutlet weak var labelDidShareCount: UILabel!
     @IBOutlet weak var labelDidReceiveCount: UILabel!
+    
+    // MARK:- Venue Diary
+    var venueDiary: VenueDiary?
     
     // MARK:- Social mixing
     
@@ -87,6 +91,14 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
+        
+        
+        // Added diary logger
+        if nil == venueDiary {
+            venueDiary = VenueDiary()
+        }
+        venueDiary!.add(self)
+        sensor.add(delegate: venueDiary!)
         
         dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         dateFormatterTime.dateFormat = "HH:mm:ss"
@@ -274,6 +286,12 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
             exit(1)
         }
     }
+    
+    // MARK:- VenueDiaryDelegate
+    func venue(_ didUpdate: VenueDiaryEvent) {
+        // highlight item as Venue in the UI
+        logger.debug("venue didUpdate")
+    }
 
     // MARK:- SensorDelegate
 
@@ -391,7 +409,22 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
             method = "\(method),Share"
         }
         let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
-        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]"
+        let shortName = target.payloadData.shortName
+        var txt = "\(shortName) [\(method)]"
+        venueDiary?.listRecordableEvents().forEach({ (evt) in
+            self.logger.debug("listRecordableEvents item")
+            guard let eventPayload = evt.payload else {
+                return
+            }
+            if eventPayload.shortName == shortName {
+                txt += " [Venue]"
+                // TODO set text to venue name, if providede
+                // TODO include area of venue on test UI too
+            } else {
+                self.logger.debug("listRecordableEvents  - shortNames don't match: \(shortName) vs. \(eventPayload.shortName)")
+            }
+        })
+        cell.textLabel?.text = txt
         cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
         return cell
     }

@@ -18,8 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: SensorArray?
     
-    var venueDiary: VenueDiary?
-    
     var phoneMode = true
 
     /// Generate unique and consistent device identifier for testing detection and tracking
@@ -61,12 +59,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     func startBeacon(_ payloadSupplier: PayloadDataSupplier) {
         phoneMode = false
         sensor = SensorArray(payloadSupplier)
-        
-        // Added diary logger
-        if nil == venueDiary {
-            venueDiary = VenueDiary()
-            sensor?.add(delegate: venueDiary!)
-        }
         
         // Add ourselves as delegate
         sensor?.add(delegate: self)

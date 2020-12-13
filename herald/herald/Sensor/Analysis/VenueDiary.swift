@@ -7,6 +7,10 @@
 
 import Foundation
 
+public protocol VenueDiaryDelegate {
+    func venue(_ didUpdate: VenueDiaryEvent)
+}
+
 ///
 /// Represents a Venue Diary event.
 ///
@@ -33,6 +37,9 @@ public class VenueDiaryEvent: NSObject {
     private var recordable: Bool
     /// Has this diary record exceeded the 'no long here' time?
     private var closed: Bool
+    
+    /// Last received payload
+    public var payload: PayloadData? = nil
     
     // TODO add supports for within-venue subdivisions (rooms, dining areas, etc.)
     
@@ -139,6 +146,12 @@ public class VenueDiary: NSObject, SensorDelegate {
     private let queue: DispatchQueue
     private var encounters: [VenueDiaryEvent] = []
     
+    var delegates: [VenueDiaryDelegate] = []
+    
+    public func add(_ delegate: VenueDiaryDelegate) {
+        delegates.append(delegate)
+    }
+    
     public override init() {
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         queue = DispatchQueue(label: "Sensor.Analysis.VenueDiary")
@@ -165,6 +178,7 @@ public class VenueDiary: NSObject, SensorDelegate {
     
     /// Find a contact event and add to it, or create a new one
     public func findOrCreateEvent(country: UInt16,state:UInt16,venue:UInt32,seen at: Date, with payload: PayloadData?) -> VenueDiaryEvent {
+        logger.debug("findOrCreateEvent (country=\(country), state=\(state), venue=\(venue)")
         // TODO ensure events are ordered by isClosed(false then true), and then lastSeen time
         // find in list by country, state, code, and isClosed == false
         for evt in encounters {
@@ -174,6 +188,10 @@ public class VenueDiary: NSObject, SensorDelegate {
                 // If not, then it adds time, so is fine
                 let extends = evt.addPresenceIfSameEvent(at)
                 if extends {
+                    evt.payload = payload
+                    delegates.forEach({ (delegate) in
+                        delegate.venue(evt)
+                    })
                     return evt
                 }
                 // We don't break because there may be multiple events for the same venue
@@ -184,6 +202,10 @@ public class VenueDiary: NSObject, SensorDelegate {
         // TODO use payload somewhere
         let newEvent = VenueDiaryEvent(country: country, state: state, venue: venue, firstSeen: at)
         encounters.append(newEvent)
+        newEvent.payload = payload
+        delegates.forEach({ (delegate) in
+            delegate.venue(newEvent)
+        })
         return newEvent
     }
     
@@ -205,8 +227,8 @@ public class VenueDiary: NSObject, SensorDelegate {
     
     /// Return all recordable events
     public func listRecordableEvents() -> [VenueDiaryEvent] {
-        // DUMMY for TDD
-        return []
+        // DUMMY for TDD - TODO filter for actual recordable events
+        return encounters
     }
     
     /// Return latest diary event, optionally may return latest that isn't yet recordable (so you can monitor the feature in a UI)
@@ -233,11 +255,13 @@ public class VenueDiary: NSObject, SensorDelegate {
     }
     
     public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {
-        // TODO parse payload if venue
-        guard sensor == SensorType.BEACON || sensor == SensorType.BLMESH else {
+        logger.debug("VenueDiary.sensor didMeasure withPayload")
+        // parse payload if venue
+        guard sensor == SensorType.BLE || sensor == SensorType.BEACON || sensor == SensorType.BLMESH else {
             // Not going to be a useful payload, so return
             return
         }
+        logger.debug("VenueDiary.sensor didMeasure withPayload - valid payload")
         
         do {
             guard let encounter = try VenueEncounter(didMeasure, withPayload) else {
@@ -250,12 +274,6 @@ public class VenueDiary: NSObject, SensorDelegate {
             logger.fault("Error parsing Beacon payload: \(error)")
             return
         }
-        // DUMMY for TDD
-        return
-        // TODO find existing event
-        // If none, create
-        // If found, add time
-        // If add fails, create new check in and add
     }
 }
 
