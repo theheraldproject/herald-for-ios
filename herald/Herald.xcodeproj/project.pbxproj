@@ -406,11 +406,8 @@
 				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
-<<<<<<< HEAD
 				6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */,
 				B6C41BE3255951B700F7E9FB /* StatisticsDidReadLog.swift in Sources */,
-=======
->>>>>>> develop
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
 				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
 				B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */,
