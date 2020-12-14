@@ -396,36 +396,37 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "targetIdentifier", for: indexPath)
         let target = targets[indexPath.row]
-        var method = "Read"
+        // Event time interval statistics
+        var statistics = "R"
         if let mean = target.didReadTimeInterval.mean {
-            let didReadTimeInterval = String(format: "%.1f", mean)
-            method = "\(method)=\(didReadTimeInterval)s"
+            statistics = "\(statistics)=\(String(format: "%.1f", mean))s"
         }
         if let mean = target.didMeasureTimeInterval.mean {
-            let didMeasureTimeInterval = String(format: "%.1f", mean)
-            method = "\(method),Measure=\(didMeasureTimeInterval)s"
+            statistics = "\(statistics),M=\(String(format: "%.1f", mean))s"
         }
-        if target.didShare != nil {
-            method = "\(method),Share"
+        if let mean = target.didShareTimeInterval.mean {
+            statistics = "\(statistics),S=\(String(format: "%.1f", mean))s"
         }
-        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
+//        // Immediate send : Superceded in full UI
+//        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
+        // Venue
         let shortName = target.payloadData.shortName
-        var txt = "\(shortName) [\(method)]"
+        var labelText = "\(shortName)"
         venueDiary?.listRecordableEvents().forEach({ (evt) in
             self.logger.debug("listRecordableEvents item")
             guard let eventPayload = evt.payload else {
                 return
             }
             if eventPayload.shortName == shortName {
-                txt += " [Venue]"
-                // TODO set text to venue name, if providede
+                labelText += " (Venue)"
+                // TODO set text to venue name, if provided
                 // TODO include area of venue on test UI too
             } else {
                 self.logger.debug("listRecordableEvents  - shortNames don't match: \(shortName) vs. \(eventPayload.shortName)")
             }
         })
-        cell.textLabel?.text = txt
-        cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
+        cell.textLabel?.text = labelText
+        cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt)) [\(statistics)]"
         return cell
     }
 
@@ -494,9 +495,17 @@ private class Target {
     var didMeasure: Date?
     let didMeasureTimeInterval = Sample()
     var didShare: Date? {
+        willSet(date) {
+            if let date = date, let didShare = didShare {
+                didShareTimeInterval.add(date.timeIntervalSince(didShare))
+            }
+        }
         didSet {
-            lastUpdatedAt = didRead
+            if let didShare = didShare {
+                lastUpdatedAt = didShare
+            }
         }}
+    let didShareTimeInterval = Sample()
     var didReceive: Date?
     init(targetIdentifier: TargetIdentifier, payloadData: PayloadData) {
         self.targetIdentifier = targetIdentifier
