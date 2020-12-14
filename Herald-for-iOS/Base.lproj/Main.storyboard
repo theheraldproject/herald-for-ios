@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="y7g-Ib-WPs">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="y7g-Ib-WPs">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -17,44 +17,62 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Welcome to the Herald Demo app" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oor-Uh-6Ag">
-                                <rect key="frame" x="31" y="110" width="257" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Demonstration App" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oor-Uh-6Ag">
+                                <rect key="frame" x="90" y="211" width="234" height="33.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="herald" translatesAutoresizingMaskIntoConstraints="NO" id="4PD-1r-il2">
+                                <rect key="frame" x="0.0" y="44" width="414" height="159"/>
+                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Mbr-hE-UF4" userLabel="Modes">
+                                <rect key="frame" x="0.0" y="303" width="414" height="30"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SK7-l7-E2M">
+                                        <rect key="frame" x="0.0" y="0.0" width="207" height="30"/>
+                                        <state key="normal" title="Venue Beacon"/>
+                                        <connections>
+                                            <action selector="openVenueBeaconMode:" destination="y7g-Ib-WPs" eventType="touchUpInside" id="chx-6b-i09"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y2W-YN-LAr">
+                                        <rect key="frame" x="207" y="0.0" width="207" height="30"/>
+                                        <state key="normal" title="Personal Phone"/>
+                                        <connections>
+                                            <action selector="openPhoneMode:" destination="y7g-Ib-WPs" eventType="touchUpInside" id="79y-BZ-qdk"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please select a mode for this phone" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GAB-ow-6Uv">
+                                <rect key="frame" x="71.5" y="252.5" width="271" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please select a mode for this phone" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GAB-ow-6Uv">
-                                <rect key="frame" x="24" y="180" width="271" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SK7-l7-E2M">
-                                <rect key="frame" x="57" y="260" width="141" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Venue Beacon Mode"/>
-                                <connections>
-                                    <action selector="openVenueBeaconMode:" destination="y7g-Ib-WPs" eventType="touchUpInside" id="chx-6b-i09"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y2W-YN-LAr">
-                                <rect key="frame" x="57" y="348" width="150" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Personal Phone Mode"/>
-                                <connections>
-                                    <action selector="openPhoneMode:" destination="y7g-Ib-WPs" eventType="touchUpInside" id="79y-BZ-qdk"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="7wb-0Z-Gt4"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="4PD-1r-il2" firstAttribute="centerX" secondItem="mmG-8k-OvQ" secondAttribute="centerX" id="34p-JO-uzS"/>
+                            <constraint firstItem="GAB-ow-6Uv" firstAttribute="centerX" secondItem="mmG-8k-OvQ" secondAttribute="centerX" id="7nQ-qd-GOL"/>
+                            <constraint firstItem="4PD-1r-il2" firstAttribute="top" secondItem="7wb-0Z-Gt4" secondAttribute="top" id="9cu-KE-eck"/>
+                            <constraint firstItem="Mbr-hE-UF4" firstAttribute="leading" secondItem="7wb-0Z-Gt4" secondAttribute="leading" id="GfL-Zw-ow7"/>
+                            <constraint firstItem="4PD-1r-il2" firstAttribute="leading" secondItem="mmG-8k-OvQ" secondAttribute="leading" id="NqC-qO-NKc"/>
+                            <constraint firstItem="7wb-0Z-Gt4" firstAttribute="trailing" secondItem="Mbr-hE-UF4" secondAttribute="trailing" id="Olu-Qv-1QQ"/>
+                            <constraint firstItem="Oor-Uh-6Ag" firstAttribute="centerX" secondItem="mmG-8k-OvQ" secondAttribute="centerX" id="Rlm-4r-Mjb"/>
+                            <constraint firstItem="Mbr-hE-UF4" firstAttribute="centerX" secondItem="mmG-8k-OvQ" secondAttribute="centerX" id="YeR-qr-xnp"/>
+                            <constraint firstItem="Mbr-hE-UF4" firstAttribute="top" secondItem="GAB-ow-6Uv" secondAttribute="bottom" constant="30" id="cYE-Yb-qSV"/>
+                            <constraint firstItem="GAB-ow-6Uv" firstAttribute="top" secondItem="Oor-Uh-6Ag" secondAttribute="bottom" constant="8" symbolic="YES" id="ky8-nz-dut"/>
+                            <constraint firstAttribute="trailing" secondItem="4PD-1r-il2" secondAttribute="trailing" id="tM7-wb-ndk"/>
+                            <constraint firstItem="Oor-Uh-6Ag" firstAttribute="top" secondItem="4PD-1r-il2" secondAttribute="bottom" constant="8" symbolic="YES" id="w2l-5T-p0d"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I5h-JF-fL3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-696" y="522"/>
+            <point key="canvasLocation" x="-697.10144927536237" y="521.65178571428567"/>
         </scene>
         <!--Phone Mode View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -893,6 +911,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="herald" width="447" height="159"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
