@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F47E13E25871B29003D3042 /* VenueDiaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F47E13D25871B29003D3042 /* VenueDiaryViewController.swift */; };
+		6F47E14225871EE4003D3042 /* VenueDiaryEventCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F47E14125871EE4003D3042 /* VenueDiaryEventCell.swift */; };
 		6FBC6F2625868ED8001A86CE /* ModeSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBC6F2525868ED8001A86CE /* ModeSelectionViewController.swift */; };
 		6FBC6F2825868FAF001A86CE /* VenueModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBC6F2725868FAF001A86CE /* VenueModeViewController.swift */; };
 		6FBC6F2C2586B8D8001A86CE /* TargetDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBC6F2B2586B8D8001A86CE /* TargetDetailsViewController.swift */; };
@@ -52,6 +54,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6F47E13D25871B29003D3042 /* VenueDiaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueDiaryViewController.swift; sourceTree = "<group>"; };
+		6F47E14125871EE4003D3042 /* VenueDiaryEventCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueDiaryEventCell.swift; sourceTree = "<group>"; };
 		6FBC6F2525868ED8001A86CE /* ModeSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSelectionViewController.swift; sourceTree = "<group>"; };
 		6FBC6F2725868FAF001A86CE /* VenueModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueModeViewController.swift; sourceTree = "<group>"; };
 		6FBC6F2B2586B8D8001A86CE /* TargetDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetDetailsViewController.swift; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 				6FBC6F2525868ED8001A86CE /* ModeSelectionViewController.swift */,
 				6FBC6F2725868FAF001A86CE /* VenueModeViewController.swift */,
 				6FBC6F2B2586B8D8001A86CE /* TargetDetailsViewController.swift */,
+				6F47E13D25871B29003D3042 /* VenueDiaryViewController.swift */,
+				6F47E14125871EE4003D3042 /* VenueDiaryEventCell.swift */,
 			);
 			path = "Herald-for-iOS";
 			sourceTree = "<group>";
@@ -231,7 +237,9 @@
 			files = (
 				6FBC6F2C2586B8D8001A86CE /* TargetDetailsViewController.swift in Sources */,
 				B692CA9824CADA7500F45AEE /* PhoneModeViewController.swift in Sources */,
+				6F47E14225871EE4003D3042 /* VenueDiaryEventCell.swift in Sources */,
 				B692CA9424CADA7500F45AEE /* AppDelegate.swift in Sources */,
+				6F47E13E25871B29003D3042 /* VenueDiaryViewController.swift in Sources */,
 				6FBC6F2825868FAF001A86CE /* VenueModeViewController.swift in Sources */,
 				6FBC6F2625868ED8001A86CE /* ModeSelectionViewController.swift in Sources */,
 				B6B733BD2513F4F1000DF74C /* Log.swift in Sources */,

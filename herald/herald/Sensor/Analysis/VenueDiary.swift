@@ -41,6 +41,9 @@ public class VenueDiaryEvent: NSObject {
     /// Last received payload
     public var payload: PayloadData? = nil
     
+    /// Optional name (Decoded from ExtendedData value)
+    private var name: String? = nil
+    
     // TODO add supports for within-venue subdivisions (rooms, dining areas, etc.)
     
     public init(country: UInt16, state: UInt16, venue code: UInt32, firstSeen at: Date) {
@@ -103,6 +106,13 @@ public class VenueDiaryEvent: NSObject {
         return lastTime - firstTime
     }
     
+    public func setName(name: String?) {
+        self.name = name
+    }
+    
+    public func getName() -> String? {
+        return name
+    }
 }
 
 public class UniqueVenue {
