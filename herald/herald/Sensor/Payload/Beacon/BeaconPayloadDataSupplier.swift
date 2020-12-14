@@ -20,10 +20,10 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
     private let payloadLength: Int = 9 // default, may be more with extended data area
     private var commonHeader: Data // 5 bytes
     private var codePayload: Data // 4 bytes
-    private var extendedData: Data // 0+ bytes
+    private var extendedData: ExtendedData? // 0+ bytes
     private var fullPayload: Data // 9+ bytes
     
-    public init(countryCode: UInt16, stateCode: UInt16, code: UInt32) {
+    public init(countryCode: UInt16, stateCode: UInt16, code: UInt32, extendedData: ExtendedData? = nil) {
         // Generate common header
         // All data is big endian
         var protocolAndVersionValue = ConcreteBeaconPayloadDataSupplierV1.protocolAndVersion.bigEndian
@@ -46,11 +46,15 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
         var fullPayload = Data()
         fullPayload.append(commonHeader)
         fullPayload.append(codePayload)
-        self.extendedData = Data()
+        self.extendedData = extendedData
+        if let extended = extendedData {
+            // append to payload
+            if extended.hasData() {
+                fullPayload.append(extended.payload()!)
+            }
+        }
         self.fullPayload = fullPayload
     }
-    
-    // TODO append extended data segment method call
     
     // MARK:- SimplePayloadDataSupplier
     

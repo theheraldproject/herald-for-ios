@@ -449,6 +449,19 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
 //        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
 //        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
     }
+    
+    @IBAction func showVenueDiary(_ sender: UIButton) {
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "venuediaryvc") as? UIViewController {
+            self.present(viewController, animated: true, completion: {
+                self.logger.debug("completion callback - venue diary")
+                if let vdvc = viewController as? VenueDiaryViewController {
+                    self.logger.debug(" - Got VenueDiaryViewController")
+                    vdvc.setDiary(self.venueDiary!)
+                }
+            })
+        }
+    }
 }
 
 /// Detected target

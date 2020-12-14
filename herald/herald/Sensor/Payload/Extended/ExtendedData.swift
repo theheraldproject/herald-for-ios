@@ -41,6 +41,18 @@ public enum ExtendedDataSegmentCodesV1 : UInt8 {
     case LocationUrl = 0x13
 }
 
+public class ConcreteExtendedDataSectionV1 {
+    public var code: UInt8
+    public var length: UInt8
+    public var data: Data
+    
+    public init(code: UInt8, length: UInt8, data: Data) {
+        self.code = code
+        self.length = length
+        self.data = data
+    }
+}
+
 /// Beacon payload data supplier.
 public class ConcreteExtendedDataV1 : ExtendedData {
     var payloadData : PayloadData
@@ -116,4 +128,34 @@ public class ConcreteExtendedDataV1 : ExtendedData {
         payloadData.append(value)
     }
     
+    // MARK:- V1 only methods
+    
+    public func getSections() -> [ConcreteExtendedDataSectionV1] {
+        var sections : [ConcreteExtendedDataSectionV1] = []
+        var pos = 0
+        // read code
+        while pos < payloadData.count {
+            if payloadData.count - 2 <= pos { // at least 3 in length
+                pos = payloadData.count
+                continue
+            }
+            // read code
+            let code = payloadData.uint8(pos)!
+            pos = pos + 1
+            // read length
+            var length = payloadData[pos]
+            pos = pos + 1
+            // sanity check length
+            if pos + Int(length) > payloadData.count {
+                length = UInt8(payloadData.count - pos)
+            }
+            // extract data
+            let data = payloadData.subdata(in: pos..<(pos+Int(length)))
+            
+            sections.append(ConcreteExtendedDataSectionV1(code: code, length: length, data: data))
+            
+            // repeat
+        }
+        return sections
+    }
 }
