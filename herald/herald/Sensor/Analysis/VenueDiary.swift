@@ -41,15 +41,19 @@ public class VenueDiaryEvent: NSObject {
     /// Last received payload
     public var payload: PayloadData? = nil
     
+    /// Optional extended data
+    public var extended: ExtendedData? = nil
+    
     /// Optional name (Decoded from ExtendedData value)
     private var name: String? = nil
     
     // TODO add supports for within-venue subdivisions (rooms, dining areas, etc.)
     
-    public init(country: UInt16, state: UInt16, venue code: UInt32, firstSeen at: Date) {
+    public init(country: UInt16, state: UInt16, venue code: UInt32, name: String? = nil, firstSeen at: Date) {
         self.country = country
         self.state = state
         self.code = code
+        self.name = name
         firstTime = at
         lastTime = at
         recordable = false // not until we exceed the necessary MINIMUM check in time
@@ -124,10 +128,14 @@ public class UniqueVenue {
     // The unique venue code
     private let code: UInt32
     
-    public init(country: UInt16, state: UInt16, venue: UInt32) {
+    // Name
+    private let name: String?
+    
+    public init(country: UInt16, state: UInt16, venue: UInt32, name: String? = nil) {
         self.country = country
         self.state = state
         self.code = venue
+        self.name = name
     }
     
     public func getCountry() -> UInt16 {
@@ -140,6 +148,13 @@ public class UniqueVenue {
     
     public func getCode() -> UInt32 {
         return code
+    }
+    
+    public func getName() -> String {
+        guard let name = name else {
+            return "Unknown"
+        }
+        return name
     }
 }
 
@@ -187,7 +202,8 @@ public class VenueDiary: NSObject, SensorDelegate {
     }
     
     /// Find a contact event and add to it, or create a new one
-    public func findOrCreateEvent(country: UInt16,state:UInt16,venue:UInt32,seen at: Date, with payload: PayloadData?) -> VenueDiaryEvent {
+    public func findOrCreateEvent(country: UInt16,state:UInt16,venue:UInt32,
+                                  name: String? = nil, extended: ExtendedData? = nil, seen at: Date, with payload: PayloadData?) -> VenueDiaryEvent {
         logger.debug("findOrCreateEvent (country=\(country), state=\(state), venue=\(venue)")
         // TODO ensure events are ordered by isClosed(false then true), and then lastSeen time
         // find in list by country, state, code, and isClosed == false
@@ -199,6 +215,7 @@ public class VenueDiary: NSObject, SensorDelegate {
                 let extends = evt.addPresenceIfSameEvent(at)
                 if extends {
                     evt.payload = payload
+                    evt.extended = extended
                     delegates.forEach({ (delegate) in
                         delegate.venue(evt)
                     })
@@ -210,7 +227,8 @@ public class VenueDiary: NSObject, SensorDelegate {
         // If so, create a new event and return; OR
         // If not found, create a new event and return
         // TODO use payload somewhere
-        let newEvent = VenueDiaryEvent(country: country, state: state, venue: venue, firstSeen: at)
+        let newEvent = VenueDiaryEvent(country: country, state: state, venue: venue,
+                                       name: name, firstSeen: at)
         encounters.append(newEvent)
         newEvent.payload = payload
         delegates.forEach({ (delegate) in
@@ -260,6 +278,8 @@ public class VenueDiary: NSObject, SensorDelegate {
         return findOrCreateEvent(country: venue.getCountry(),
                                   state: venue.getState(),
                                   venue: venue.getCode(),
+                                  name: venue.getName(),
+                                  extended: encounter.getExtended(),
                                   seen: at,
                                   with: payload)
     }
@@ -395,9 +415,16 @@ public class VenueEncounter {
         logger.debug("stateData: \(stateData.hexEncodedString(options: .upperCase))")
         let venueCodeData : Data = payload.subdata(in: 5..<9) // bytes at pos 5 and 6 and 7 and 8
         logger.debug("venueCodeData: \(venueCodeData.hexEncodedString(options: .upperCase))")
-        var ed : ExtendedData? = nil
+        var ed : ConcreteExtendedDataV1? = nil
+        var name: String? = nil
         if (payload.count > 9) {
             ed = ConcreteExtendedDataV1(payload.subdata(in: 9..<payload.count))
+            let sections = ed!.getSections()
+            for section in sections {
+                if section.code == ExtendedDataSegmentCodesV1.TextPremises.rawValue {
+                    name = String(bytes: section.data, encoding: .utf8)
+                }
+            }
         }
         // If parsing fails, throw
         // If all succeeds, set members
@@ -407,8 +434,13 @@ public class VenueEncounter {
         logger.debug("countryInt: \(countryInt), stateInt: \(stateInt), venueInt: \(codeInt)")
         let uv : UniqueVenue = UniqueVenue(country: countryInt,
                                            state: stateInt,
-                                           venue: codeInt)
+                                           venue: codeInt,
+                                           name: name)
         self.venueData = uv
         self.extendedData = ed
+    }
+    
+    public func getExtended() -> ExtendedData? {
+        return extendedData
     }
 }

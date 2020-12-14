@@ -16,16 +16,16 @@ class VenueModeViewController: UIViewController, UIPickerViewDelegate, UIPickerV
     @IBOutlet weak var pickerVenue: UIPickerView!
     @IBOutlet weak var buttonStart: UIButton!
     
-    var venues : [UInt32] = []
+    var venues : [UniqueVenue] = []
     
-    var venueCodeSelected : UInt32? = nil
+    var venueSelected : UniqueVenue? = nil
     
     override func viewDidLoad() {
         // Initialise list of venues - just codes for now
-        venues.append(UInt32(12345))
-        venues.append(UInt32(22334))
-        venues.append(UInt32(55566))
-        venues.append(UInt32(123123))
+        venues.append(UniqueVenue(country: 826, state: 4, venue: UInt32(12345), name: "Joe's Pizza"))
+        venues.append(UniqueVenue(country: 826, state: 3, venue: UInt32(22334), name: "Adam's Fish Shop"))
+        venues.append(UniqueVenue(country: 832, state: 1, venue: UInt32(55566), name: "Max's Fine Dining"))
+        venues.append(UniqueVenue(country: 826, state: 4, venue: UInt32(123123), name: "Erin's Stakehouse"))
         
         pickerVenue.delegate = self
         pickerVenue.dataSource = self
@@ -34,13 +34,16 @@ class VenueModeViewController: UIViewController, UIPickerViewDelegate, UIPickerV
     }
     
     @IBAction func beginBeaconing(_ sender: UIButton) {
-        guard let venueCodeSelected = venueCodeSelected else {
+        guard let venueSelected = venueSelected else {
             return
         }
-        logger.debug("beginBeaconing for: \(venueCodeSelected)")
+        logger.debug("beginBeaconing for: \(venueSelected.getName())")
         
         // Now enable phone mode - initialises SensorArray
-        appDelegate.startBeacon(ConcreteBeaconPayloadDataSupplierV1(countryCode: 826, stateCode: 4, code: venueCodeSelected))
+        let ext = ConcreteExtendedDataV1()
+        ext.addSection(code: ExtendedDataSegmentCodesV1.TextPremises.rawValue , value: venueSelected.getName())
+        let pds = ConcreteBeaconPayloadDataSupplierV1(countryCode: venueSelected.getCountry(), stateCode: venueSelected.getState(), code: venueSelected.getCode(), extendedData: ext)
+        appDelegate.startBeacon(pds)
         
         sensor = appDelegate.sensor
     }
@@ -55,12 +58,12 @@ class VenueModeViewController: UIViewController, UIPickerViewDelegate, UIPickerV
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return "\(venues[row])"
+        return venues[row].getName()
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        venueCodeSelected = venues[row]
-        logger.debug("Selected: \(venueCodeSelected!)")
+        venueSelected = venues[row]
+        logger.debug("Selected: \(venueSelected!.getName())")
     }
     
 }
