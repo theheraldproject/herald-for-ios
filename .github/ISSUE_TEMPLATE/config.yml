@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Herald project website
+    url: https://vmware.github.io/herald
+    about: Our main project website for information
+  - name: Developer and integration guides
+    url: https://vmware.github.io/herald/guide/
+    about: Please review this guide for how to integrate Herald with your application
+  - name: Security HackerOne page
+    url: https://hackerone.com/vmware?type=team
+    about: VMware's HackerOne vulnerability disclosure programme
+  - name: Herald community
+    url: https://vmware.github.io/herald/community
+    about: Please join the Herald community to ask questions and get involved with development
