@@ -2,7 +2,7 @@
 name: Security report
 about: Report a specific security concern
 title: 'Security Report'
-labels: 'verify','security'
+labels: 'verify'
 assignees: ''
 
 ---
