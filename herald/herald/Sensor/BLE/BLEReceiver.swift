@@ -554,7 +554,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let targetIdentifier = TargetIdentifier(peripheral: peripheral)
         logger.debug("disconnect (source=\(source),peripheral=\(targetIdentifier))")
         guard peripheral.state == .connected || peripheral.state == .connecting else {
-            logger.fault("disconnect denied, peripheral not connected or connecting (source=\(source),peripheral=\(targetIdentifier))")
+            logger.fault("disconnect denied, peripheral not connected or connecting (source=\(source),peripheral=\(targetIdentifier),state=\(peripheral.state))")
             return
         }
         queue.async { self.central.cancelPeripheralConnection(peripheral) }

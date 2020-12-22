@@ -158,18 +158,24 @@ public class BLEDevice : Device {
     /// Service characteristic for signalling between BLE devices, e.g. to keep awake
     var signalCharacteristic: CBCharacteristic? {
         didSet {
-            lastUpdatedAt = Date()
+            if signalCharacteristic != nil {
+                lastUpdatedAt = Date()
+            }
             delegate.device(self, didUpdate: .signalCharacteristic)
         }}
     /// Service characteristic for reading payload data
     var payloadCharacteristic: CBCharacteristic? {
         didSet {
-            lastUpdatedAt = Date()
+            if payloadCharacteristic != nil {
+                lastUpdatedAt = Date()
+            }
             delegate.device(self, didUpdate: .payloadCharacteristic)
         }}
     var legacyPayloadCharacteristic: CBCharacteristic? {
         didSet {
-            lastUpdatedAt = Date()
+            if legacyPayloadCharacteristic != nil {
+                lastUpdatedAt = Date()
+            }
             delegate.device(self, didUpdate: .payloadCharacteristic)
         }}
     /// Device operating system, this is necessary for selecting different interaction procedures for each platform.
@@ -326,7 +332,7 @@ class BLEPseudoDeviceAddress {
         data = Data(manufacturerData.subdata(in: 2..<8))
         var longValueData = Data(repeating: 0, count: 2)
         longValueData.append(data)
-        guard let longValue = longValueData.uint64(0) else {
+        guard let longValue = longValueData.int64(0) else {
             return nil
         }
         address = Int64(longValue)
