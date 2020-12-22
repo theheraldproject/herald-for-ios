@@ -335,6 +335,6 @@ class BLEPseudoDeviceAddress {
         guard let longValue = longValueData.int64(0) else {
             return nil
         }
-        address = Int64(longValue)
+        address = longValue
     }
 }
