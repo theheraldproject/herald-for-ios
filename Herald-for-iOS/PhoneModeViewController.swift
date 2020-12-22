@@ -435,15 +435,14 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let target = targets[indexPath.row]
         let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "targetvc") as? UIViewController {
-            self.present(viewController, animated: true, completion: {
-                self.logger.debug("completion callback - phone")
-                //viewController.presentationController?.delegate = self
-                if let tdvc = viewController as? TargetDetailsViewController {
-                    tdvc.display(target.targetIdentifier, payload: target.payloadData)
-                }
-            })
-        }
+        let viewController = mainStoryboard.instantiateViewController(withIdentifier: "targetvc")
+        self.present(viewController, animated: true, completion: {
+            self.logger.debug("completion callback - phone")
+            //viewController.presentationController?.delegate = self
+            if let tdvc = viewController as? TargetDetailsViewController {
+                tdvc.display(target.targetIdentifier, payload: target.payloadData)
+            }
+        })
 //        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
 //            return
 //        }
@@ -453,15 +452,14 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     
     @IBAction func showVenueDiary(_ sender: UIButton) {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "venuediaryvc") as? UIViewController {
-            self.present(viewController, animated: true, completion: {
-                self.logger.debug("completion callback - venue diary")
-                if let vdvc = viewController as? VenueDiaryViewController {
-                    self.logger.debug(" - Got VenueDiaryViewController")
-                    vdvc.setDiary(self.venueDiary!)
-                }
-            })
-        }
+        let viewController = mainStoryboard.instantiateViewController(withIdentifier: "venuediaryvc")
+        self.present(viewController, animated: true, completion: {
+            self.logger.debug("completion callback - venue diary")
+            if let vdvc = viewController as? VenueDiaryViewController {
+                self.logger.debug(" - Got VenueDiaryViewController")
+                vdvc.setDiary(self.venueDiary!)
+            }
+        })
     }
 }
 

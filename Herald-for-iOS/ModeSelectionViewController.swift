@@ -24,22 +24,20 @@ class ModeSelectionViewController: UIViewController, UIAdaptivePresentationContr
     
     @IBAction func openVenueBeaconMode(_ sender: UIButton) {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "venuevc") as? UIViewController {
-            self.present(viewController, animated: true, completion: {
-                self.logger.debug("completion callback - venue")
-                viewController.presentationController?.delegate = self
-            })
-        }
+        let viewController = mainStoryboard.instantiateViewController(withIdentifier: "venuevc")
+        self.present(viewController, animated: true, completion: {
+            self.logger.debug("completion callback - venue")
+            viewController.presentationController?.delegate = self
+        })
     }
     
     @IBAction func openPhoneMode(_ sender: UIButton) {
         let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "phonevc") as? UIViewController {
-            self.present(viewController, animated: true, completion: {
-                self.logger.debug("completion callback - phone")
-                viewController.presentationController?.delegate = self
-            })
-        }
+        let viewController = mainStoryboard.instantiateViewController(withIdentifier: "phonevc")
+        self.present(viewController, animated: true, completion: {
+            self.logger.debug("completion callback - phone")
+            viewController.presentationController?.delegate = self
+        })
     }
     
     /// MARK: UIAdaptivePresentationControllerDelegate
