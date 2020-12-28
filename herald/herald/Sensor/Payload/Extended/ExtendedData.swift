@@ -93,9 +93,14 @@ public class ConcreteExtendedDataV1 : ExtendedData {
         
         var input: [Float16] = [value]
         var output: [UInt8] = [0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
+
+        input.withUnsafeMutableBytes { inputBytes in
+            output.withUnsafeMutableBytes { outputBytes in
+                var sourceBuffer = vImage_Buffer(data: inputBytes.baseAddress, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
+                var destinationBuffer = vImage_Buffer(data: outputBytes.baseAddress, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
+                vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
+            }
+        }
         
         payloadData.append(output[0].bigEndian)
         payloadData.append(output[1].bigEndian)
@@ -107,9 +112,14 @@ public class ConcreteExtendedDataV1 : ExtendedData {
         
         var input: [Float] = [value]
         var output: [UInt8] = [0,0,0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
-        vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
+
+        input.withUnsafeMutableBytes { inputBytes in
+            output.withUnsafeMutableBytes { outputBytes in
+                var sourceBuffer = vImage_Buffer(data: inputBytes.baseAddress, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
+                var destinationBuffer = vImage_Buffer(data: outputBytes.baseAddress, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
+                vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
+            }
+        }
         payloadData.append(output[0].bigEndian)
         payloadData.append(output[1].bigEndian)
         payloadData.append(output[2].bigEndian)
