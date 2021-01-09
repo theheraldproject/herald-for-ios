@@ -34,13 +34,20 @@ public class SensorArray : NSObject, Sensor {
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)
         sensorArray.append(concreteBle!)
+        
         // Payload data at initiation time for identifying this device in the logs
         payloadData = payloadDataSupplier.payload(PayloadTimestamp(), device: nil)
         super.init()
         logger.debug("device (os=\(UIDevice.current.systemName)\(UIDevice.current.systemVersion),model=\(deviceModel()))")
 
+        // Inertia sensor configured for automated RSSI-distance calibration data capture
+        if BLESensorConfiguration.inertiaSensorEnabled {
+            logger.debug("Inertia sensor enabled");
+            sensorArray.append(ConcreteInertiaSensor());
+            add(delegate: CalibrationLog(filename: "calibration.csv"));
+        }
+
         if let payloadData = payloadData {
-            
             // Loggers
             #if DEBUG
             add(delegate: ContactLog(filename: "contacts.csv"))

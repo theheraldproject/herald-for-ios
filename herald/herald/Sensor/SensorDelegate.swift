@@ -62,6 +62,8 @@ public enum SensorType : String {
     case BEACON
     /// Ultrasound audio beacon.
     case ULTRASOUND
+    /// Accelerometer motion sensor
+    case ACCELEROMETER
     /// Other - Incase of an extension between minor versions of Herald
     case OTHER
 }
@@ -174,5 +176,18 @@ public struct PlacenameLocationReference : LocationReference {
     let name: String
     public var description: String { get {
         "PLACE(name=\(name))"
+        }}
+}
+
+/// Acceleration (x,y,z) in meters per second at point in time
+public struct InertiaLocationReference : LocationReference {
+    let x: Double
+    let y: Double
+    let z: Double
+    var magnitude: Double { get {
+        sqrt(x * x + y * y + z * z)
+    }}
+    public var description: String { get {
+        "Inertia(magnitude=\(magnitude),x=\(x),y=\(y),z=\(z))"
         }}
 }
