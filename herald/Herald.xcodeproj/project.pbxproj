@@ -42,7 +42,9 @@
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
+		B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */; };
 		B68DAB8A2580040400F396D7 /* EventTimeIntervalLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */; };
+		B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA10B225A78AF50071C08E /* CalibrationLog.swift */; };
 		B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745EF255713C2003567B7 /* SocialDistance.swift */; };
 		B6F745F3255713C2003567B7 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* Sample.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
@@ -104,8 +106,10 @@
 		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InertiaSensor.swift; path = herald/Sensor/Motion/InertiaSensor.swift; sourceTree = SOURCE_ROOT; };
 		B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventTimeIntervalLog.swift; path = herald/Sensor/Data/EventTimeIntervalLog.swift; sourceTree = SOURCE_ROOT; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6DA10B225A78AF50071C08E /* CalibrationLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalibrationLog.swift; path = herald/Sensor/Data/CalibrationLog.swift; sourceTree = SOURCE_ROOT; };
 		B6F745EF255713C2003567B7 /* SocialDistance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistance.swift; sourceTree = "<group>"; };
 		B6F745F0255713C2003567B7 /* Sample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
@@ -185,6 +189,7 @@
 		B637EF5C251E56320072D238 /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				B6599D0125A4EAE600AC306D /* Motion */,
 				B6F745EE255713C2003567B7 /* Analysis */,
 				B637EF5D251E56320072D238 /* BLE */,
 				B637EF63251E56320072D238 /* Location */,
@@ -261,6 +266,7 @@
 				B637EF74251E56320072D238 /* DetectionLog.swift */,
 				B637EF75251E56320072D238 /* SensorLogger.swift */,
 				B637EF76251E56320072D238 /* ContactLog.swift */,
+				B6DA10B225A78AF50071C08E /* CalibrationLog.swift */,
 				B637EF77251E56320072D238 /* StatisticsLog.swift */,
 				B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */,
 			);
@@ -293,6 +299,14 @@
 				6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */,
 			);
 			path = HeraldTests;
+			sourceTree = "<group>";
+		};
+		B6599D0125A4EAE600AC306D /* Motion */ = {
+			isa = PBXGroup;
+			children = (
+				B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */,
+			);
+			path = Motion;
 			sourceTree = "<group>";
 		};
 		B6F745EE255713C2003567B7 /* Analysis */ = {
@@ -434,9 +448,11 @@
 				B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */,
 				6F273A48258631190090B3B5 /* SwiftExtensions.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
+				B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
 				B637EF81251E56320072D238 /* DayCodes.swift in Sources */,
 				B637EF8C251E56320072D238 /* ContactLog.swift in Sources */,
+				B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */,
 				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,

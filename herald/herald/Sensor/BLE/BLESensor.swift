@@ -105,6 +105,13 @@ public struct BLESensorConfiguration {
     /// - Lower bound : Set this value to Android scan-process period (roughly 2 minutes) to minimise workload, but iOS connection resume will be more reliant on re-discovery (connection resume period = 2 mins or more dependent on external factors).
     /// - iOS-iOS connections may resume beyond the set interval value if the addresses have not changed, due to other mechanisms in Herald.
     public static var peripheralCleanInterval = TimeInterval.minute * 2
+    
+    /// Enable inertia sensor
+    /// - Inertia sensor (accelerometer) measures acceleration in meters per second (m/s) along device X, Y and Z axis
+    /// - Generates SensorDelegate:didVisit callbacks with InertiaLocationReference data
+    /// - Set to false to disable sensor, and true value to enable sensor
+    /// - This is used for automated capture of RSSI at different distances, where the didVisit data is used as markers
+    public static var inertiaSensorEnabled: Bool = false
 }
 
 
