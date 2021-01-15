@@ -14,7 +14,7 @@ public class Device : NSObject {
     var lastUpdatedAt: Date
     
     /// Ephemeral device identifier, e.g. peripheral identifier UUID
-    var identifier: TargetIdentifier
+    public var identifier: TargetIdentifier
     
     init(_ identifier: TargetIdentifier) {
         self.createdAt = Date()
