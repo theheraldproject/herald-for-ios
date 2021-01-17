@@ -19,17 +19,12 @@ public class SensorArray : NSObject, Sensor {
     
     public init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
-        // Location sensor is necessary for enabling background BLE advert detection
-        // - This is optional in iOS 9.3 to 13, because an Android device can act as a relay,
+        // Mobility sensor enables background BLE advert detection
+        // - This is optional because an Android device can act as a relay,
         //   but enabling location sensor will enable direct iOS-iOS detection in background.
-        // - This is mandatory in iOS 14, because service discovery will fail for Android and
-        //   iOS devices unless location sensor has been enabled and the user grants access
-        //   to location. Please note, the actual location is not used nor recorded by HERALD.
-        //   This is only necessary to enable iOS-iOS background BLE advert discovery, and
-        //   service discovery, to enable characteristic read / write / notify with other
-        //   iOS and Android devices.
-        if (BLESensorConfiguration.awakeOnLocationEnabled) {
-            sensorArray.append(ConcreteAwakeSensor(rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
+        // - Please note, the actual location is not used or recorded by HERALD.
+        if let mobilitySensorResolution = BLESensorConfiguration.mobilitySensorEnabled {
+            sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.serviceUUID.uuidString)))
         }
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)

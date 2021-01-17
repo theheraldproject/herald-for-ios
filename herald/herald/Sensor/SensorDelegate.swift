@@ -54,8 +54,8 @@ public enum SensorType : String {
     case BLE
     /// Bluetooth Mesh (5.0+)
     case BLMESH
-    /// Awake location sensor - uses Location API to be alerted to screen on events
-    case AWAKE
+    /// Mobility sensor - uses Location API measure range travelled
+    case MOBILITY
     /// GPS location sensor - not used by default in Herald
     case GPS
     /// Physical beacon, e.g. iBeacon
@@ -176,6 +176,17 @@ public struct PlacenameLocationReference : LocationReference {
     let name: String
     public var description: String { get {
         "PLACE(name=\(name))"
+        }}
+}
+
+/// Distance in metres
+public typealias Distance = Double
+
+/// Distance travelled in any direction in metres, as indicator of range of movement.
+public struct MobilityLocationReference : LocationReference {
+    let distance: Distance
+    public var description: String { get {
+        "Mobility(distance=\(distance))"
         }}
 }
 

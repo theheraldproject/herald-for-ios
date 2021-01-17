@@ -1,37 +1,39 @@
 //
-//  AwakeSensor.swift
+//  MobilitySensor.swift
 //
-//  Copyright 2020 VMware, Inc.
+//  Copyright 2021 VMware, Inc.
 //  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
 import CoreLocation
 
-protocol AwakeSensor : Sensor {
+protocol MobilitySensor : Sensor {
 }
 
 /**
- Screen awake sensor based on CoreLocation. Does NOT make use of the GPS position
+ Mobility sensor based on CoreLocation to assess range of travel as indicator for assisting prioritisation
+ in contact tracing work. Does NOT make use of the GPS position.
  Requires : Signing & Capabilities : BackgroundModes : LocationUpdates = YES
  Requires : Info.plist : Privacy - Location When In Use Usage Description
  Requires : Info.plist : Privacy - Location Always and When In Use Usage Description
  */
-class ConcreteAwakeSensor : NSObject, AwakeSensor, CLLocationManagerDelegate {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteAwakeSensor")
+class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelegate {
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteMobilitySensor")
     private var delegates: [SensorDelegate] = []
     private let locationManager = CLLocationManager()
     private let rangeForBeacon: UUID?
 
-    init(desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyThreeKilometers, distanceFilter: CLLocationDistance = CLLocationDistanceMax, rangeForBeacon: UUID? = nil) {
-        logger.debug("init(desiredAccuracy=\(desiredAccuracy == kCLLocationAccuracyThreeKilometers ? "3km" : desiredAccuracy.description),distanceFilter=\(distanceFilter == CLLocationDistanceMax ? "max" : distanceFilter.description),rangeForBeacon=\(rangeForBeacon == nil ? "disabled" : rangeForBeacon!.description))")
+    init(resolution: Distance = CLLocationDistanceMax, rangeForBeacon: UUID? = nil) {
+        let accuracy = ConcreteMobilitySensor.locationAccuracy(resolution)
+        logger.debug("init(resolution=\(resolution),accuracy=\(accuracy.description),rangeForBeacon=\(rangeForBeacon == nil ? "disabled" : rangeForBeacon!.description))")
         self.rangeForBeacon = rangeForBeacon
         super.init()
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.pausesLocationUpdatesAutomatically = false
-        locationManager.desiredAccuracy = desiredAccuracy
-        locationManager.distanceFilter = distanceFilter
+        locationManager.desiredAccuracy = accuracy
+        locationManager.distanceFilter = resolution
         locationManager.allowsBackgroundLocationUpdates = true
         if #available(iOS 11.0, *) {
             logger.debug("init(ios>=11.0)")
@@ -39,6 +41,23 @@ class ConcreteAwakeSensor : NSObject, AwakeSensor, CLLocationManagerDelegate {
         } else {
             logger.debug("init(ios<11.0)")
         }
+    }
+    
+    /// Establish location accuracy required based on distance resolution required
+    private static func locationAccuracy(_ resolution: Distance) -> CLLocationAccuracy {
+        if resolution < 10 {
+            return kCLLocationAccuracyBest
+        }
+        if resolution < 100 {
+            return kCLLocationAccuracyNearestTenMeters
+        }
+        if resolution < 1000 {
+            return kCLLocationAccuracyHundredMeters
+        }
+        if resolution < 3000 {
+            return kCLLocationAccuracyKilometer
+        }
+        return kCLLocationAccuracyThreeKilometers
     }
     
     func add(delegate: SensorDelegate) {
@@ -99,7 +118,7 @@ class ConcreteAwakeSensor : NSObject, AwakeSensor, CLLocationManagerDelegate {
             locationManager.startUpdatingLocation()
         }
         if status != CLAuthorizationStatus.notDetermined {
-            delegates.forEach({ $0.sensor(.AWAKE, didUpdateState: state) })
+            delegates.forEach({ $0.sensor(.MOBILITY, didUpdateState: state) })
         }
     }
 
@@ -116,16 +135,22 @@ class ConcreteAwakeSensor : NSObject, AwakeSensor, CLLocationManagerDelegate {
             locationManager.startUpdatingLocation()
         }
         if manager.authorizationStatus != CLAuthorizationStatus.notDetermined {
-            delegates.forEach({ $0.sensor(.AWAKE, didUpdateState: state) })
+            delegates.forEach({ $0.sensor(.MOBILITY, didUpdateState: state) })
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        logger.debug("locationManager:didUpdateLocations()")
-//        guard locations.count > 0 else {
-//            return
-//        }
-          // Commented out as we don't use or need the actual location of a device in Herald for the on awake event
+        guard locations.count > 0 else {
+            return
+        }
+        logger.debug("locationManager:didUpdateLocations(count=\(locations.count))")
+        // Note, the actual location, direction of travel, or distance travelled is not being
+        // used for mobility detection, just the fact that movement has occurred.
+        let timestamp = Date()
+        let mobilityLocationReference = MobilityLocationReference(distance: locationManager.distanceFilter)
+        let location = Location(value: mobilityLocationReference, time: (start: timestamp, end: timestamp))
+        delegates.forEach { $0.sensor(.MOBILITY, didVisit: location) }
+          // Commented out as we don't use or need the actual location of a device in Herald for mobility events
 //        locations.forEach() { location in
 //            let location = Location(
 //                value: WGS84PointLocationReference(
@@ -135,6 +160,26 @@ class ConcreteAwakeSensor : NSObject, AwakeSensor, CLLocationManagerDelegate {
 //                time: (start: location.timestamp, end: location.timestamp))
 //            delegates.forEach { $0.sensor(.GPS, didVisit: location) }
 //        }
-        delegates.forEach { $0.sensor(.AWAKE, didVisit: nil) }
     }
+}
+
+extension CLLocationAccuracy {
+    var description: String { get {
+        if self == kCLLocationAccuracyBest {
+            return "best"
+        }
+        if self == kCLLocationAccuracyNearestTenMeters {
+            return "10m"
+        }
+        if self == kCLLocationAccuracyHundredMeters {
+            return "100m"
+        }
+        if self == kCLLocationAccuracyKilometer {
+            return "1km"
+        }
+        if self == kCLLocationAccuracyThreeKilometers {
+            return "3km"
+        }
+        return "unknown"
+    }}
 }
