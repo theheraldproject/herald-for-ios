@@ -19,33 +19,23 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
     private static let protocolAndVersion : UInt8 = 0x30 // V1 of Beacon protocol
     private let payloadLength: Int = 9 // default, may be more with extended data area
     private var commonHeader: Data // 5 bytes
-    private var codePayload: Data // 4 bytes
     private var extendedData: ExtendedData? // 0+ bytes
     private var fullPayload: Data // 9+ bytes
     
     public init(countryCode: UInt16, stateCode: UInt16, code: UInt32, extendedData: ExtendedData? = nil) {
         // Generate common header
-        // All data is big endian
-        var protocolAndVersionValue = ConcreteBeaconPayloadDataSupplierV1.protocolAndVersion.bigEndian
-        let protocolAndVersionData = Data(bytes: &protocolAndVersionValue, count: MemoryLayout.size(ofValue: protocolAndVersionValue))
-        var countryCodeValue = countryCode.littleEndian
-        let countryCodeData = Data(bytes: &countryCodeValue, count: MemoryLayout.size(ofValue: countryCodeValue))
-        var stateCodeValue = stateCode.littleEndian
-        let stateCodeData = Data(bytes: &stateCodeValue, count: MemoryLayout.size(ofValue: stateCodeValue))
         // Common header = protocolAndVersion + countryCode + stateCode
         var commonHeader = Data()
-        commonHeader.append(protocolAndVersionData)
-        commonHeader.append(countryCodeData)
-        commonHeader.append(stateCodeData)
+        commonHeader.append(ConcreteBeaconPayloadDataSupplierV1.protocolAndVersion)
+        commonHeader.append(countryCode)
+        commonHeader.append(stateCode)
         self.commonHeader = commonHeader
 
         // Generate beacon payload
-        var codeValue = code.littleEndian
-        self.codePayload = Data(bytes: &codeValue, count: MemoryLayout.size(ofValue: codeValue))
         // Beacon payload = commonHeader + Beacon Registration Code + Extended Data
         var fullPayload = Data()
         fullPayload.append(commonHeader)
-        fullPayload.append(codePayload)
+        fullPayload.append(code)
         self.extendedData = extendedData
         if let extended = extendedData {
             // append to payload

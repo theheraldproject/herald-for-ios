@@ -74,57 +74,41 @@ public class ConcreteExtendedDataV1 : ExtendedData {
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: UInt8) {
-        payloadData.append(code.bigEndian)
-        payloadData.append(UInt8(0x01).bigEndian)
-        payloadData.append(value.bigEndian)
+        payloadData.append(code)
+        payloadData.append(UInt8(1))
+        payloadData.append(value)
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: UInt16) {
-        payloadData.append(code.bigEndian)
-        payloadData.append(UInt8(0x02).bigEndian)
-        payloadData.append(UInt8(value >> 8).bigEndian)
-        payloadData.append(UInt8(value & 0x00FF).bigEndian)
+        payloadData.append(code)
+        payloadData.append(UInt8(2))
+        payloadData.append(value)
     }
     
     @available(iOS 14.0, *)
     public func addSection(code: ExtendedDataSegmentCode, value: Float16) {
-        payloadData.append(code.bigEndian)
-        payloadData.append(UInt8(0x02).bigEndian)
-        
-        var input: [Float16] = [value]
-        var output: [UInt8] = [0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
-        
-        payloadData.append(output[0].bigEndian)
-        payloadData.append(output[1].bigEndian)
+        payloadData.append(code)
+        payloadData.append(UInt8(2))
+        payloadData.append(value)
     }
     
     public func addSection(code: ExtendedDataSegmentCode, value: Float32) {
-        payloadData.append(code.bigEndian)
-        payloadData.append(UInt8(0x04).bigEndian)
-        
-        var input: [Float] = [value]
-        var output: [UInt8] = [0,0,0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
-        vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
-        payloadData.append(output[0].bigEndian)
-        payloadData.append(output[1].bigEndian)
-        payloadData.append(output[2].bigEndian)
-        payloadData.append(output[3].bigEndian)
+        payloadData.append(code)
+        payloadData.append(UInt8(4))
+        payloadData.append(value)
     }
     
+    /// Maximum value supported is UInt8.max length
     public func addSection(code: ExtendedDataSegmentCode, value: String) {
-        payloadData.append(code.bigEndian)
-        payloadData.append(UInt8(value.count).bigEndian)
+        payloadData.append(code)
+        payloadData.append(UInt8(value.count))
         payloadData.append(value.data(using: .utf8)!)
     }
     
+    /// Maximum value supported is UInt8.max length
     public func addSection(code: ExtendedDataSegmentCode, value: Data) {
-        payloadData.append(code.bigEndian)
-        payloadData.append(UInt8(value.count).bigEndian)
+        payloadData.append(code)
+        payloadData.append(UInt8(value.count))
         payloadData.append(value)
     }
     

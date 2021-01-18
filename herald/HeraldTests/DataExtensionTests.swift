@@ -11,32 +11,183 @@ import XCTest
 class DataExtensionTests: XCTestCase {
     /// MARK:- Basic class functionality tests
     
-    func testUInt16Only() throws {
-        var data = Data()
-        let value = UInt16(826)
-        data.append(UInt8(value & 0x00FF).bigEndian)
-        data.append(UInt8(value >> 8).bigEndian)
-        XCTAssertEqual(UInt16(826),data.uint16(0))
+    func testInt8() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(Int8(0))
+        dataRange.append(Int8(Int8.min))
+        dataRange.append(Int8(Int8.max))
+        XCTAssertEqual(Int8(0), dataRange.int8(0))
+        XCTAssertEqual(Int8(Int8.min), dataRange.int8(1))
+        XCTAssertEqual(Int8(Int8.max), dataRange.int8(2))
+        // Values in range
+        for i in Int8.min...Int8.max {
+            let value = Int8(i)
+            var data = Data()
+            data.append(value)
+            XCTAssertEqual(value, data.int8(0))
+        }
+    }
+
+    func testUInt8() throws {
+        // Zero, Max
+        var dataRange = Data()
+        dataRange.append(UInt8(0))
+        dataRange.append(UInt8(UInt8.min))
+        dataRange.append(UInt8(UInt8.max))
+        XCTAssertEqual(UInt8(0), dataRange.uint8(0))
+        XCTAssertEqual(UInt8(UInt8.min), dataRange.uint8(1))
+        XCTAssertEqual(UInt8(UInt8.max), dataRange.uint8(2))
+        // Values in range
+        for i in UInt8.min...UInt8.max {
+            let value = UInt8(i)
+            var data = Data()
+            data.append(value)
+            XCTAssertEqual(value, data.uint8(0))
+        }
+    }
+
+    func testInt16() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(Int16(0))
+        dataRange.append(Int16(Int16.min))
+        dataRange.append(Int16(Int16.max))
+        XCTAssertEqual(Int16(0), dataRange.int16(0))
+        XCTAssertEqual(Int16(Int16.min), dataRange.int16(2))
+        XCTAssertEqual(Int16(Int16.max), dataRange.int16(4))
+        // Values in range
+        for i in Int16.min...Int16.max {
+            let value = Int16(i)
+            var data = Data()
+            data.append(value)
+            XCTAssertEqual(value, data.int16(0))
+        }
+    }
+
+    func testUInt16() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(UInt16(0))
+        dataRange.append(UInt16(UInt16.min))
+        dataRange.append(UInt16(UInt16.max))
+        XCTAssertEqual(UInt16(0), dataRange.uint16(0))
+        XCTAssertEqual(UInt16(UInt16.min), dataRange.uint16(2))
+        XCTAssertEqual(UInt16(UInt16.max), dataRange.uint16(4))
+        // Values in range
+        for i in UInt16.min...UInt16.max {
+            let value = UInt16(i)
+            var data = Data()
+            data.append(value)
+            XCTAssertEqual(value, data.uint16(0))
+        }
+    }
+
+    func testInt32() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(Int32(0))
+        dataRange.append(Int32(Int32.min))
+        dataRange.append(Int32(Int32.max))
+        XCTAssertEqual(Int32(0), dataRange.int32(0))
+        XCTAssertEqual(Int32(Int32.min), dataRange.int32(4))
+        XCTAssertEqual(Int32(Int32.max), dataRange.int32(8))
+        // Values in range
+        var i = 1
+        while i <= (Int32.max / 7) {
+            var data = Data()
+            data.append(Int32(i))
+            data.append(Int32(-i))
+            XCTAssertEqual(Int32(i), data.int32(0))
+            XCTAssertEqual(Int32(-i), data.int32(4))
+            i *= 7
+        }
+    }
+
+    func testUInt32() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(UInt32(0))
+        dataRange.append(UInt32(UInt32.min))
+        dataRange.append(UInt32(UInt32.max))
+        XCTAssertEqual(UInt32(0), dataRange.uint32(0))
+        XCTAssertEqual(UInt32(UInt32.min), dataRange.uint32(4))
+        XCTAssertEqual(UInt32(UInt32.max), dataRange.uint32(8))
+        // Values in range
+        var i = 1
+        while i <= (UInt32.max / 7) {
+            var data = Data()
+            data.append(UInt32(i))
+            XCTAssertEqual(UInt32(i), data.uint32(0))
+            i *= 7
+        }
+    }
+
+    func testInt64() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(Int64(0))
+        dataRange.append(Int64(Int64.min))
+        dataRange.append(Int64(Int64.max))
+        XCTAssertEqual(Int64(0), dataRange.int64(0))
+        XCTAssertEqual(Int64(Int64.min), dataRange.int64(8))
+        XCTAssertEqual(Int64(Int64.max), dataRange.int64(16))
+        // Values in range
+        var i = 1
+        while i <= (Int64.max / 7) {
+            var data = Data()
+            data.append(Int64(i))
+            data.append(Int64(-i))
+            XCTAssertEqual(Int64(i), data.int64(0))
+            XCTAssertEqual(Int64(-i), data.int64(8))
+            i *= 7
+        }
+    }
+
+    func testUInt64() throws {
+        // Zero, Min, Max
+        var dataRange = Data()
+        dataRange.append(UInt64(0))
+        dataRange.append(UInt64(UInt64.min))
+        dataRange.append(UInt64(UInt64.max))
+        XCTAssertEqual(UInt64(0), dataRange.uint64(0))
+        XCTAssertEqual(UInt64(UInt64.min), dataRange.uint64(8))
+        XCTAssertEqual(UInt64(UInt64.max), dataRange.uint64(16))
+        // Values in range
+        var i = 1
+        while i <= (UInt64.max / 7) {
+            var data = Data()
+            data.append(UInt64(i))
+            XCTAssertEqual(UInt64(i), data.uint64(0))
+            i *= 7
+        }
     }
     
-    func testUInt16BiDirectional() throws {
+    func testString() throws {
+        // Zero
+        var dataRange = Data()
+        _ = dataRange.append("")
+        XCTAssertEqual("", dataRange.string(0)?.value)
+        XCTAssertEqual(1, dataRange.string(0)?.start)
+        XCTAssertEqual(1, dataRange.string(0)?.end)
+        
+        // Values
         var data = Data()
-        data.append(UInt16(12345))
-        XCTAssertEqual(2,data.count)
-        XCTAssertEqual(12345,data.uint16(0))
-    }
-    
-    func testUInt32BiDirectional() throws {
-        var data = Data()
-        data.append(UInt32(1234567))
-        XCTAssertEqual(4,data.count)
-        XCTAssertEqual(1234567,data.uint32(0))
-    }
-    
-    func testUInt64BiDirectional() throws {
-        var data = Data()
-        data.append(UInt64(1234567890000))
-        XCTAssertEqual(8,data.count)
-        XCTAssertEqual(1234567890000,data.uint64(0))
+        _ = data.append("a", .UINT8)
+        _ = data.append("bb", .UINT16)
+        _ = data.append("ccc", .UINT32)
+        _ = data.append("dddd", .UINT64)
+        XCTAssertEqual("a", data.string(0, .UINT8)?.value)
+        XCTAssertEqual(1, data.string(0, .UINT8)?.start)
+        XCTAssertEqual(2, data.string(0, .UINT8)?.end)
+        XCTAssertEqual("bb", data.string(2, .UINT16)?.value)
+        XCTAssertEqual(4, data.string(2, .UINT16)?.start)
+        XCTAssertEqual(6, data.string(2, .UINT16)?.end)
+        XCTAssertEqual("ccc", data.string(6, .UINT32)?.value)
+        XCTAssertEqual(10, data.string(6, .UINT32)?.start)
+        XCTAssertEqual(13, data.string(6, .UINT32)?.end)
+        XCTAssertEqual("dddd", data.string(13, .UINT64)?.value)
+        XCTAssertEqual(21, data.string(13, .UINT64)?.start)
+        XCTAssertEqual(25, data.string(13, .UINT64)?.end)
     }
 }

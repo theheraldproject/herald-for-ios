@@ -9,16 +9,15 @@ import Foundation
 import CommonCrypto
 import Accelerate
 
-/// Simple payload data supplier. Payload data is 23 bytes.
+/// Simple payload data supplier. Payload data is 21 bytes.
 public protocol SimplePayloadDataSupplier : PayloadDataSupplier {
 }
 
 /// Simple payload data supplier.
 public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteSimplePayloadDataSupplier")
-    private let payloadLength: Int = 23
+    public static let payloadLength: Int = 21
     private let commonHeader: Data
-    private let commonPayload: Data
     private let matchingKeys: [MatchingKey]
     // Cache contact identifiers for the day
     private var day: Int?
@@ -26,30 +25,12 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     
     public init(protocolAndVersion: UInt8, countryCode: UInt16, stateCode: UInt16, secretKey: SecretKey) {
         // Generate common header
-        // All data is big endian
-        var protocolAndVersionBigEndian = protocolAndVersion.bigEndian
-        let protocolAndVersionData = Data(bytes: &protocolAndVersionBigEndian, count: MemoryLayout.size(ofValue: protocolAndVersionBigEndian))
-        var countryCodeBigEndian = countryCode.bigEndian
-        let countryCodeData = Data(bytes: &countryCodeBigEndian, count: MemoryLayout.size(ofValue: countryCodeBigEndian))
-        var stateCodeBigEndian = stateCode.bigEndian
-        let stateCodeData = Data(bytes: &stateCodeBigEndian, count: MemoryLayout.size(ofValue: stateCodeBigEndian))
         // Common header = protocolAndVersion + countryCode + stateCode
         var commonHeader = Data()
-        commonHeader.append(protocolAndVersionData)
-        commonHeader.append(countryCodeData)
-        commonHeader.append(stateCodeData)
+        commonHeader.append(protocolAndVersion)
+        commonHeader.append(countryCode)
+        commonHeader.append(stateCode)
         self.commonHeader = commonHeader
-
-        // Generate common payload
-        // Transmit power is not available on iOS, pre-compute common payload
-        let transmitPower: Float = 0
-        var transmitPowerBinary16 = F.binary16(transmitPower)
-        let transmitPowerBinary16Data = Data(bytes: &transmitPowerBinary16, count: MemoryLayout.size(ofValue: transmitPowerBinary16))
-        // Common payload = commonHeader + transmitPower
-        var commonPayload = Data()
-        commonPayload.append(commonHeader)
-        commonPayload.append(transmitPowerBinary16Data)
-        self.commonPayload = commonPayload
         
         // Generate matching keys from secret key
         matchingKeys = K.matchingKeys(secretKey)
@@ -116,7 +97,7 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     
     public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
         var payloadData = PayloadData()
-        payloadData.append(commonPayload)
+        payloadData.append(commonHeader)
         if let contactIdentifier = contactIdentifier(timestamp) {
             payloadData.append(contactIdentifier)
         } else {
@@ -129,12 +110,12 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     public func payload(_ data: Data) -> [PayloadData] {
         // Split data into payloads based on fixed length
         var payloads: [PayloadData] = []
-        var indexStart = 0, indexEnd = payloadLength
+        var indexStart = 0, indexEnd = ConcreteSimplePayloadDataSupplier.payloadLength
         while indexEnd <= data.count {
             let payload = PayloadData(data.subdata(in: indexStart..<indexEnd))
             payloads.append(payload)
-            indexStart += payloadLength
-            indexEnd += payloadLength
+            indexStart += ConcreteSimplePayloadDataSupplier.payloadLength
+            indexEnd += ConcreteSimplePayloadDataSupplier.payloadLength
         }
         return payloads
     }

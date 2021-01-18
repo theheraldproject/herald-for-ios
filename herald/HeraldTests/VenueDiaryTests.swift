@@ -144,7 +144,7 @@ class VenueDiaryTests: XCTestCase {
         
         // modify payload info bit to be invalid
         var brokenData = PayloadData()
-        brokenData.append(UInt8(0x00).bigEndian)
+        brokenData.append(UInt8(0x00))
         brokenData.append(payload!.subdata(in: 1..<payload!.count))
         
         var thrownError: Error?
