@@ -35,7 +35,7 @@ class ConcreteSimplePayloadDataMatcher : SimplePayloadDataMatcher {
         guard let bloomFilter = bloomFilters[day] else {
             return false
         }
-        let contactIdentifier = ContactIdentifier(data.subdata(in: 7..<23))
+        let contactIdentifier = ContactIdentifier(data.subdata(in: 5..<ConcreteSimplePayloadDataSupplier.payloadLength))
         return bloomFilter.contains(contactIdentifier)
     }
 }

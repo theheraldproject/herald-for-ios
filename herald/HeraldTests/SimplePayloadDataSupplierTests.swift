@@ -159,7 +159,7 @@ class SimplePayloadDataSupplierTests: XCTestCase {
 
         // Payload is 23 bytes long
         XCTAssertNotNil(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil))
-        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil)?.count, 23)
+        XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil)?.count, ConcreteSimplePayloadDataSupplier.payloadLength)
 
         // Same payload in same period
         XCTAssertEqual(pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil), pds1.payload(K.date("2020-09-24T00:00:00+0000")!, device: nil))
