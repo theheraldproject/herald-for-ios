@@ -20,15 +20,24 @@ protocol MobilitySensor : Sensor {
  */
 class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelegate {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteMobilitySensor")
+    /// Minimum mobility sensing resolution is 3km as defined by CoreLocation.
+    public static let minimumResolution: Distance = Distance(kCLLocationAccuracyThreeKilometers)
     private var delegates: [SensorDelegate] = []
     private let locationManager = CLLocationManager()
     private let rangeForBeacon: UUID?
+    /// Mobility sensing is only concerned with distance travelled, not actual location.
+    /// Last location is only being used here to enable calculation of cummulative distance travelled.
+    private let resolution: Distance
+    private var lastLocation: CLLocation?
+    private var lastUpdate: Date?
+    private var cummulativeDistance: Distance = 0
 
-    init(resolution: Distance = CLLocationDistanceMax, rangeForBeacon: UUID? = nil) {
-        let accuracy = ConcreteMobilitySensor.locationAccuracy(resolution)
-        logger.debug("init(resolution=\(resolution),accuracy=\(accuracy.description),rangeForBeacon=\(rangeForBeacon == nil ? "disabled" : rangeForBeacon!.description))")
+    init(resolution: Distance = minimumResolution, rangeForBeacon: UUID? = nil) {
+        self.resolution = resolution
         self.rangeForBeacon = rangeForBeacon
         super.init()
+        let accuracy = ConcreteMobilitySensor.locationAccuracy(resolution)
+        logger.debug("init(resolution=\(resolution),accuracy=\(accuracy),rangeForBeacon=\(rangeForBeacon == nil ? "disabled" : rangeForBeacon!.description))")
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.pausesLocationUpdatesAutomatically = false
@@ -81,8 +90,6 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
             locationManager.startRangingBeacons(in: beaconRegion)
             logger.debug("startRangingBeacons(ios<13.0,beaconUUID=\(beaconUUID.uuidString)))")
         }
-
-
     }
     
     func stop() {
@@ -140,46 +147,62 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // Only process location data if mobility sensor has been enabled
+        guard let resolution = BLESensorConfiguration.mobilitySensorEnabled else {
+            return
+        }
         guard locations.count > 0 else {
             return
         }
-        logger.debug("locationManager:didUpdateLocations(count=\(locations.count))")
-        // Note, the actual location, direction of travel, or distance travelled is not being
-        // used for mobility detection, just the fact that movement has occurred.
-        let timestamp = Date()
-        let mobilityLocationReference = MobilityLocationReference(distance: locationManager.distanceFilter)
-        let location = Location(value: mobilityLocationReference, time: (start: timestamp, end: timestamp))
-        delegates.forEach { $0.sensor(.MOBILITY, didVisit: location) }
-          // Commented out as we don't use or need the actual location of a device in Herald for mobility events
-//        locations.forEach() { location in
-//            let location = Location(
-//                value: WGS84PointLocationReference(
-//                    latitude: location.coordinate.latitude,
-//                    longitude: location.coordinate.longitude,
-//                    altitude: location.altitude),
-//                time: (start: location.timestamp, end: location.timestamp))
-//            delegates.forEach { $0.sensor(.GPS, didVisit: location) }
-//        }
+        // Accumulate distance travelled and report at required resolution
+        // Note, the actual location and direction of travel is not being
+        // reported in mobility detection, just the cummulative distance
+        // travelled in resolution units.
+        locations.forEach() { location in
+            guard let lastLocation = lastLocation, let lastUpdate = lastUpdate else {
+                self.lastLocation = location
+                self.lastUpdate = location.timestamp
+                return
+            }
+            // Accumulate distance travelled as indicator of mobility.
+            // Note, distance travelled is calculated as a straight
+            // line along Earth's curvature, and the distance calculation
+            // does not take into account the accuracy of the location
+            // data. This is a deliberate design decision to decouple
+            // mobility data from actual location data.
+            let distance = location.distance(from: lastLocation)
+            cummulativeDistance += distance
+            logger.debug("didUpdateLocations(distance=\(distance))")
+            // Mobility data is only reported in unit lengths to further
+            // decouple mobility data from actual location data.
+            if cummulativeDistance >= resolution {
+                let didVisit = Location(value: MobilityLocationReference(distance: cummulativeDistance), time: (start: lastUpdate, end: location.timestamp))
+                delegates.forEach { $0.sensor(.MOBILITY, didVisit: didVisit) }
+                cummulativeDistance = 0
+                self.lastUpdate = location.timestamp
+            }
+            self.lastLocation = location
+        }
     }
 }
-
-extension CLLocationAccuracy {
-    var description: String { get {
-        if self == kCLLocationAccuracyBest {
-            return "best"
-        }
-        if self == kCLLocationAccuracyNearestTenMeters {
-            return "10m"
-        }
-        if self == kCLLocationAccuracyHundredMeters {
-            return "100m"
-        }
-        if self == kCLLocationAccuracyKilometer {
-            return "1km"
-        }
-        if self == kCLLocationAccuracyThreeKilometers {
-            return "3km"
-        }
-        return "unknown"
-    }}
-}
+//
+//extension CLLocationAccuracy {
+//    var description: String { get {
+//        if self == kCLLocationAccuracyBest {
+//            return "best"
+//        }
+//        if self == kCLLocationAccuracyNearestTenMeters {
+//            return "10m"
+//        }
+//        if self == kCLLocationAccuracyHundredMeters {
+//            return "100m"
+//        }
+//        if self == kCLLocationAccuracyKilometer {
+//            return "1km"
+//        }
+//        if self == kCLLocationAccuracyThreeKilometers {
+//            return "3km"
+//        }
+//        return "unknown"
+//    }}
+//}

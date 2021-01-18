@@ -83,7 +83,7 @@ public struct BLESensorConfiguration {
     /// - Use this for prioritising positive cases that may have spread the disease over significant distances
     /// - Enabling location permission also has the benefit of enabling  awake on screen for iOS-iOS background detection
     /// - Set to nil to disable sensor, set to distance in metres to enable sensor for mobility sensing at given resolution.
-    public static var mobilitySensorEnabled: Distance? = 3000
+    public static var mobilitySensorEnabled: Distance? = ConcreteMobilitySensor.minimumResolution
     
     /// Payload update at regular intervals, in addition to default HERALD communication process.
     /// - Use this to enable regular payload reads according to app payload lifespan.
