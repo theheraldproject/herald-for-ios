@@ -24,7 +24,7 @@ public class Interactions: NSObject, SensorDelegate {
         super.init()
     }
     
-    public init(filename: String) {
+    public init(filename: String, retention: TimeInterval = TimeInterval.fortnight) {
         textFile = TextFile(filename: filename)
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         queue = DispatchQueue(label: "Sensor.Analysis.EncounterLog(\(filename))")
@@ -43,6 +43,8 @@ public class Interactions: NSObject, SensorDelegate {
                 logger.fault("Failed to read encounter log")
             }
         }
+        // Remove data beyond data retention period
+        remove(before: Date().addingTimeInterval(-retention))
     }
     
     public func append(_ encounter: Encounter) {
@@ -71,7 +73,7 @@ public class Interactions: NSObject, SensorDelegate {
     /// Remove all log records before date (exclusive). Use this function to implement data retention policy.
     public func remove(before: Date) {
         queue.sync {
-            var content = String()
+            var content = "time,proximity,unit,payload\n"
             let subdata = encounters.filter({ $0.timestamp >= before })
             subdata.forEach { encounter in
                 content.append(encounter.csvString)

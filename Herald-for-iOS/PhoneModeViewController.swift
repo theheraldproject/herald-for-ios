@@ -40,7 +40,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     
     // MARK:- Social mixing
     
-    private let socialMixingScore = SocialDistance()
+    private let socialMixingScore = SocialDistance(filename: "socialDistance.csv")
     private var socialMixingScoreUnit = TimeInterval(60)
     // Labels to show score over time, each label is a unit
     @IBOutlet weak var labelSocialMixingScore00: UILabel!
@@ -69,6 +69,10 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     @IBOutlet weak var buttonMessageSend: UIButton!
     @IBOutlet weak var labelMessageReceived: UILabel!
     
+    // MARK:- Mobility
+    
+    private let mobility = Mobility(filename: "mobility.csv")
+    
     // MARK:- Detected payloads
     
     private var targetIdentifiers: [TargetIdentifier:PayloadData] = [:]
@@ -91,6 +95,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
+        sensor.add(delegate: mobility)
         
         
         // Added diary logger

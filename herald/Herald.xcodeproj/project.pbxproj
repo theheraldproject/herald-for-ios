@@ -22,7 +22,7 @@
 		B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF60251E56320072D238 /* BLEUtilities.swift */; };
 		B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF61251E56320072D238 /* BLETransmitter.swift */; };
 		B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF62251E56320072D238 /* BLEReceiver.swift */; };
-		B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* AwakeSensor.swift */; };
+		B637EF7E251E56320072D238 /* MobilitySensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* MobilitySensor.swift */; };
 		B637EF7F251E56320072D238 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF65251E56320072D238 /* Sensor.swift */; };
 		B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */; };
 		B637EF81251E56320072D238 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6A251E56320072D238 /* DayCodes.swift */; };
@@ -45,6 +45,8 @@
 		B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */; };
 		B68DAB8A2580040400F396D7 /* EventTimeIntervalLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */; };
 		B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA10B225A78AF50071C08E /* CalibrationLog.swift */; };
+		B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */; };
+		B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */; };
 		B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745EF255713C2003567B7 /* SocialDistance.swift */; };
 		B6F745F3255713C2003567B7 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* Sample.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
@@ -86,7 +88,7 @@
 		B637EF60251E56320072D238 /* BLEUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
 		B637EF61251E56320072D238 /* BLETransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
 		B637EF62251E56320072D238 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
-		B637EF64251E56320072D238 /* AwakeSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AwakeSensor.swift; sourceTree = "<group>"; };
+		B637EF64251E56320072D238 /* MobilitySensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobilitySensor.swift; sourceTree = "<group>"; };
 		B637EF65251E56320072D238 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
 		B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
 		B637EF6A251E56320072D238 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
@@ -110,6 +112,8 @@
 		B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventTimeIntervalLog.swift; path = herald/Sensor/Data/EventTimeIntervalLog.swift; sourceTree = SOURCE_ROOT; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6DA10B225A78AF50071C08E /* CalibrationLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalibrationLog.swift; path = herald/Sensor/Data/CalibrationLog.swift; sourceTree = SOURCE_ROOT; };
+		B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Mobility.swift; path = herald/Sensor/Analysis/Mobility.swift; sourceTree = SOURCE_ROOT; };
+		B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventLog.swift; path = herald/Sensor/Data/EventLog.swift; sourceTree = SOURCE_ROOT; };
 		B6F745EF255713C2003567B7 /* SocialDistance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistance.swift; sourceTree = "<group>"; };
 		B6F745F0255713C2003567B7 /* Sample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
@@ -221,7 +225,7 @@
 		B637EF63251E56320072D238 /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				B637EF64251E56320072D238 /* AwakeSensor.swift */,
+				B637EF64251E56320072D238 /* MobilitySensor.swift */,
 			);
 			path = Location;
 			sourceTree = "<group>";
@@ -269,6 +273,7 @@
 				B6DA10B225A78AF50071C08E /* CalibrationLog.swift */,
 				B637EF77251E56320072D238 /* StatisticsLog.swift */,
 				B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */,
+				B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -316,6 +321,7 @@
 				B6F745F0255713C2003567B7 /* Sample.swift */,
 				B6F745F1255713C2003567B7 /* Interactions.swift */,
 				6F273A4325862B1A0090B3B5 /* VenueDiary.swift */,
+				B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */,
 			);
 			path = Analysis;
 			sourceTree = "<group>";
@@ -434,6 +440,7 @@
 				B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */,
 				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
+				B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
 				6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */,
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
@@ -445,10 +452,11 @@
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
-				B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */,
+				B637EF7E251E56320072D238 /* MobilitySensor.swift in Sources */,
 				6F273A48258631190090B3B5 /* SwiftExtensions.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
 				B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */,
+				B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */,
 				B637EF82251E56320072D238 /* SHA.swift in Sources */,
 				B637EF81251E56320072D238 /* DayCodes.swift in Sources */,
 				B637EF8C251E56320072D238 /* ContactLog.swift in Sources */,

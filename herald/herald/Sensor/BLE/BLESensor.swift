@@ -79,8 +79,11 @@ public struct BLESensorConfiguration {
     /// Log level for BLESensor
     public static var logLevel: SensorLoggerLevel = .debug
     
-    /// Are Location Permissions enabled in the app, and thus awake on screen on enabled
-    public static var awakeOnLocationEnabled: Bool = true
+    /// Mobility sensor for estimating range of travel without recording location
+    /// - Use this for prioritising positive cases that may have spread the disease over significant distances
+    /// - Enabling location permission also has the benefit of enabling  awake on screen for iOS-iOS background detection
+    /// - Set to nil to disable sensor, set to distance in metres to enable sensor for mobility sensing at given resolution.
+    public static var mobilitySensorEnabled: Distance? = ConcreteMobilitySensor.minimumResolution
     
     /// Payload update at regular intervals, in addition to default HERALD communication process.
     /// - Use this to enable regular payload reads according to app payload lifespan.
