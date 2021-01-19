@@ -184,32 +184,6 @@ class SimplePayloadDataSupplierTests: XCTestCase {
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-18T00:05:59+0000")!, device: nil))
         XCTAssertEqual(pds1.payload(K.date("2026-03-18T00:00:00+0000")!, device: nil), pds1.payload(K.date("2026-03-18T00:06:00+0000")!, device: nil))
     }
-
-    func testCrossPlatformUInt8() throws {
-        print("value,uint8")
-        for i in 0...255 {
-            let value = UInt8(i)
-            var bigEndian = value.bigEndian
-            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
-            print("\(value),\(data.base64EncodedString())")
-        }
-    }
-
-    func testCrossPlatformUInt16() throws {
-        print("value,uint16")
-        for i in 0...127 {
-            let value = UInt16(i)
-            var bigEndian = value.bigEndian
-            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
-            print("\(value),\(data.base64EncodedString())")
-        }
-        for i in (65536-128)...65535 {
-            let value = UInt16(i)
-            var bigEndian = value.bigEndian
-            let data = Data(bytes: &bigEndian, count: MemoryLayout.size(ofValue: bigEndian))
-            print("\(value),\(data.base64EncodedString())")
-        }
-    }
     
 //    func testCrossPlatformBinary16() throws {
 //        print("value,float16")
@@ -221,7 +195,7 @@ class SimplePayloadDataSupplierTests: XCTestCase {
 //    }
 
     func testContactIdentifierCrossPlatform() throws {
-        print("day,period,matchingKey,contactKey,contactIdentifier");
+        var csv = "day,period,matchingKey,contactKey,contactIdentifier\n"
         // Generate secret and matching keys
         let ks1 = SecretKey(repeating: 0, count: 2048)
         let km1 = K.matchingKeys(ks1)
@@ -230,15 +204,24 @@ class SimplePayloadDataSupplierTests: XCTestCase {
             let kc1 = K.contactKeys(km1[day])
             for period in 0...240 {
                 let Ic1 = K.contactIdentifier(kc1[period])
-                print("\(day),\(period),\(km1[day].base64EncodedString()),\(kc1[period].base64EncodedString()),\(Ic1.base64EncodedString())")
+                csv.append("\(day),\(period),\(km1[day].base64EncodedString()),\(kc1[period].base64EncodedString()),\(Ic1.base64EncodedString())\n")
             }
         }
+        let attachment = XCTAttachment(string: csv)
+        attachment.lifetime = .keepAlways
+        attachment.name = "contactIdentifier.csv"
+        add(attachment)
     }
     
     func testPayloadData() throws {
+        var csv = "value,data\n"
         for i in 0...600 {
             let payloadData = PayloadData(repeating: 0, count: i)
-            print("\(i) -> \(payloadData.shortName)")
+            csv.append("\(i),\(payloadData.shortName)\n")
         }
+        let attachment = XCTAttachment(string: csv)
+        attachment.lifetime = .keepAlways
+        attachment.name = "payloadDataShortName.csv"
+        add(attachment)
     }
 }
