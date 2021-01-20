@@ -73,6 +73,13 @@ public class ConcreteExtendedDataV1 : ExtendedData {
         return 0 != payloadData.count
     }
     
+    public func addSection(code: ExtendedDataSegmentCode, value: Int8) {
+        payloadData.append(code)
+        payloadData.append(UInt8(1))
+        payloadData.append(value)
+    }
+    
+    
     public func addSection(code: ExtendedDataSegmentCode, value: UInt8) {
         payloadData.append(code)
         payloadData.append(UInt8(1))
