@@ -8,7 +8,7 @@
 import Foundation
 import Accelerate
 
-extension Data {
+public extension Data {
     
     public struct HexEncodingOptions: OptionSet {
         public init(rawValue: Int) {

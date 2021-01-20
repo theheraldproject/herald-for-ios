@@ -201,7 +201,7 @@ public class BLEDevice : Device {
     /// Payload data already shared with this peer
     var payloadSharingData: [PayloadData] = []
     /// Most recent RSSI measurement taken by readRSSI or didDiscover.
-    var rssi: BLE_RSSI? {
+    public var rssi: BLE_RSSI? {
         didSet {
             lastUpdatedAt = Date()
             rssiLastUpdatedAt = lastUpdatedAt
@@ -210,7 +210,7 @@ public class BLEDevice : Device {
     /// RSSI last update timestamp, this is used to track last advertised at without relying on didDiscover
     var rssiLastUpdatedAt: Date = Date.distantPast
     /// Transmit power data where available (only provided by Android devices)
-    var txPower: BLE_TxPower? {
+    public var txPower: BLE_TxPower? {
         didSet {
             lastUpdatedAt = Date()
             delegate.device(self, didUpdate: .txPower)
@@ -308,9 +308,9 @@ enum BLEDeviceOperatingSystem : String {
 }
 
 /// RSSI in dBm.
-typealias BLE_RSSI = Int
+public typealias BLE_RSSI = Int
 
-typealias BLE_TxPower = Int
+public typealias BLE_TxPower = Int
 
 class BLEPseudoDeviceAddress {
     let address: Int64
