@@ -139,6 +139,7 @@ public class ConcreteExtendedDataV1 : ExtendedData {
             sections.append(ConcreteExtendedDataSectionV1(code: code, length: length, data: data))
             
             // repeat
+            pos = pos + Int(length)
         }
         return sections
     }
