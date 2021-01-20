@@ -169,7 +169,7 @@ class VenueDiaryTests: XCTestCase {
         XCTAssertEqual("303A03040040E20100",payload!.hexEncodedString(options: .upperCase))
         // 0x30 = 30, 826 = 3A03, 4 = 0400, 123456 = 40E20100 - LittleEndian
         
-        let brokenPayload = payload!.subdata(in: 0..<8) // too short - by 1 byte
+        let brokenPayload = PayloadData(payload!.subdata(in: 0..<8))// too short - by 1 byte
         
         let target = TargetIdentifier("SomeID")
         

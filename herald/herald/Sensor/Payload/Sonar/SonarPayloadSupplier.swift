@@ -30,7 +30,7 @@ public class MockSonarPayloadSupplier : SonarPayloadDataSupplier {
     }
     
     public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
-        var payloadData = PayloadData()
+        let payloadData = PayloadData()
         // First 3 bytes are reserved in SONAR
         payloadData.append(Data(repeating: 0, count: 3))
         payloadData.append(networkByteOrderData(identifier))

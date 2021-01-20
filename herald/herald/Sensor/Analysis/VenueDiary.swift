@@ -399,7 +399,7 @@ public class VenueEncounter {
         }
         // attempt to parse the payload
         // Read payload ID and version, and if we don't support it just return OK (forward compatibility)
-        let payloadIdAndVersion : UInt8 = payload[0]
+        let payloadIdAndVersion : UInt8 = payload.data[0]
         if HeraldBeaconPayloadVersions.V1.rawValue == payloadIdAndVersion {
             // default parser
         } else if (payloadIdAndVersion > HeraldBeaconPayloadVersions.V1.rawValue) && (payloadIdAndVersion <= HeraldBeaconPayloadVersions.V8.rawValue) {
@@ -410,15 +410,15 @@ public class VenueEncounter {
         logger.debug("Protocol code: \(payloadIdAndVersion), HeraldV1Beacon raw: \(HeraldBeaconPayloadVersions.V1.rawValue)")
         // If we do support it, attempt to parse
         let countryData : Data = payload.subdata(in: 1..<3) // bytes at pos 1 and 2
-        logger.debug("Country: \(countryData.hexEncodedString(options: .upperCase))")
+        logger.debug("Country: \(countryData.hexEncodedString)")
         let stateData : Data = payload.subdata(in: 3..<5) // bytes at pos 3 and 4
-        logger.debug("stateData: \(stateData.hexEncodedString(options: .upperCase))")
+        logger.debug("stateData: \(stateData.hexEncodedString)")
         let venueCodeData : Data = payload.subdata(in: 5..<9) // bytes at pos 5 and 6 and 7 and 8
-        logger.debug("venueCodeData: \(venueCodeData.hexEncodedString(options: .upperCase))")
+        logger.debug("venueCodeData: \(venueCodeData.hexEncodedString)")
         var ed : ConcreteExtendedDataV1? = nil
         var name: String? = nil
         if (payload.count > 9) {
-            ed = ConcreteExtendedDataV1(payload.subdata(in: 9..<payload.count))
+            ed = ConcreteExtendedDataV1(PayloadData(payload.subdata(in: 9..<payload.count)))
             let sections = ed!.getSections()
             for section in sections {
                 if section.code == ExtendedDataSegmentCodesV1.TextPremises.rawValue {
