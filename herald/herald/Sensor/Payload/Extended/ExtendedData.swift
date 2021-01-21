@@ -58,7 +58,7 @@ public class ConcreteExtendedDataV1 : ExtendedData {
     var payloadData : PayloadData
     
     public init() {
-        payloadData = Data() // empty
+        payloadData = PayloadData() // empty
     }
     
     public init(_ unparsedData: PayloadData) {
@@ -124,10 +124,10 @@ public class ConcreteExtendedDataV1 : ExtendedData {
                 continue
             }
             // read code
-            let code = payloadData.uint8(pos)!
+            let code = payloadData.data.uint8(pos)!
             pos = pos + 1
             // read length
-            var length = payloadData[pos]
+            var length = payloadData.data[pos]
             pos = pos + 1
             // sanity check length
             if pos + Int(length) > payloadData.count {

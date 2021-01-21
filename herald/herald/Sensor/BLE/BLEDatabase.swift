@@ -338,3 +338,38 @@ class BLEPseudoDeviceAddress {
         address = Int64(longValue)
     }
 }
+
+/// Legacy advert only protocol data extracted from service data
+class BLELegacyAdvertOnlyProtocolData {
+    let service: String
+    let connectable: Bool
+    let data: Data // BIG ENDIAN (network order) AT THIS POINT
+    var description: String { get {
+        return "BLELegacyAdvertOnlyProtocolData(service=\(service.description),connectable=\(connectable.description),data=\(data.base64EncodedString()))"
+        }}
+    var payloadData: LegacyPayloadData { get {
+        return LegacyPayloadData(service: service, data: data)
+    }}
+    
+    init?(fromAdvertisementData: [String: Any]) {
+        // Get service data
+        guard let serviceDataDictionary = fromAdvertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID:NSData] else {
+            return nil
+        }
+        // Advert only protocol is not connectable
+        guard let isConnectableValue = fromAdvertisementData[CBAdvertisementDataIsConnectable] as? NSNumber else {
+            return nil
+        }
+        self.connectable = (isConnectableValue != 0)
+        // Extract data for specific service data key
+        guard let serviceDataKey = BLESensorConfiguration.legacyAdvertOnlyProtocolServiceUUIDDataKey,
+              let serviceData = serviceDataDictionary[serviceDataKey],
+              serviceData.count > 0 else {
+            return nil
+        }
+        self.service = serviceDataKey.uuidString
+        // Service data on iOS is little endian, reversing
+        // to big endian for consistency with Android
+        self.data = Data(serviceData.reversed())
+    }
+}

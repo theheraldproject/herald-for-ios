@@ -40,7 +40,7 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
         if let extended = extendedData {
             // append to payload
             if extended.hasData() {
-                fullPayload.append(extended.payload()!)
+                fullPayload.append(extended.payload()!.data)
             }
         }
         self.fullPayload = fullPayload
@@ -53,7 +53,7 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
     }
     
     public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
-        var payloadData = PayloadData()
+        let payloadData = PayloadData()
         payloadData.append(fullPayload)
         return payloadData
     }

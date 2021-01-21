@@ -45,7 +45,7 @@ class TargetDetailsViewController: UIViewController, UITableViewDataSource, UITa
             lblId.text = target.description.prefix(17) + "..."
         }
         
-        lblPayload.text = payload.hexEncodedString(options: .upperCase)
+        lblPayload.text = payload.hexEncodedString
         // TODO trim the above text if very long
         
         // vary display based on data in Payload

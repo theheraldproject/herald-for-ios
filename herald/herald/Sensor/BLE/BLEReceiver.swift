@@ -248,8 +248,13 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskScanForPeripherals() {
         // Scan for peripherals -> didDiscover
+        var scanForServices : [CBUUID] = [BLESensorConfiguration.serviceUUID]
+        // Optionally include legacy advert only protocol as scan criteria
+        if let legacyAdvertOnlyProtocolServiceUUID = BLESensorConfiguration.legacyAdvertOnlyProtocolServiceUUID {
+            scanForServices.append(legacyAdvertOnlyProtocolServiceUUID)
+        }
         central.scanForPeripherals(
-            withServices: [BLESensorConfiguration.serviceUUID],
+            withServices: scanForServices,
             options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.serviceUUID]])
     }
     
@@ -632,7 +637,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 return
             }
             self.logger.debug("writeLegacyPayload (source=\(source),peripheral=\(device.identifier) writing...)")
-            peripheral.writeValue(payloadToWrite, for: characteristic, type: .withResponse)
+            peripheral.writeValue(payloadToWrite.data, for: characteristic, type: .withResponse)
         }
         
     }
@@ -769,7 +774,13 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             device.txPower = BLE_TxPower(txPower)
         }
         logger.debug("didDiscover (device=\(device),rssi=\((String(describing: device.rssi))),txPower=\((String(describing: device.txPower))))")
-        if deviceHasPendingTask(device) {
+        // Process legacy advert only protocol
+        let legacyAdvertOnlyProtocolData = (BLESensorConfiguration.legacyAdvertOnlyProtocolServiceUUID == nil ? nil : BLELegacyAdvertOnlyProtocolData(fromAdvertisementData: advertisementData))
+        if let legacyAdvertOnlyProtocolData = legacyAdvertOnlyProtocolData {
+            device.payloadData = legacyAdvertOnlyProtocolData.payloadData
+            logger.debug("didDiscover, legacy payload (device=\(device),service=\(legacyAdvertOnlyProtocolData.service.description),payload=\(legacyAdvertOnlyProtocolData.payloadData.hexEncodedString))")
+        }
+        if (legacyAdvertOnlyProtocolData == nil || legacyAdvertOnlyProtocolData!.connectable), deviceHasPendingTask(device) {
             connect("didDiscover", peripheral);
         } else {
             scanResults.append(device)

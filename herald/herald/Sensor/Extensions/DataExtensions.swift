@@ -10,17 +10,26 @@ import Accelerate
 
 extension Data {
     
-    public struct HexEncodingOptions: OptionSet {
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
+    var hexEncodedString: String { get {
+        return map { String(format: "%02hhX", $0) }.joined()
+    }}
+    
+    init?(hexEncodedString: String) {
+        guard hexEncodedString.count.isMultiple(of: 2) else {
+            return nil
         }
-        public let rawValue: Int
-        public static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
-    }
-
-    public func hexEncodedString(options: HexEncodingOptions = []) -> String {
-        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
-        return map { String(format: format, $0) }.joined()
+        if hexEncodedString.count == 0 {
+            self.init()
+        } else {
+            let chars = hexEncodedString.map { $0 }
+            let bytes = stride(from: 0, to: chars.count, by: 2)
+                .map { String(chars[$0]) + String(chars[$0 + 1]) }
+                .compactMap { UInt8($0, radix: 16) }
+            guard hexEncodedString.count / bytes.count == 2 else {
+                return nil
+            }
+            self.init(bytes)
+        }
     }
     
     /// MARK:- Conversion from intrinsic types to Data
@@ -257,4 +266,12 @@ extension Data {
 /// Encoding option for string length data as prefix
 public enum StringLengthEncodingOption {
     case UINT8, UINT16, UINT32, UINT64
+}
+
+public struct HexEncodingOptions: OptionSet {
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+    public let rawValue: Int
+    public static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
 }

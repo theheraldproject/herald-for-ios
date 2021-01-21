@@ -30,13 +30,33 @@ public struct BLESensorConfiguration {
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
     public static var payloadCharacteristicUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
-    public static var legacyPayloadCharacteristicUUID : CBUUID? = nil
-    /// Legacy characteristic. E.g. could be set to: CBMutableCharacteristic(type: BLESensorConfiguration.legacyPayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable])
-    public static var legacyPayloadCharacteristic : CBMutableCharacteristic? = nil
     /// Manufacturer data is being used on Android to store pseudo device address
     /// - Pending update to dedicated ID
     public static var manufacturerIdForSensor = UInt16(65530)
 
+    
+    /// Legacy payload sharing characteristic
+    /// - Enable support for capturing of legacy read/write based protocol
+    /// - Set UUID to null to disable feature
+    /// - Example protocol is TT service that reads and writes payload via a GATT characteristic
+    /// ---- Herald will read from this characteristic to obtain legacy payload
+    /// ---- Data written to this characteristic by legacy protocol will be captured by Herald
+    public static var legacyPayloadCharacteristicUUID : CBUUID? = nil
+    /// Legacy characteristic. E.g. could be set to: CBMutableCharacteristic(type: BLESensorConfiguration.legacyPayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable])
+    public static var legacyPayloadCharacteristic : CBMutableCharacteristic? = nil
+    /// Legacy advert only protocol service
+    /// - Enable support for capturing of legacy advert only protocols
+    /// - Assumes protocol advertises a service UUID and boardcasts token data in service data area
+    /// - Set UUID to null to disable feature
+    /// - Example protocol is EN service that uses a 16-bit UUID and data key 0xFD6F
+    /// --- Scan for 16-bit UUID by setting the value xxxx in base UUID 0000xxxx-0000-1000-8000-00805F9B34FB
+    /// --- Read broadcasted token data from service data area associated with given data key "FD6F"
+    ///     legacyAdvertOnlyProtocolServiceUUID : CBUUID? = CBUUID(string: "FD6F")
+    ///     legacyAdvertOnlyProtocolServiceUUIDDataKey : CBUUID? = CBUUID(string: "FD6F")
+    public static var legacyAdvertOnlyProtocolServiceUUID : CBUUID? = nil
+    public static var legacyAdvertOnlyProtocolServiceUUIDDataKey : CBUUID? = nil
+
+    
     // MARK:- BLE signal characteristic action codes
     
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data

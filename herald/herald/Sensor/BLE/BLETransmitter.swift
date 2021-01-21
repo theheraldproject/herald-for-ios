@@ -422,18 +422,18 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         switch request.characteristic.uuid {
         case BLESensorConfiguration.payloadCharacteristicUUID:
             logger.debug("Read (central=\(central.description),characteristic=payload,offset=\(request.offset))")
-            let pd = payloadDataSupplier.payload(PayloadTimestamp(), device: central)
-            guard let data = pd else {
+            let payloadDataSupplied = payloadDataSupplier.payload(PayloadTimestamp(), device: central)
+            guard let payloadData = payloadDataSupplied else {
                 logger.fault("Read, no payload data supplied (central=\(central.description),characteristic=payload,offset=\(request.offset),data=BLANK)")
                 queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }
                 return
             }
-            guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.count))")
+            guard request.offset < payloadData.count else {
+                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(payloadData.count))")
                 queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }
                 return
             }
-            request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
+            request.value = (request.offset == 0 ? payloadData.data : payloadData.subdata(in: request.offset..<payloadData.count))
             queue.async { peripheral.respond(to: request, withResult: .success) }
         default:
             logger.fault("Read (central=\(central.description),characteristic=unknown)")
