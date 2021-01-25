@@ -8,7 +8,7 @@
 import Foundation
 import Accelerate
 
-extension Data {
+public extension Data {
     
     var hexEncodedString: String { get {
         return map { String(format: "%02hhX", $0) }.joined()
