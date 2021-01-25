@@ -86,11 +86,11 @@ public typealias TargetIdentifier = String
 /// Raw data for estimating proximity between sensor and target, e.g. RSSI for BLE.
 public struct Proximity {
     /// Unit of measurement, e.g. RSSI
-    let unit: ProximityMeasurementUnit
+    public let unit: ProximityMeasurementUnit
     /// Measured value, e.g. raw RSSI value.
-    let value: Double
+    public let value: Double
     /// Calibration data (optional), e.g. transmit power
-    let calibration: Calibration?
+    public let calibration: Calibration?
     /// Get plain text description of proximity data
     public var description: String { get {
         guard let calibration = calibration else {
@@ -117,9 +117,9 @@ public enum ProximityMeasurementUnit : String {
 /// Calibration data for interpreting proximity value between sensor and target, e.g. Transmit power for BLE.
 public struct Calibration {
     /// Unit of measurement, e.g. transmit power
-    let unit: CalibrationMeasurementUnit
+    public let unit: CalibrationMeasurementUnit
     /// Measured value, e.g. transmit power in BLE advert
-    let value: Double
+    public let value: Double
     /// Get plain text description of calibration data
     public var description: String { get {
         unit.rawValue + ":" + value.description
