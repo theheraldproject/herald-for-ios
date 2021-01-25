@@ -56,6 +56,7 @@
 		B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */; };
 		B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74607255714C2003567B7 /* BloomFilterTests.swift */; };
 		B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74608255714C2003567B7 /* InteractionsTests.swift */; };
+		D301023D25B8DD8300598DF4 /* ExtendedDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +122,7 @@
 		B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcherTests.swift; sourceTree = "<group>"; };
 		B6F74607255714C2003567B7 /* BloomFilterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilterTests.swift; sourceTree = "<group>"; };
 		B6F74608255714C2003567B7 /* InteractionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractionsTests.swift; sourceTree = "<group>"; };
+		D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedDataTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -287,6 +289,7 @@
 				6F273A4F258641CA0090B3B5 /* VenueDiaryTests.swift */,
 				6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */,
 				B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */,
+				D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -475,6 +478,7 @@
 			files = (
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
 				B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */,
+				D301023D25B8DD8300598DF4 /* ExtendedDataTests.swift in Sources */,
 				6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */,
 				B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */,
 				6FBC6F2025867508001A86CE /* DataExtensionTests.swift in Sources */,
