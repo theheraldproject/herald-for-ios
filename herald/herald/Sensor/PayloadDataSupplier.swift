@@ -58,22 +58,22 @@ public class PayloadData : Hashable, Equatable {
         return String(data.subdata(in: 3..<data.count).base64EncodedString().prefix(6))
     }
 
-    init(_ data: Data) {
+    public init(_ data: Data) {
         self.data = data
     }
 
-    init?(base64Encoded: String) {
+    public init?(base64Encoded: String) {
         guard let data = Data(base64Encoded: base64Encoded) else {
             return nil
         }
         self.data = data
     }
 
-    init(repeating: UInt8, count: Int) {
+    public init(repeating: UInt8, count: Int) {
         self.data = Data(repeating: repeating, count: count)
     }
 
-    init() {
+    public init() {
         self.data = Data()
     }
     
@@ -107,52 +107,52 @@ public class PayloadData : Hashable, Equatable {
 
     // MARK:- Append
 
-    func append(_ other: PayloadData) {
+    public func append(_ other: PayloadData) {
         data.append(other.data)
     }
     
-    func append(_ other: Data) {
+    public func append(_ other: Data) {
         data.append(other)
     }
 
-    func append(_ other: Int8) {
+    public func append(_ other: Int8) {
         data.append(other)
     }
 
-    func append(_ other: Int16) {
+    public func append(_ other: Int16) {
         data.append(other)
     }
     
-    func append(_ other: Int32) {
+    public func append(_ other: Int32) {
         data.append(other)
     }
     
-    func append(_ other: Int64) {
+    public func append(_ other: Int64) {
         data.append(other)
     }
 
-    func append(_ other: UInt8) {
+    public func append(_ other: UInt8) {
         data.append(other)
     }
 
-    func append(_ other: UInt16) {
+    public func append(_ other: UInt16) {
         data.append(other)
     }
     
-    func append(_ other: UInt32) {
+    public func append(_ other: UInt32) {
         data.append(other)
     }
     
-    func append(_ other: UInt64) {
+    public func append(_ other: UInt64) {
         data.append(other)
     }
 
     @available(iOS 14.0, *)
-    func append(_ other: Float16) {
+    public func append(_ other: Float16) {
         data.append(other)
     }
     
-    func append(_ other: Float32) {
+    public func append(_ other: Float32) {
         data.append(other)
     }
 }
@@ -161,7 +161,7 @@ public class PayloadData : Hashable, Equatable {
 public class LegacyPayloadData : PayloadData {
     public let service: String
     
-    init(service: String, data: Data) {
+    public init(service: String, data: Data) {
         self.service = service
         super.init(data)
     }
