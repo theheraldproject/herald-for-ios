@@ -41,22 +41,6 @@ public class SensorArray : NSObject, Sensor {
             sensorArray.append(ConcreteInertiaSensor());
             add(delegate: CalibrationLog(filename: "calibration.csv"));
         }
-
-        if let payloadData = payloadData {
-            // Loggers
-            #if DEBUG
-            add(delegate: ContactLog(filename: "contacts.csv"))
-            add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
-            add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
-            _ = BatteryLog(filename: "battery.csv")
-            if BLESensorConfiguration.payloadDataUpdateTimeInterval != .never {
-                add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
-            }
-            #endif
-            logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
-        } else {
-            logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
-        }
     }
     
     private func deviceModel() -> String {

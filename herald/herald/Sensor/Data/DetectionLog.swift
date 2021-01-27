@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 /// CSV contact log for post event analysis and visualisation
-class DetectionLog: NSObject, SensorDelegate {
+public class DetectionLog: NSObject, SensorDelegate {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.DetectionLog")
     private let textFile: TextFile
     private let payloadData: PayloadData
@@ -18,7 +18,7 @@ class DetectionLog: NSObject, SensorDelegate {
     private var payloads: Set<String> = []
     private let queue = DispatchQueue(label: "Sensor.Data.DetectionLog.Queue")
     
-    init(filename: String, payloadData: PayloadData) {
+    public init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
         self.payloadData = payloadData
         super.init()
@@ -50,7 +50,7 @@ class DetectionLog: NSObject, SensorDelegate {
     
     // MARK:- SensorDelegate
     
-    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         queue.async {
             if self.payloads.insert(didRead.shortName).inserted {
                 self.logger.debug("didRead (payload=\(didRead.shortName))")
@@ -59,7 +59,7 @@ class DetectionLog: NSObject, SensorDelegate {
         }
     }
     
-    func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         didShare.forEach() { payloadData in
             queue.async {
                 if self.payloads.insert(payloadData.shortName).inserted {

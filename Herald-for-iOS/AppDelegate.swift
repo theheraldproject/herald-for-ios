@@ -44,6 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         payloadDataSupplier = MockSonarPayloadSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
+        addEfficacyLogging()
         sensor?.start()
         
         // EXAMPLE immediate data send function (note: NOT wrapped with Herald header)
@@ -62,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         
         // Add ourselves as delegate
         sensor?.add(delegate: self)
+        addEfficacyLogging()
         sensor?.start()
     }
     
@@ -76,7 +78,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
             stopBeacon()
         }
     }
-    
+
+    // MARK:- Efficacy Logging
+
+    func addEfficacyLogging() {
+        if let payloadData = sensor?.payloadData {
+            // Loggers
+            #if DEBUG
+            sensor?.add(delegate: ContactLog(filename: "contacts.csv"))
+            sensor?.add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
+            sensor?.add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
+            _ = BatteryLog(filename: "battery.csv")
+            if BLESensorConfiguration.payloadDataUpdateTimeInterval != .never {
+                sensor?.add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
+            }
+            #endif
+            logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
+        } else {
+            logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
+        }
+    }
+
     // MARK:- UIApplicationDelegate
     
     func applicationDidBecomeActive(_ application: UIApplication) {
