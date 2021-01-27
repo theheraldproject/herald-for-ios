@@ -24,7 +24,7 @@
 		B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF62251E56320072D238 /* BLEReceiver.swift */; };
 		B637EF7E251E56320072D238 /* MobilitySensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* MobilitySensor.swift */; };
 		B637EF7F251E56320072D238 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF65251E56320072D238 /* Sensor.swift */; };
-		B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */; };
+		B637EF80251E56320072D238 /* TestPayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* TestPayloadDataSupplier.swift */; };
 		B637EF86251E56320072D238 /* SensorArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6F251E56320072D238 /* SensorArray.swift */; };
 		B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF70251E56320072D238 /* PayloadDataSupplier.swift */; };
 		B637EF88251E56320072D238 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF72251E56320072D238 /* TextFile.swift */; };
@@ -89,7 +89,7 @@
 		B637EF62251E56320072D238 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
 		B637EF64251E56320072D238 /* MobilitySensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobilitySensor.swift; sourceTree = "<group>"; };
 		B637EF65251E56320072D238 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
-		B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
+		B637EF68251E56320072D238 /* TestPayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestPayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF6F251E56320072D238 /* SensorArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorArray.swift; sourceTree = "<group>"; };
 		B637EF70251E56320072D238 /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF72251E56320072D238 /* TextFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
@@ -235,17 +235,17 @@
 				6F52D508257C4F4A0097DD92 /* Extended */,
 				6F52D4FB257C46D30097DD92 /* Beacon */,
 				B650151225229CED0070F774 /* Simple */,
-				B637EF67251E56320072D238 /* Sonar */,
+				B637EF67251E56320072D238 /* Test */,
 			);
 			path = Payload;
 			sourceTree = "<group>";
 		};
-		B637EF67251E56320072D238 /* Sonar */ = {
+		B637EF67251E56320072D238 /* Test */ = {
 			isa = PBXGroup;
 			children = (
-				B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */,
+				B637EF68251E56320072D238 /* TestPayloadDataSupplier.swift */,
 			);
-			path = Sonar;
+			path = Test;
 			sourceTree = "<group>";
 		};
 		B637EF71251E56320072D238 /* Data */ = {
@@ -461,7 +461,7 @@
 				B6F745FE25571475003567B7 /* XXH3.swift in Sources */,
 				6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
-				B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */,
+				B637EF80251E56320072D238 /* TestPayloadDataSupplier.swift in Sources */,
 				B6F745F3255713C2003567B7 /* Sample.swift in Sources */,
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
 				B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */,
@@ -627,8 +627,10 @@
 		B637EF59251E55E60072D238 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -652,8 +654,10 @@
 		B637EF5A251E55E60072D238 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

@@ -98,7 +98,8 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.fault("start denied, not powered on")
             return
         }
-        if signalCharacteristic != nil, payloadCharacteristic != nil, (BLESensorConfiguration.legacyPayloadCharacteristicUUID == nil || legacyPayloadCharacteristic != nil) {
+        if signalCharacteristic != nil, payloadCharacteristic != nil,
+           (!BLESensorConfiguration.interopOpenTraceEnabled || legacyPayloadCharacteristic != nil) {
             logger.debug("starting advert with existing characteristics")
             if !peripheral.isAdvertising {
                 startAdvertising(withNewCharacteristics: false)
@@ -137,7 +138,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil || legacyPayloadCharacteristic == nil {
             signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
-            legacyPayloadCharacteristic = BLESensorConfiguration.legacyPayloadCharacteristic
+            legacyPayloadCharacteristic = (BLESensorConfiguration.interopOpenTraceEnabled ? CBMutableCharacteristic(type: BLESensorConfiguration.interopOpenTracePayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable]) : nil)
         }
         let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
         signalCharacteristic?.value = nil

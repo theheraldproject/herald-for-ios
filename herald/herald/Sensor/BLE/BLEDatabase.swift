@@ -320,38 +320,59 @@ class BLEPseudoDeviceAddress {
         }}
     
     init?(fromAdvertisementData: [String: Any]) {
-        guard let manufacturerData = fromAdvertisementData["kCBAdvDataManufacturerData"] as? Data else {
+        guard let manufacturerData = fromAdvertisementData[CBAdvertisementDataManufacturerDataKey] as? Data else {
             return nil
         }
-        guard let manufacturerId = manufacturerData.uint16(0), manufacturerId == BLESensorConfiguration.manufacturerIdForSensor else {
+        guard let manufacturerId = manufacturerData.uint16(0) else {
             return nil
         }
-        guard manufacturerData.count == 8 else {
+        // HERALD pseudo device address
+        if manufacturerId == BLESensorConfiguration.manufacturerIdForSensor, manufacturerData.count == 8 {
+            data = Data(manufacturerData.subdata(in: 2..<8))
+            var longValueData = Data(repeating: 0, count: 2)
+            longValueData.append(data)
+            guard let longValue = longValueData.int64(0) else {
+                return nil
+            }
+            address = Int64(longValue)
+        }
+        // Legacy pseudo device address
+        else if BLESensorConfiguration.interopOpenTraceEnabled, manufacturerId == BLESensorConfiguration.interopOpenTraceManufacturerId, manufacturerData.count > 2 {
+            data = Data(manufacturerData.subdata(in: 2..<min(8, manufacturerData.count)))
+            var longValueData = Data(data)
+            if longValueData.count < 8 {
+                longValueData.append(Data(repeating: 0, count: 8 - longValueData.count))
+            }
+            guard let longValue = longValueData.int64(0) else {
+                return nil
+            }
+            address = Int64(longValue)
+        }
+        // Pseudo device address not detected
+        else {
             return nil
         }
-        data = Data(manufacturerData.subdata(in: 2..<8))
-        var longValueData = Data(repeating: 0, count: 2)
-        longValueData.append(data)
-        guard let longValue = longValueData.int64(0) else {
-            return nil
-        }
-        address = Int64(longValue)
     }
 }
 
+
 /// Legacy advert only protocol data extracted from service data
 class BLELegacyAdvertOnlyProtocolData {
-    let service: String
+    let service: UUID
     let connectable: Bool
     let data: Data // BIG ENDIAN (network order) AT THIS POINT
     var description: String { get {
-        return "BLELegacyAdvertOnlyProtocolData(service=\(service.description),connectable=\(connectable.description),data=\(data.base64EncodedString()))"
+        return "BLELegacyAdvertOnlyProtocolData(service=\(service.uuidString),connectable=\(connectable.description),data=\(data.base64EncodedString()))"
         }}
     var payloadData: LegacyPayloadData { get {
         return LegacyPayloadData(service: service, data: data)
     }}
     
     init?(fromAdvertisementData: [String: Any]) {
+        // Interoperability is enabled
+        guard BLESensorConfiguration.interopAdvertBasedProtocolEnabled else {
+            return nil
+        }
         // Get service data
         guard let serviceDataDictionary = fromAdvertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID:NSData] else {
             return nil
@@ -362,12 +383,12 @@ class BLELegacyAdvertOnlyProtocolData {
         }
         self.connectable = (isConnectableValue != 0)
         // Extract data for specific service data key
-        guard let serviceDataKey = BLESensorConfiguration.legacyAdvertOnlyProtocolServiceUUIDDataKey,
-              let serviceData = serviceDataDictionary[serviceDataKey],
+        guard let service = UUID(uuidString: BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString),
+              let serviceData = serviceDataDictionary[BLESensorConfiguration.interopAdvertBasedProtocolServiceDataKey],
               serviceData.count > 0 else {
             return nil
         }
-        self.service = serviceDataKey.uuidString
+        self.service = service
         // Service data on iOS is little endian, reversing
         // to big endian for consistency with Android
         self.data = Data(serviceData.reversed())

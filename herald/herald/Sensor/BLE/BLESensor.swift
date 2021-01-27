@@ -35,26 +35,35 @@ public struct BLESensorConfiguration {
     public static var manufacturerIdForSensor = UInt16(65530)
 
     
-    /// Legacy payload sharing characteristic
-    /// - Enable support for capturing of legacy read/write based protocol
-    /// - Set UUID to null to disable feature
-    /// - Example protocol is TT service that reads and writes payload via a GATT characteristic
-    /// ---- Herald will read from this characteristic to obtain legacy payload
-    /// ---- Data written to this characteristic by legacy protocol will be captured by Herald
-    public static var legacyPayloadCharacteristicUUID : CBUUID? = nil
-    /// Legacy characteristic. E.g. could be set to: CBMutableCharacteristic(type: BLESensorConfiguration.legacyPayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable])
-    public static var legacyPayloadCharacteristic : CBMutableCharacteristic? = nil
-    /// Legacy advert only protocol service
-    /// - Enable support for capturing of legacy advert only protocols
-    /// - Assumes protocol advertises a service UUID and boardcasts token data in service data area
-    /// - Set UUID to null to disable feature
-    /// - Example protocol is EN service that uses a 16-bit UUID and data key 0xFD6F
-    /// --- Scan for 16-bit UUID by setting the value xxxx in base UUID 0000xxxx-0000-1000-8000-00805F9B34FB
-    /// --- Read broadcasted token data from service data area associated with given data key "FD6F"
-    ///     legacyAdvertOnlyProtocolServiceUUID : CBUUID? = CBUUID(string: "FD6F")
-    ///     legacyAdvertOnlyProtocolServiceUUIDDataKey : CBUUID? = CBUUID(string: "FD6F")
-    public static var legacyAdvertOnlyProtocolServiceUUID : CBUUID? = nil
-    public static var legacyAdvertOnlyProtocolServiceUUIDDataKey : CBUUID? = nil
+    // MARK:- Interoperability with OpenTrace
+
+    /// OpenTrace service UUID, characteristic UUID, and manufacturer ID
+    /// - Enables capture of OpenTrace payloads, e.g. for transition to HERALD
+    /// - HERALD will discover devices advertising OpenTrace service UUID (can be the same as HERALD service UUID)
+    /// - HERALD will search for OpenTrace characteristic, write payload of self to target,
+    ///   read payload from target, and capture payload written to self by target.
+    /// - OpenTrace payloads will be reported via SensorDelegate:didRead where the payload
+    ///   has type LegacyPayloadData, and service will be the OpenTrace characteristic UUID.
+    /// - Set interopOpenTraceEnabled = false to disable feature
+    public static var interopOpenTraceEnabled = false
+    public static var interopOpenTraceServiceUUID = CBUUID(string: "A6BA4286-C550-4794-A888-9467EF0B31A8")
+    public static var interopOpenTracePayloadCharacteristicUUID  = CBUUID(string: "D1034710-B11E-42F2-BCA3-F481177D5BB2")
+    public static var interopOpenTraceManufacturerId = UInt16(1023)
+    
+
+    // MARK:- Interoperability with Advert based protocols
+
+    /// Advert based protocol service UUID, service data key
+    /// - Enable capture of advert based protocol payloads, e.g. for transition to HERALD
+    /// - HERALD will discover devices advertising protocol service UUID (can be the same as HERALD service UUID)
+    /// - HERALD will parse service data to read payload from target
+    /// - Protocol payloads will be reported via SensorDelegate:didRead where the payload
+    ///   has type LegacyPayloadData, and service will be the protocol service UUID.
+    /// - Set interopAdvertBasedProtocolEnabled = false to disable feature
+    /// - Scan for 16-bit service UUID by setting the value xxxx in base UUID 0000xxxx-0000-1000-8000-00805F9B34FB
+    public static var interopAdvertBasedProtocolEnabled = false
+    public static var interopAdvertBasedProtocolServiceUUID = CBUUID(string: "FD6F")
+    public static var interopAdvertBasedProtocolServiceDataKey = CBUUID(string: "FD6F")
 
     
     // MARK:- BLE signal characteristic action codes
