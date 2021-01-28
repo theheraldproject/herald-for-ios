@@ -165,16 +165,22 @@ public class PayloadData : Hashable, Equatable {
 /// Payload data associated with legacy service
 public class LegacyPayloadData : PayloadData {
     public let service: UUID
-    public var protocolName: String { get {
+    public var protocolName: ProtocolName { get {
         switch service.uuidString {
+        case BLESensorConfiguration.serviceUUID.uuidString:
+            return .HERALD
         case BLESensorConfiguration.interopOpenTraceServiceUUID.uuidString:
-            return "OpenTrace"
+            return .OPENTRACE
         case BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString:
-            return "AdvertBased"
+            return .ADVERT
         default:
-            return "Unknown"
+            return .UNKNOWN
         }
     }}
+    
+    public enum ProtocolName : String {
+        case UNKNOWN, NOT_AVAILABLE, HERALD, OPENTRACE, ADVERT
+    }
     
     public init(service: UUID, data: Data) {
         self.service = service
