@@ -17,10 +17,12 @@ public class DetectionLog: NSObject, SensorDelegate {
     private let deviceOS = UIDevice.current.systemVersion
     private var payloads: Set<String> = []
     private let queue = DispatchQueue(label: "Sensor.Data.DetectionLog.Queue")
-    
-    public init(filename: String, payloadData: PayloadData) {
+    private let payloadDataFormatter: PayloadDataFormatter
+
+    public init(filename: String, payloadData: PayloadData, payloadDataFormatter: PayloadDataFormatter = ConcretePayloadDataFormatter()) {
         textFile = TextFile(filename: filename)
         self.payloadData = payloadData
+        self.payloadDataFormatter = payloadDataFormatter
         super.init()
         write()
     }
@@ -30,10 +32,10 @@ public class DetectionLog: NSObject, SensorDelegate {
     }
 
     private func write() {
-        var content = "\(csv(deviceName)),iOS,\(csv(deviceOS)),\(csv(payloadData.shortName))"
+        var content = "\(csv(deviceName)),iOS,\(csv(deviceOS)),\(csv(payloadDataFormatter.shortFormat(payloadData)))"
         var payloadList: [String] = []
         payloads.forEach() { payload in
-            guard payload != payloadData.shortName else {
+            guard payload != payloadDataFormatter.shortFormat(payloadData) else {
                 return
             }
             payloadList.append(payload)
@@ -52,8 +54,8 @@ public class DetectionLog: NSObject, SensorDelegate {
     
     public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         queue.async {
-            if self.payloads.insert(didRead.shortName).inserted {
-                self.logger.debug("didRead (payload=\(didRead.shortName))")
+            if self.payloads.insert(self.payloadDataFormatter.shortFormat(didRead)).inserted {
+                self.logger.debug("didRead (payload=\(self.payloadDataFormatter.shortFormat(didRead)))")
                 self.write()
             }
         }
@@ -62,8 +64,8 @@ public class DetectionLog: NSObject, SensorDelegate {
     public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         didShare.forEach() { payloadData in
             queue.async {
-                if self.payloads.insert(payloadData.shortName).inserted {
-                    self.logger.debug("didShare (payload=\(payloadData.shortName))")
+                if self.payloads.insert(self.payloadDataFormatter.shortFormat(payloadData)).inserted {
+                    self.logger.debug("didShare (payload=\(self.payloadDataFormatter.shortFormat(payloadData)))")
                     self.write()
                 }
             }
