@@ -11,13 +11,15 @@ import Foundation
 public class ContactLog: NSObject, SensorDelegate {
     private let textFile: TextFile
     private let dateFormatter = DateFormatter()
-    
-    public init(filename: String) {
+    private let payloadDataFormatter: PayloadDataFormatter
+
+    public init(filename: String, payloadDataFormatter: PayloadDataFormatter = ConcretePayloadDataFormatter()) {
         textFile = TextFile(filename: filename)
         if textFile.empty() {
             textFile.write("time,sensor,id,detect,read,measure,share,visit,data")
         }
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        self.payloadDataFormatter = payloadDataFormatter
     }
     
     private func timestamp() -> String {
@@ -36,7 +38,7 @@ public class ContactLog: NSObject, SensorDelegate {
     }
     
     public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
-        textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,2,,,," + csv(didRead.shortName))
+        textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,2,,,," + csv(payloadDataFormatter.shortFormat(didRead)))
     }
     
     public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
@@ -46,7 +48,7 @@ public class ContactLog: NSObject, SensorDelegate {
     public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let prefix = timestamp() + "," + sensor.rawValue + "," + csv(fromTarget)
         didShare.forEach() { payloadData in
-            textFile.write(prefix + ",,,,4,," + csv(payloadData.shortName))
+            textFile.write(prefix + ",,,,4,," + csv(payloadDataFormatter.shortFormat(payloadData)))
         }
     }
     
