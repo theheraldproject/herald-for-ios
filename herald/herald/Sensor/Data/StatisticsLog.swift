@@ -8,14 +8,14 @@
 import Foundation
 
 /// CSV contact log for post event analysis and visualisation
-class StatisticsLog: NSObject, SensorDelegate {
+public class StatisticsLog: NSObject, SensorDelegate {
     private let textFile: TextFile
     private let payloadData: PayloadData
     private var identifierToPayload: [TargetIdentifier:String] = [:]
     private var payloadToTime: [String:Date] = [:]
     private var payloadToSample: [String:Sample] = [:]
     
-    init(filename: String, payloadData: PayloadData) {
+    public init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
         self.payloadData = payloadData
     }
@@ -68,16 +68,16 @@ class StatisticsLog: NSObject, SensorDelegate {
 
     // MARK:- SensorDelegate
     
-    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         identifierToPayload[fromTarget] = didRead.shortName
         add(identifier: fromTarget)
     }
     
-    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         add(identifier: fromTarget)
     }
     
-    func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         didShare.forEach() { payloadData in
             add(payload: payloadData.shortName)
         }

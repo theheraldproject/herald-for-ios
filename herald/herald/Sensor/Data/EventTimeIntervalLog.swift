@@ -8,7 +8,7 @@
 import Foundation
 
 /// CSV log of events for analysis and visualisation
-class EventTimeIntervalLog: NSObject, SensorDelegate {
+public class EventTimeIntervalLog: NSObject, SensorDelegate {
     private let textFile: TextFile
     private let payloadData: PayloadData
     private let eventType: EventTimeIntervalLogEventType
@@ -16,7 +16,7 @@ class EventTimeIntervalLog: NSObject, SensorDelegate {
     private var payloadToTime: [String:Date] = [:]
     private var payloadToSample: [String:Sample] = [:]
     
-    init(filename: String, payloadData: PayloadData, eventType: EventTimeIntervalLogEventType) {
+    public init(filename: String, payloadData: PayloadData, eventType: EventTimeIntervalLogEventType) {
         textFile = TextFile(filename: filename)
         self.payloadData = payloadData
         self.eventType = eventType
@@ -65,7 +65,7 @@ class EventTimeIntervalLog: NSObject, SensorDelegate {
 
     // MARK:- SensorDelegate
     
-    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         let payload = didRead.shortName
         targetIdentifierToPayload[fromTarget] = payload
         guard eventType == .read else {
@@ -74,21 +74,21 @@ class EventTimeIntervalLog: NSObject, SensorDelegate {
         add(payload: payload)
     }
     
-    func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
         guard eventType == .detect, let payload = targetIdentifierToPayload[didDetect] else {
             return
         }
         add(payload: payload)
     }
     
-    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         guard eventType == .measure, let payload = targetIdentifierToPayload[fromTarget] else {
             return
         }
         add(payload: payload)
     }
     
-    func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         if eventType == .share, let payload = targetIdentifierToPayload[fromTarget] {
             add(payload: payload)
         } else if eventType == .sharedPeer {
@@ -99,7 +99,7 @@ class EventTimeIntervalLog: NSObject, SensorDelegate {
         }
     }
     
-    func sensor(_ sensor: SensorType, didVisit: Location?) {
+    public func sensor(_ sensor: SensorType, didVisit: Location?) {
         guard eventType == .visit else {
             return
         }

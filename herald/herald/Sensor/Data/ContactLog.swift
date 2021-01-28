@@ -8,11 +8,11 @@
 import Foundation
 
 /// CSV contact log for post event analysis and visualisation
-class ContactLog: NSObject, SensorDelegate {
+public class ContactLog: NSObject, SensorDelegate {
     private let textFile: TextFile
     private let dateFormatter = DateFormatter()
     
-    init(filename: String) {
+    public init(filename: String) {
         textFile = TextFile(filename: filename)
         if textFile.empty() {
             textFile.write("time,sensor,id,detect,read,measure,share,visit,data")
@@ -31,26 +31,26 @@ class ContactLog: NSObject, SensorDelegate {
     
     // MARK:- SensorDelegate
     
-    func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
         textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(didDetect) + ",1,,,,,")
     }
     
-    func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,2,,,," + csv(didRead.shortName))
     }
     
-    func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         textFile.write(timestamp() + "," + sensor.rawValue + "," + csv(fromTarget) + ",,,3,,," + csv(didMeasure.description))
     }
     
-    func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
+    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         let prefix = timestamp() + "," + sensor.rawValue + "," + csv(fromTarget)
         didShare.forEach() { payloadData in
             textFile.write(prefix + ",,,,4,," + csv(payloadData.shortName))
         }
     }
     
-    func sensor(_ sensor: SensorType, didVisit: Location?) {
+    public func sensor(_ sensor: SensorType, didVisit: Location?) {
         var visitString = ""
         if let dv = didVisit {
             visitString = dv.description

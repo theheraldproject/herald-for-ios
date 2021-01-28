@@ -10,13 +10,13 @@ import NotificationCenter
 import os
 
 /// Battery log for monitoring battery level over time
-class BatteryLog {
+public class BatteryLog {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "BatteryLog")
     private let textFile: TextFile
     private let dateFormatter = DateFormatter()
     private let updateInterval = TimeInterval(30)
 
-    init(filename: String) {
+    public init(filename: String) {
         textFile = TextFile(filename: filename)
         if textFile.empty() {
             textFile.write("time,source,level")
