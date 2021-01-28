@@ -93,9 +93,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
                 sensor?.add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
             }
             #endif
-            logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
-        } else {
-            logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
         }
     }
 

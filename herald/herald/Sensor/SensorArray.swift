@@ -41,6 +41,12 @@ public class SensorArray : NSObject, Sensor {
             sensorArray.append(ConcreteInertiaSensor());
             add(delegate: CalibrationLog(filename: "calibration.csv"));
         }
+
+        if let payloadData = payloadData {
+            logger.info("DEVICE (payloadPrefix=\(payloadData.shortName),description=\(SensorArray.deviceDescription))")
+        } else {
+            logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
+        }
     }
     
     private func deviceModel() -> String {
