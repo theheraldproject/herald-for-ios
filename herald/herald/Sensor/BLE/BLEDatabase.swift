@@ -319,39 +319,76 @@ class BLEPseudoDeviceAddress {
         return "BLEPseudoDeviceAddress(address=\(address),data=\(data.base64EncodedString()))"
         }}
     
-    init?(fromAdvertisementData: [String: Any]) {
-        guard let manufacturerData = fromAdvertisementData["kCBAdvDataManufacturerData"] as? Data else {
+    init(value: Int64) {
+        data = BLEPseudoDeviceAddress.encode(value)
+        // Decode is guaranteed to be successful because the data was encoded by itself
+        address = BLEPseudoDeviceAddress.decode(data)!
+    }
+    
+    init?(data: Data) {
+        guard data.count == 6, let value = BLEPseudoDeviceAddress.decode(data) else {
             return nil
         }
-        guard let manufacturerId = manufacturerData.uint16(0), manufacturerId == BLESensorConfiguration.manufacturerIdForSensor else {
+        address = value
+        self.data = BLEPseudoDeviceAddress.encode(address)
+    }
+    
+    convenience init?(fromAdvertisementData: [String: Any]) {
+        guard let manufacturerData = fromAdvertisementData[CBAdvertisementDataManufacturerDataKey] as? Data else {
             return nil
         }
-        guard manufacturerData.count == 8 else {
+        guard let manufacturerId = manufacturerData.uint16(0) else {
             return nil
         }
-        data = Data(manufacturerData.subdata(in: 2..<8))
-        var longValueData = Data(repeating: 0, count: 2)
-        longValueData.append(data)
-        guard let longValue = longValueData.int64(0) else {
+        // HERALD pseudo device address
+        if manufacturerId == BLESensorConfiguration.manufacturerIdForSensor, manufacturerData.count == 8 {
+            self.init(data: Data(manufacturerData.subdata(in: 2..<8)))
+        }
+        // Legacy pseudo device address
+        else if BLESensorConfiguration.interopOpenTraceEnabled, manufacturerId == BLESensorConfiguration.interopOpenTraceManufacturerId, manufacturerData.count > 2 {
+            var addressData = Data(manufacturerData.subdata(in: 2..<min(8, manufacturerData.count)))
+            if addressData.count < 6 {
+                addressData.append(Data(repeating: 0, count: 6 - addressData.count))
+            }
+            self.init(data: addressData)
+        }
+        // Pseudo device address not detected
+        else {
             return nil
         }
-        address = Int64(longValue)
+    }
+
+    private static func encode(_ value: Int64) -> Data {
+        var data = Data()
+        data.append(value)
+        return Data(data.subdata(in: 2..<8))
+    }
+
+    private static func decode(_ data: Data) -> Int64? {
+        var decoded = Data(repeating: 0, count: 2)
+        decoded.append(data)
+        return decoded.int64(0)
     }
 }
 
+
 /// Legacy advert only protocol data extracted from service data
 class BLELegacyAdvertOnlyProtocolData {
-    let service: String
+    let service: UUID
     let connectable: Bool
     let data: Data // BIG ENDIAN (network order) AT THIS POINT
     var description: String { get {
-        return "BLELegacyAdvertOnlyProtocolData(service=\(service.description),connectable=\(connectable.description),data=\(data.base64EncodedString()))"
+        return "BLELegacyAdvertOnlyProtocolData(service=\(service.uuidString),connectable=\(connectable.description),data=\(data.base64EncodedString()))"
         }}
     var payloadData: LegacyPayloadData { get {
         return LegacyPayloadData(service: service, data: data)
     }}
     
     init?(fromAdvertisementData: [String: Any]) {
+        // Interoperability is enabled
+        guard BLESensorConfiguration.interopAdvertBasedProtocolEnabled else {
+            return nil
+        }
         // Get service data
         guard let serviceDataDictionary = fromAdvertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID:NSData] else {
             return nil
@@ -362,12 +399,12 @@ class BLELegacyAdvertOnlyProtocolData {
         }
         self.connectable = (isConnectableValue != 0)
         // Extract data for specific service data key
-        guard let serviceDataKey = BLESensorConfiguration.legacyAdvertOnlyProtocolServiceUUIDDataKey,
-              let serviceData = serviceDataDictionary[serviceDataKey],
+        guard let service = UUID(uuidString: BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString),
+              let serviceData = serviceDataDictionary[BLESensorConfiguration.interopAdvertBasedProtocolServiceDataKey],
               serviceData.count > 0 else {
             return nil
         }
-        self.service = serviceDataKey.uuidString
+        self.service = service
         // Service data on iOS is little endian, reversing
         // to big endian for consistency with Android
         self.data = Data(serviceData.reversed())

@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     
     func startPhone() {
         phoneMode = true
-        payloadDataSupplier = MockSonarPayloadSupplier(identifier: identifier())
+        payloadDataSupplier = ConcreteTestPayloadDataSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
         sensor?.start()

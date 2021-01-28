@@ -11,7 +11,7 @@ import Foundation
 /// Implement this to integration your solution with this transport.
 public protocol PayloadDataSupplier {
     /// Legacy payload supplier callback - for those transitioning their apps to Herald. Note: Device may be null if Payload in use is same for all receivers
-    func legacyPayload(_ timestamp: PayloadTimestamp, device: Device?) -> PayloadData?
+    func legacyPayload(_ timestamp: PayloadTimestamp, device: Device?) -> LegacyPayloadData?
     
     /// Get payload for given timestamp. Use this for integration with any payload generator. Note: Device may be null if Payload in use is same for all receivers
     func payload(_ timestamp: PayloadTimestamp, device: Device?) -> PayloadData?
@@ -22,6 +22,12 @@ public protocol PayloadDataSupplier {
 
 /// Implements payload splitting function, assuming fixed length payloads.
 public extension PayloadDataSupplier {
+    
+    /// Default implementation returns nil.
+    func legacyPayload(_ timestamp: PayloadTimestamp, device: Device?) -> LegacyPayloadData? {
+        return nil
+    }
+    
     /// Default implementation assumes fixed length payload data.
     func payload(_ data: Data) -> [PayloadData] {
         // Get example payload to determine length
@@ -80,7 +86,7 @@ public class PayloadData : Hashable, Equatable {
     // MARK:- Data
     
     public var count: Int { get { data.count }}
-
+    
     public var hexEncodedString: String { get { data.hexEncodedString }}
     
     public func base64EncodedString() -> String {
@@ -94,7 +100,7 @@ public class PayloadData : Hashable, Equatable {
     // MARK:- Hashable
     
     public var hashValue: Int { get { data.hashValue } }
-
+    
     public func hash(into hasher: inout Hasher) {
         data.hash(into: &hasher)
     }
@@ -104,9 +110,8 @@ public class PayloadData : Hashable, Equatable {
     public static func ==(lhs: PayloadData, rhs: PayloadData) -> Bool {
         return lhs.data == rhs.data
     }
-
+    
     // MARK:- Append
-
     public func append(_ other: PayloadData) {
         data.append(other.data)
     }
@@ -146,7 +151,7 @@ public class PayloadData : Hashable, Equatable {
     public func append(_ other: UInt64) {
         data.append(other)
     }
-
+    
     @available(iOS 14.0, *)
     public func append(_ other: Float16) {
         data.append(other)
@@ -159,12 +164,59 @@ public class PayloadData : Hashable, Equatable {
 
 /// Payload data associated with legacy service
 public class LegacyPayloadData : PayloadData {
-    public let service: String
+    public let service: UUID
+    public var protocolName: ProtocolName { get {
+        switch service.uuidString {
+        case BLESensorConfiguration.serviceUUID.uuidString:
+            return .HERALD
+        case BLESensorConfiguration.interopOpenTraceServiceUUID.uuidString:
+            return .OPENTRACE
+        case BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString:
+            return .ADVERT
+        default:
+            return .UNKNOWN
+        }
+    }}
     
-    public init(service: String, data: Data) {
+    public enum ProtocolName : String {
+        case UNKNOWN, NOT_AVAILABLE, HERALD, OPENTRACE, ADVERT
+    }
+    
+    public init(service: UUID, data: Data) {
         self.service = service
         super.init(data)
     }
+    
+    public override var shortName: String { get {
+        // Decoder for test payload to assist debugging of OpenTrace interop
+        if service.uuidString == BLESensorConfiguration.interopOpenTraceServiceUUID.uuidString {
+            if let base64EncodedPayloadData = try? JSONDecoder().decode(CentralWriteDataV2.self, from: data).id,
+               let payloadData = PayloadData(base64Encoded: base64EncodedPayloadData) {
+                return payloadData.shortName
+            }
+            if let base64EncodedPayloadData = try? JSONDecoder().decode(PeripheralCharacteristicsDataV2.self, from: data).id,
+               let payloadData = PayloadData(base64Encoded: base64EncodedPayloadData) {
+                return payloadData.shortName
+            }
+        }
+        return super.shortName
+    }}
+}
 
-    public override var shortName: String { get { super.shortName + ":L" }}
+
+// MARK:- OpenTrace protocol data objects
+
+struct CentralWriteDataV2: Codable {
+    var mc: String // phone model of central
+    var rs: Double // rssi
+    var id: String // tempID
+    var o: String // organisation
+    var v: Int // protocol version
+}
+
+struct PeripheralCharacteristicsDataV2: Codable {
+    var mp: String // phone model of peripheral
+    var id: String // tempID
+    var o: String // organisation
+    var v: Int // protocol version
 }

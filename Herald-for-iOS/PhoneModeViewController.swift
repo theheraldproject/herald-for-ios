@@ -417,6 +417,10 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         // Venue
         let shortName = target.payloadData.shortName
         var labelText = "\(shortName)"
+        if let legacyPayloadData = target.payloadData as? LegacyPayloadData {
+            labelText += ":"
+            labelText += String(legacyPayloadData.protocolName.rawValue.prefix(1))
+        }
         venueDiary?.listRecordableEvents().forEach({ (evt) in
             self.logger.debug("listRecordableEvents item")
             guard let eventPayload = evt.payload else {

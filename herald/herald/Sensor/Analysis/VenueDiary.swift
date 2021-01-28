@@ -285,23 +285,23 @@ public class VenueDiary: NSObject, SensorDelegate {
     }
     
     public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {
-        logger.debug("VenueDiary.sensor didMeasure withPayload")
         // parse payload if venue
         guard sensor == SensorType.BLE || sensor == SensorType.BEACON || sensor == SensorType.BLMESH else {
             // Not going to be a useful payload, so return
             return
         }
-        logger.debug("VenueDiary.sensor didMeasure withPayload - valid payload")
-        
         do {
             guard let encounter = try VenueEncounter(didMeasure, withPayload) else {
                 return
             }
-            // add encounter
+            logger.debug("didVisit(payload=\(withPayload.shortName))")
             let _ = addEncounter(encounter, with: withPayload, at: Date())
+        } catch VenuePayloadParseError.UnsupportedPayloadIdAndVersion {
+            // Payload is not a Herald beacon, this will be a common condition
+            return
         } catch {
-            // parse error - silently ignore but log
-            logger.fault("Error parsing Beacon payload: \(error)")
+            // Parse payload failed, this should be logged
+            logger.fault("didVisit parse error (payload=\(withPayload.shortName),error=\(error))")
             return
         }
     }
