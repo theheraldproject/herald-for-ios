@@ -43,11 +43,13 @@ public class ConcreteTestPayloadDataSupplier : TestPayloadDataSupplier {
     
     public func payload(_ timestamp: PayloadTimestamp = PayloadTimestamp(), device: Device?) -> PayloadData? {
         let payloadData = PayloadData()
-        // First 3 bytes are reserved for protocolAndVersion (UInt8) + countryCode (UInt16)
-        payloadData.append(Data(repeating: 0, count: 3))
+        // First 1 byte = protocolAndVersion (UInt8)
+        payloadData.append(UInt8(0))
+        // Next 2 bytes = countryCode (UInt16)
+        payloadData.append(UInt16(0))
         // Next 4 bytes are used for fixed cross-platform identifier (Int32)
         payloadData.append(Int32(identifier))
-        // Fill with blank data to make payload the same size as that in SONAR
+        // Fill with blank data to make payload the same size expected length
         payloadData.append(Data(repeating: 0, count: length - payloadData.count))
         return payloadData
     }

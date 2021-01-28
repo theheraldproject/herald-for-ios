@@ -260,7 +260,7 @@ class DataExtensionTests: XCTestCase {
     func testHexTransform() throws {
         for i in 0...1000 {
             let expected = Data(repeating: UInt8(i % 255), count: i)
-            let hex = expected.hexEncodedString()
+            let hex = expected.hexEncodedString
             let actual = Data(hexEncodedString: hex)
             XCTAssertEqual(expected, actual)
         }

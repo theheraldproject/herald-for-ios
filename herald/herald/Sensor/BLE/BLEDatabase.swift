@@ -319,7 +319,21 @@ class BLEPseudoDeviceAddress {
         return "BLEPseudoDeviceAddress(address=\(address),data=\(data.base64EncodedString()))"
         }}
     
-    init?(fromAdvertisementData: [String: Any]) {
+    init(value: Int64) {
+        data = BLEPseudoDeviceAddress.encode(value)
+        // Decode is guaranteed to be successful because the data was encoded by itself
+        address = BLEPseudoDeviceAddress.decode(data)!
+    }
+    
+    init?(data: Data) {
+        guard data.count == 6, let value = BLEPseudoDeviceAddress.decode(data) else {
+            return nil
+        }
+        address = value
+        self.data = BLEPseudoDeviceAddress.encode(address)
+    }
+    
+    convenience init?(fromAdvertisementData: [String: Any]) {
         guard let manufacturerData = fromAdvertisementData[CBAdvertisementDataManufacturerDataKey] as? Data else {
             return nil
         }
@@ -328,30 +342,32 @@ class BLEPseudoDeviceAddress {
         }
         // HERALD pseudo device address
         if manufacturerId == BLESensorConfiguration.manufacturerIdForSensor, manufacturerData.count == 8 {
-            data = Data(manufacturerData.subdata(in: 2..<8))
-            var longValueData = Data(repeating: 0, count: 2)
-            longValueData.append(data)
-            guard let longValue = longValueData.int64(0) else {
-                return nil
-            }
-            address = Int64(longValue)
+            self.init(data: Data(manufacturerData.subdata(in: 2..<8)))
         }
         // Legacy pseudo device address
         else if BLESensorConfiguration.interopOpenTraceEnabled, manufacturerId == BLESensorConfiguration.interopOpenTraceManufacturerId, manufacturerData.count > 2 {
-            data = Data(manufacturerData.subdata(in: 2..<min(8, manufacturerData.count)))
-            var longValueData = Data(data)
-            if longValueData.count < 8 {
-                longValueData.append(Data(repeating: 0, count: 8 - longValueData.count))
+            var addressData = Data(manufacturerData.subdata(in: 2..<min(8, manufacturerData.count)))
+            if addressData.count < 6 {
+                addressData.append(Data(repeating: 0, count: 6 - addressData.count))
             }
-            guard let longValue = longValueData.int64(0) else {
-                return nil
-            }
-            address = Int64(longValue)
+            self.init(data: addressData)
         }
         // Pseudo device address not detected
         else {
             return nil
         }
+    }
+
+    private static func encode(_ value: Int64) -> Data {
+        var data = Data()
+        data.append(value)
+        return Data(data.subdata(in: 2..<8))
+    }
+
+    private static func decode(_ data: Data) -> Int64? {
+        var decoded = Data(repeating: 0, count: 2)
+        decoded.append(data)
+        return decoded.int64(0)
     }
 }
 

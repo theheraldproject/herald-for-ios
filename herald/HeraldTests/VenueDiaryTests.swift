@@ -117,7 +117,7 @@ class VenueDiaryTests: XCTestCase {
         
         let payload = supplier.payload(device: nil)
         XCTAssertNotNil(payload)
-        XCTAssertEqual("303A03040040E20100",payload!.hexEncodedString(options: .upperCase))
+        XCTAssertEqual("303A03040040E20100", payload?.hexEncodedString)
         // 0x30 = 30, 826 = 3A03, 4 = 0400, 123456 = 40E20100 - LittleEndian
         
         let encounter = try VenueEncounter(Proximity(unit: .RSSI, value: -55), payload!)
@@ -166,7 +166,7 @@ class VenueDiaryTests: XCTestCase {
         
         let payload = supplier.payload(device: nil)
         XCTAssertNotNil(payload)
-        XCTAssertEqual("303A03040040E20100",payload!.hexEncodedString(options: .upperCase))
+        XCTAssertEqual("303A03040040E20100", payload?.hexEncodedString)
         // 0x30 = 30, 826 = 3A03, 4 = 0400, 123456 = 40E20100 - LittleEndian
         
         let brokenPayload = PayloadData(payload!.subdata(in: 0..<8))// too short - by 1 byte
@@ -188,7 +188,7 @@ class VenueDiaryTests: XCTestCase {
         
         let payload = supplier.payload(device: nil)
         XCTAssertNotNil(payload)
-        XCTAssertEqual("303A03040040E20100",payload!.hexEncodedString(options: .upperCase))
+        XCTAssertEqual("303A03040040E20100", payload?.hexEncodedString)
         // 0x30 = 30, 826 = 3A03, 4 = 0400, 123456 = 40E20100 - LittleEndian
         
         let target = TargetIdentifier("SomeID")

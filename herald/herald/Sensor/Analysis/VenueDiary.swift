@@ -296,9 +296,12 @@ public class VenueDiary: NSObject, SensorDelegate {
             }
             logger.debug("didVisit(payload=\(withPayload.shortName))")
             let _ = addEncounter(encounter, with: withPayload, at: Date())
+        } catch VenuePayloadParseError.UnsupportedPayloadIdAndVersion {
+            // Payload is not a Herald beacon, this will be a common condition
+            return
         } catch {
-            // parse error - silently ignore but log
-            //logger.fault("Error parsing Beacon payload: \(error)")
+            // Parse payload failed, this should be logged
+            logger.fault("didVisit parse error (payload=\(withPayload.shortName),error=\(error))")
             return
         }
     }
