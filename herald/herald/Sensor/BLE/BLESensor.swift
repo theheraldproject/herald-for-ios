@@ -45,7 +45,7 @@ public struct BLESensorConfiguration {
     /// - OpenTrace payloads will be reported via SensorDelegate:didRead where the payload
     ///   has type LegacyPayloadData, and service will be the OpenTrace characteristic UUID.
     /// - Set interopOpenTraceEnabled = false to disable feature
-    public static var interopOpenTraceEnabled: Bool = true
+    public static var interopOpenTraceEnabled: Bool = false
     public static var interopOpenTraceServiceUUID: CBUUID = CBUUID(string: "A6BA4286-C550-4794-A888-9467EF0B31A8")
     public static var interopOpenTracePayloadCharacteristicUUID: CBUUID  = CBUUID(string: "D1034710-B11E-42F2-BCA3-F481177D5BB2")
     public static var interopOpenTraceManufacturerId: UInt16 = UInt16(1023)
@@ -61,7 +61,7 @@ public struct BLESensorConfiguration {
     ///   has type LegacyPayloadData, and service will be the protocol service UUID.
     /// - Set interopAdvertBasedProtocolEnabled = false to disable feature
     /// - Scan for 16-bit service UUID by setting the value xxxx in base UUID 0000xxxx-0000-1000-8000-00805F9B34FB
-    public static var interopAdvertBasedProtocolEnabled: Bool = true
+    public static var interopAdvertBasedProtocolEnabled: Bool = false
     public static var interopAdvertBasedProtocolServiceUUID: CBUUID = CBUUID(string: "0000FD6F-0000-1000-8000-00805F9B34FB")
     public static var interopAdvertBasedProtocolServiceDataKey: CBUUID = CBUUID(string: "FD6F")
 
