@@ -39,7 +39,11 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
         let accuracy = ConcreteMobilitySensor.locationAccuracy(resolution)
         logger.debug("init(resolution=\(resolution),accuracy=\(accuracy),rangeForBeacon=\(rangeForBeacon == nil ? "disabled" : rangeForBeacon!.description))")
         locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
+        if #available(iOS 13.4, *) {
+            self.locationManager.requestWhenInUseAuthorization()
+        } else {
+            self.locationManager.requestAlwaysAuthorization()
+        }
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = accuracy
         locationManager.distanceFilter = resolution
@@ -115,12 +119,20 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         var state = SensorState.off
         
-        if status == CLAuthorizationStatus.authorizedWhenInUse ||
-            status == CLAuthorizationStatus.authorizedAlways {
+        if status == CLAuthorizationStatus.authorizedWhenInUse {
+            self.locationManager.requestAlwaysAuthorization()
+            state = .on
+        }
+        
+        if status == CLAuthorizationStatus.authorizedAlways {
             state = .on
         }
         if status == CLAuthorizationStatus.notDetermined {
-            locationManager.requestAlwaysAuthorization()
+            if #available(iOS 13.4, *) {
+                self.locationManager.requestWhenInUseAuthorization()
+            } else {
+                self.locationManager.requestAlwaysAuthorization()
+            }
             locationManager.stopUpdatingLocation()
             locationManager.startUpdatingLocation()
         }
@@ -132,12 +144,16 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
     @available(iOS 14.0, *)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         var state = SensorState.off
-        if manager.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse ||
-            manager.authorizationStatus == CLAuthorizationStatus.authorizedAlways {
+        if manager.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse {
+            self.locationManager.requestAlwaysAuthorization()
+            state = .on
+        }
+        
+        if manager.authorizationStatus == CLAuthorizationStatus.authorizedAlways {
             state = .on
         }
         if manager.authorizationStatus == CLAuthorizationStatus.notDetermined {
-            locationManager.requestAlwaysAuthorization()
+            locationManager.requestWhenInUseAuthorization()
             locationManager.stopUpdatingLocation()
             locationManager.startUpdatingLocation()
         }
