@@ -10,6 +10,7 @@ import XCTest
 
 class SimplePayloadDataMatcherTests: XCTestCase {
 
+    @available(iOS 13.0, *)
     func testMatches() throws {
         let ks1 = SecretKey(repeating: 0, count: 2048)
         let ks2 = SecretKey(repeating: 1, count: 2048)
