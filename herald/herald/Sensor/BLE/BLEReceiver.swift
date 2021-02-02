@@ -57,6 +57,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private let statistics = TimeIntervalSample()
     /// Scan result queue for recording discovered devices with no immediate pending action.
     private var scanResults: [BLEDevice] = []
+    /// Enable programmatic control of receiver start/stop
+    private var receiverEnabled: Bool = false
     
     /// Create a BLE receiver that shares the same sequential dispatch queue as the transmitter because concurrent transmit and receive
     /// operations impacts CoreBluetooth stability. The receiver and transmitter share a common database of devices to enable the transmitter
@@ -83,22 +85,23 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     func start() {
-        logger.debug("start")
-        guard central != nil else {
-            return
+        if !receiverEnabled {
+            receiverEnabled = true
+            logger.debug("start, receiver enabled to follow bluetooth state")
+        } else {
+            logger.fault("start, receiver already enabled to follow bluetooth state")
         }
-        // Start scanning
-        if central.state == .poweredOn {
-            scan("start")
-        }
+        scan("start")
     }
     
     func stop() {
-        logger.debug("stop")
-        guard central != nil else {
-            return
+        if receiverEnabled {
+            receiverEnabled = false
+            logger.debug("stop, receiver disabled")
+        } else {
+            logger.fault("stop, receiver already disabled")
         }
-        guard central.isScanning else {
+        guard central != nil, central.isScanning else {
             logger.fault("stop denied, already stopped")
             return
         }
@@ -149,9 +152,13 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     /// All work starts from scan loop.
     func scan(_ source: String) {
+        guard receiverEnabled else {
+            logger.fault("scan disabled (source=\(source),receiverEnabled=false)")
+            return
+        }
         statistics.add()
         logger.debug("scan (source=\(source),statistics={\(statistics.description)})")
-        guard central.state == .poweredOn else {
+        guard central != nil, central.state == .poweredOn else {
             logger.fault("scan failed, bluetooth is not powered on")
             return
         }

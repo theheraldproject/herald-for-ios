@@ -64,6 +64,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private var notifyTimer: DispatchSourceTimer?
     /// Dedicated sequential queue for the shifting timer.
     private let notifyTimerQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLETransmitter.Timer")
+    private var transmitterEnabled: Bool = false
 
     /**
      Create a transmitter  that uses the same sequential dispatch queue as the receiver.
@@ -90,17 +91,37 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     }
     
     func start() {
-        logger.debug("start")
-        guard peripheral != nil else {
+        if !transmitterEnabled {
+            transmitterEnabled = true
+            logger.debug("start, transmitter enabled to follow bluetooth state")
+        } else {
+            logger.fault("start, transmitter already enabled to follow bluetooth state")
+        }
+        startAdvertising()
+    }
+    
+    func stop() {
+        if transmitterEnabled {
+            transmitterEnabled = false
+            logger.debug("stop, transmitter disabled")
+        } else {
+            logger.fault("stop, transmitter already disabled")
+        }
+        stopAdvertising()
+    }
+    
+    private func startAdvertising() {
+        logger.debug("startAdvertising (transmitterEnabled=\(transmitterEnabled))")
+        guard transmitterEnabled else {
             return
         }
-        guard peripheral.state == .poweredOn else {
-            logger.fault("start denied, not powered on")
+        guard peripheral != nil, peripheral.state == .poweredOn else {
+            logger.fault("startAdvertising, starting advert with existing characteristics")
             return
         }
         if signalCharacteristic != nil, payloadCharacteristic != nil,
            (!BLESensorConfiguration.interopOpenTraceEnabled || legacyPayloadCharacteristic != nil) {
-            logger.debug("starting advert with existing characteristics")
+            logger.debug("startAdvertising, starting advert with existing characteristics")
             if !peripheral.isAdvertising {
                 startAdvertising(withNewCharacteristics: false)
             } else {
@@ -109,28 +130,15 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                     self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
                 }
             }
-            logger.debug("start successful, for existing characteristics")
         } else {
+            logger.debug("startAdvertising, starting advert with new characteristics")
             startAdvertising(withNewCharacteristics: true)
-            logger.debug("start successful, for new characteristics")
         }
         signalCharacteristic?.subscribedCentrals?.forEach() { central in
             // FEATURE : Symmetric connection on subscribe
             _ = database.device(central.identifier.uuidString)
         }
         notifySubscribers("start")
-    }
-    
-    func stop() {
-        logger.debug("stop")
-        guard peripheral != nil else {
-            return
-        }
-        guard peripheral.isAdvertising else {
-            logger.fault("stop denied, already stopped (source=%s)")
-            return
-        }
-        stopAdvertising()
     }
     
     private func startAdvertising(withNewCharacteristics: Bool) {
@@ -159,6 +167,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     private func stopAdvertising() {
         logger.debug("stopAdvertising()")
+        guard peripheral != nil, peripheral.isAdvertising else {
+            return
+        }
         queue.async {
             self.peripheral.stopAdvertising()
         }
@@ -169,6 +180,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     /// All work starts from notify subscribers loop.
     /// Generate updateValue notification after 8 seconds to notify all subscribers and keep the iOS receivers awake.
     private func notifySubscribers(_ source: String) {
+        guard transmitterEnabled else {
+            return
+        }
         notifyTimer?.cancel()
         notifyTimer = DispatchSource.makeTimerSource(queue: notifyTimerQueue)
         notifyTimer?.schedule(deadline: DispatchTime.now() + BLESensorConfiguration.notificationDelay)
@@ -240,7 +254,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // Bluetooth on -> Advertise
         if (peripheral.state == .poweredOn) {
             logger.debug("Update state (state=poweredOn)")
-            start()
+            startAdvertising()
         } else {
             if #available(iOS 10.0, *) {
                 logger.debug("Update state (state=\(peripheral.state.description))")

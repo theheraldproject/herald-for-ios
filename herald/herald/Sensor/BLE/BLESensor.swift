@@ -176,15 +176,13 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     func start() {
         logger.debug("start")
         receiver.start()
-        // BLE receivers start on powerOn event, on status change the transmitter will be started.
-        // This is to request permissions and turn on dialogs sequentially
+        transmitter.start()
     }
 
     func stop() {
         logger.debug("stop")
         transmitter.stop()
         receiver.stop()
-        // BLE transmitter and receivers stops on powerOff event
     }
     
     func add(delegate: SensorDelegate) {

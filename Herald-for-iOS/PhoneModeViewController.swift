@@ -139,7 +139,18 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         logger.debug("app (state=background)")
     }
     
-        
+    @IBAction func sensorOnOffSwitchAction(_ sender: Any) {
+        guard let sensorOnOffSwitch = sender as? UISwitch else {
+            return
+        }
+        logger.debug("sensorOnOffSwitchAction (isOn=\(sensorOnOffSwitch.isOn))")
+        if sensorOnOffSwitch.isOn {
+            sensor.start()
+        } else {
+            sensor.stop()
+        }
+    }
+    
     // MARK:- Social mixing score
     
     private func socialMixingScoreUnit(_ setTo: UIButton, active: UIColor = .systemBlue, inactive: UIColor = .systemGray) {
