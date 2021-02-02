@@ -487,7 +487,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 1. RSSI
             logger.debug("taskInitiateNextAction (goal=rssi,device=\(device))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
-        } else if (!(device.signalCharacteristic != nil && device.payloadCharacteristic != nil) || device.legacyPayloadCharacteristic != nil) {
+        } else if !((device.signalCharacteristic != nil && device.payloadCharacteristic != nil) || device.legacyPayloadCharacteristic != nil) {
             // 2. Characteristics
             logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
             discoverServices("taskInitiateNextAction|" + source, peripheral)
