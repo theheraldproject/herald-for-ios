@@ -437,13 +437,11 @@ class BLELegacyAdvertOnlyProtocolData {
         self.connectable = (isConnectableValue != 0)
         // Extract data for specific service data key
         guard let service = UUID(uuidString: BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString),
-              let serviceData = serviceDataDictionary[BLESensorConfiguration.interopAdvertBasedProtocolServiceDataKey],
+              let serviceData = serviceDataDictionary[BLESensorConfiguration.interopAdvertBasedProtocolServiceDataKey] as Data?,
               serviceData.count > 0 else {
             return nil
         }
         self.service = service
-        // Service data on iOS is little endian, reversing
-        // to big endian for consistency with Android
-        self.data = Data(serviceData.reversed())
+        self.data = serviceData
     }
 }
