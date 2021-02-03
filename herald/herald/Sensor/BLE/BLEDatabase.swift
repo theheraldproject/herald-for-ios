@@ -117,7 +117,7 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
                 if device.operatingSystem != .android {
                     device.operatingSystem = .android
                 }
-                logger.debug("updateAddress (device=\(identifier))")
+                logger.debug("updateAddress (device=\(device))")
                 return device
             }
             // Create new Android device
@@ -159,7 +159,7 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
         }
         identifiers.forEach({ database[$0] = nil })
         queue.async {
-            self.logger.debug("delete (device=\(device),identifiers=\(identifiers.count)")
+            self.logger.debug("delete (device=\(device),identifiers=\(identifiers.count))")
             self.delegates.forEach { $0.bleDatabase(didDelete: device) }
         }
     }
