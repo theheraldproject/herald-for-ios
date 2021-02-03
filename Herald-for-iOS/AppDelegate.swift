@@ -89,7 +89,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
             sensor?.add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
             sensor?.add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
             _ = BatteryLog(filename: "battery.csv")
-            if BLESensorConfiguration.payloadDataUpdateTimeInterval != .never {
+            if (BLESensorConfiguration.payloadDataUpdateTimeInterval != .never ||
+                BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval != .never) {
                 sensor?.add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
             }
             #endif

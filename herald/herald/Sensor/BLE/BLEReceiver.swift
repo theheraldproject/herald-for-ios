@@ -440,6 +440,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
             return true
         }
+        if BLESensorConfiguration.interopOpenTraceEnabled, device.protocolIsOpenTrace,
+           device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
+            return true
+        }
         // iOS should always be connected
         if device.operatingSystem == .ios, let peripheral = device.peripheral, peripheral.state != .connected {
             return true
@@ -494,7 +498,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 1. RSSI
             logger.debug("taskInitiateNextAction (goal=rssi,device=\(device))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
-        } else if !((device.signalCharacteristic != nil && device.payloadCharacteristic != nil) || device.legacyPayloadCharacteristic != nil) {
+        } else if !(device.protocolIsHerald || device.protocolIsOpenTrace) {
             // 2. Characteristics
             logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
             discoverServices("taskInitiateNextAction|" + source, peripheral)
@@ -506,12 +510,17 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 4. Payload update
             logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
             readPayload("taskInitiateNextAction|" + source, device)
+        } else if BLESensorConfiguration.interopOpenTraceEnabled, device.protocolIsOpenTrace,
+               device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
+            // 5. Payload update for OpenTrace
+            logger.debug("taskInitiateNextAction (goal=payloadUpdate|OpenTrace,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+            readPayload("taskInitiateNextAction|" + source, device)
         } else if device.operatingSystem != .ios {
-            // 5. Disconnect Android
+            // 6. Disconnect Android
             logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),device=\(device))")
             disconnect("taskInitiateNextAction|" + source, peripheral)
         } else {
-            // 6. Scan
+            // 7. Scan
             logger.debug("taskInitiateNextAction (goal=scan,device=\(device))")
             scheduleScan("taskInitiateNextAction|" + source)
         }
@@ -638,7 +647,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// OpenTrace protocol : read payload -> write payload -> disconnect
     private func writeLegacyPayload(_ source: String, _ peripheral: CBPeripheral) {
         let device = database.device(peripheral, delegate: self)
-        if device.payloadCharacteristic == nil,
+        if device.protocolIsOpenTrace,
            let legacyPayloadCharacteristic = device.legacyPayloadCharacteristic,
            let legacyPayload = payloadDataSupplier.legacyPayload(PayloadTimestamp(), device: device) {
             queue.async {
@@ -881,8 +890,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
         }
         // OpenTrace -> Read payload -> Write payload -> Disconnect
-        if let legacyPayloadCharacteristic = device.legacyPayloadCharacteristic, device.signalCharacteristic == nil {
-            if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
+        if device.protocolIsOpenTrace, let legacyPayloadCharacteristic = device.legacyPayloadCharacteristic {
+            if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
                 logger.debug("didDiscoverCharacteristicsFor, read legacy payload characteristic (device=\(device))")
                 queue.async { peripheral.readValue(for: legacyPayloadCharacteristic) }
             } else {
@@ -890,7 +899,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
         }
         // HERALD Android -> Read payload -> Disconnect
-        else if device.operatingSystem == .android, let payloadCharacteristic = device.payloadCharacteristic {
+        else if device.protocolIsHerald, device.operatingSystem == .android, let payloadCharacteristic = device.payloadCharacteristic {
             if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
                 queue.async { peripheral.readValue(for: payloadCharacteristic) }
             } else {
@@ -910,7 +919,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let device = database.device(peripheral, delegate: self)
         logger.debug("didWriteValueFor (device=\(device),error=\(String(describing: error)))")
         // OpenTrace -> read -> write -> disconnect
-        if device.legacyPayloadCharacteristic != nil, device.signalCharacteristic == nil {
+        if device.protocolIsOpenTrace {
             disconnect("didWriteValueFor|legacy", peripheral)
         }
         // For all situations, scheduleScan would have been made earlier in the chain of async calls.

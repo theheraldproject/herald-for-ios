@@ -321,6 +321,14 @@ public class BLEDevice : Device {
         }
         return lastAdvertAt.timeIntervalSince(lastConnectedAt)
         }}
+    /// Protocol is OpenTrace only
+    var protocolIsOpenTrace: Bool { get {
+        return legacyPayloadCharacteristic != nil && signalCharacteristic == nil && payloadCharacteristic == nil
+    }}
+    /// Protocol is Herald, potentially with optional support for OpenTrace
+    var protocolIsHerald: Bool { get {
+        return signalCharacteristic != nil && payloadCharacteristic != nil
+    }}
     
     public override var description: String { get {
         return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil"),address=\(pseudoDeviceAddress?.data.base64EncodedString() ?? "nil")]"
