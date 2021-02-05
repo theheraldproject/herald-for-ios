@@ -42,6 +42,10 @@ public struct BLESensorConfiguration {
     /// - HERALD will discover devices advertising OpenTrace service UUID (can be the same as HERALD service UUID)
     /// - HERALD will search for OpenTrace characteristic, write payload of self to target,
     ///   read payload from target, and capture payload written to self by target.
+    /// - HERALD will read/write payload from/to OpenTrace at regular intervals if update time
+    ///   interval is not .never. Tests have confirmed that using this feature, instead of relying
+    ///   solely on OpenTrace advert updates on idle Android and iOS devices offers more
+    ///   regular measurements for OpenTrace.
     /// - OpenTrace payloads will be reported via SensorDelegate:didRead where the payload
     ///   has type LegacyPayloadData, and service will be the OpenTrace characteristic UUID.
     /// - Set interopOpenTraceEnabled = false to disable feature
@@ -49,7 +53,8 @@ public struct BLESensorConfiguration {
     public static var interopOpenTraceServiceUUID: CBUUID = CBUUID(string: "A6BA4286-C550-4794-A888-9467EF0B31A8")
     public static var interopOpenTracePayloadCharacteristicUUID: CBUUID  = CBUUID(string: "D1034710-B11E-42F2-BCA3-F481177D5BB2")
     public static var interopOpenTraceManufacturerId: UInt16 = UInt16(1023)
-    
+    public static var interopOpenTracePayloadDataUpdateTimeInterval: TimeInterval = TimeInterval.minute * 5
+
 
     // MARK:- Interoperability with Advert based protocols
 
@@ -176,15 +181,13 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     func start() {
         logger.debug("start")
         receiver.start()
-        // BLE receivers start on powerOn event, on status change the transmitter will be started.
-        // This is to request permissions and turn on dialogs sequentially
+        transmitter.start()
     }
 
     func stop() {
         logger.debug("stop")
         transmitter.stop()
         receiver.stop()
-        // BLE transmitter and receivers stops on powerOff event
     }
     
     func add(delegate: SensorDelegate) {

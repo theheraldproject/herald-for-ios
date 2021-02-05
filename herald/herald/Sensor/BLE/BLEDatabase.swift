@@ -21,6 +21,9 @@ protocol BLEDatabase {
     func device(_ peripheral: CBPeripheral, delegate: CBPeripheralDelegate) -> BLEDevice
 
     /// Get or create device for collating information from asynchronous BLE operations.
+    func device(_ peripheral: CBPeripheral, advertisementData: [String : Any], delegate: CBPeripheralDelegate) -> BLEDevice
+    
+    /// Get or create device for collating information from asynchronous BLE operations.
     func device(_ payload: PayloadData) -> BLEDevice
     
     /// Get if a device exists
@@ -30,7 +33,7 @@ protocol BLEDatabase {
     func devices() -> [BLEDevice]
     
     /// Delete device from database
-    func delete(_ identifier: TargetIdentifier)
+    func delete(_ device: BLEDevice)
 }
 
 /// Delegate for receiving registry create/update/delete events
@@ -62,7 +65,7 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
     }
     
     func devices() -> [BLEDevice] {
-        return database.values.map { $0 }
+        return Array(Set(database.values))
     }
     
     func device(_ identifier: TargetIdentifier) -> BLEDevice {
@@ -96,6 +99,39 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
         return device
     }
     
+    func device(_ peripheral: CBPeripheral, advertisementData: [String : Any], delegate: CBPeripheralDelegate) -> BLEDevice {
+        // Get device by target identifier
+        let identifier = TargetIdentifier(peripheral: peripheral)
+        if let device = database[identifier] {
+            return device
+        }
+        // Get device by pseudo device address
+        if let pseudoDeviceAddress = BLEPseudoDeviceAddress(fromAdvertisementData: advertisementData) {
+            // Reuse existing Android device
+            if let device = devices().filter({ pseudoDeviceAddress.address == $0.pseudoDeviceAddress?.address }).first {
+                database[identifier] = device
+                if device.peripheral != peripheral {
+                    device.peripheral = peripheral
+                    peripheral.delegate = delegate
+                }
+                if device.operatingSystem != .android {
+                    device.operatingSystem = .android
+                }
+                logger.debug("updateAddress (device=\(device))")
+                return device
+            }
+            // Create new Android device
+            else {
+                let newDevice = device(peripheral, delegate: delegate)
+                newDevice.pseudoDeviceAddress = pseudoDeviceAddress
+                newDevice.operatingSystem = .android
+                return newDevice
+            }
+        }
+        // Create new device
+        return device(peripheral, delegate: delegate)
+    }
+    
     func device(_ payload: PayloadData) -> BLEDevice {
         if let device = database.values.filter({ $0.payloadData == payload }).first {
             return device
@@ -116,17 +152,18 @@ class ConcreteBLEDatabase : NSObject, BLEDatabase, BLEDeviceDelegate {
         return false
     }
 
-    func delete(_ identifier: TargetIdentifier) {
-        guard let device = database[identifier] else {
+    func delete(_ device: BLEDevice) {
+        let identifiers = database.keys.filter({ database[$0] == device })
+        guard !identifiers.isEmpty else {
             return
         }
-        database[identifier] = nil
+        identifiers.forEach({ database[$0] = nil })
         queue.async {
-            self.logger.debug("delete (device=\(identifier))")
+            self.logger.debug("delete (device=\(device),identifiers=\(identifiers.count))")
             self.delegates.forEach { $0.bleDatabase(didDelete: device) }
         }
     }
-    
+
     // MARK:- BLEDeviceDelegate
     
     func device(_ device: BLEDevice, didUpdate attribute: BLEDeviceAttribute) {
@@ -284,6 +321,14 @@ public class BLEDevice : Device {
         }
         return lastAdvertAt.timeIntervalSince(lastConnectedAt)
         }}
+    /// Protocol is OpenTrace only
+    var protocolIsOpenTrace: Bool { get {
+        return legacyPayloadCharacteristic != nil && signalCharacteristic == nil && payloadCharacteristic == nil
+    }}
+    /// Protocol is Herald, potentially with optional support for OpenTrace
+    var protocolIsHerald: Bool { get {
+        return signalCharacteristic != nil && payloadCharacteristic != nil
+    }}
     
     public override var description: String { get {
         return "BLEDevice[id=\(identifier),os=\(operatingSystem.rawValue),payload=\(payloadData?.shortName ?? "nil"),address=\(pseudoDeviceAddress?.data.base64EncodedString() ?? "nil")]"
@@ -400,13 +445,11 @@ class BLELegacyAdvertOnlyProtocolData {
         self.connectable = (isConnectableValue != 0)
         // Extract data for specific service data key
         guard let service = UUID(uuidString: BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString),
-              let serviceData = serviceDataDictionary[BLESensorConfiguration.interopAdvertBasedProtocolServiceDataKey],
+              let serviceData = serviceDataDictionary[BLESensorConfiguration.interopAdvertBasedProtocolServiceDataKey] as Data?,
               serviceData.count > 0 else {
             return nil
         }
         self.service = service
-        // Service data on iOS is little endian, reversing
-        // to big endian for consistency with Android
-        self.data = Data(serviceData.reversed())
+        self.data = serviceData
     }
 }
