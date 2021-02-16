@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "Herald"
-  spec.version      = "1.2.0"
+  spec.version      = "1.3.0-beta1"
   spec.summary      = "Reliable Bluetooth communication library for iOS"
 
   spec.description  = <<-DESC
