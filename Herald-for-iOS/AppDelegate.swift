@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     // Payload data supplier, sensor and contact log
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: SensorArray?
+    
+    var phoneMode = true
 
     /// Generate unique and consistent device identifier for testing detection and tracking
     private func identifier() -> Int32 {
@@ -34,18 +36,67 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
         
-        payloadDataSupplier = MockSonarPayloadSupplier(identifier: identifier())
+        return true
+    }
+    
+    func startPhone() {
+        phoneMode = true
+        payloadDataSupplier = ConcreteTestPayloadDataSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
+        addEfficacyLogging()
         sensor?.start()
         
         // EXAMPLE immediate data send function (note: NOT wrapped with Herald header)
         //let targetIdentifier: TargetIdentifier? // ... set its value
         //let success: Bool = sensor!.immediateSend(data: Data(), targetIdentifier!)
         
-        return true
     }
     
+    func stopPhone() {
+        sensor?.stop()
+    }
+    
+    func startBeacon(_ payloadSupplier: PayloadDataSupplier) {
+        phoneMode = false
+        sensor = SensorArray(payloadSupplier)
+        
+        // Add ourselves as delegate
+        sensor?.add(delegate: self)
+        addEfficacyLogging()
+        sensor?.start()
+    }
+    
+    func stopBeacon() {
+        sensor?.stop()
+    }
+    
+    public func stopBluetooth() {
+        if phoneMode {
+            stopPhone()
+        } else {
+            stopBeacon()
+        }
+    }
+
+    // MARK:- Efficacy Logging
+
+    func addEfficacyLogging() {
+        if let payloadData = sensor?.payloadData {
+            // Loggers
+            #if DEBUG
+            sensor?.add(delegate: ContactLog(filename: "contacts.csv"))
+            sensor?.add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
+            sensor?.add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
+            _ = BatteryLog(filename: "battery.csv")
+            if (BLESensorConfiguration.payloadDataUpdateTimeInterval != .never ||
+                (BLESensorConfiguration.interopOpenTraceEnabled && BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval != .never)) {
+                sensor?.add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
+            }
+            #endif
+        }
+    }
+
     // MARK:- UIApplicationDelegate
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -66,6 +117,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         logger.debug("applicationWillTerminate")
+//        stopBluetooth()
     }
     
     // MARK:- SensorDelegate

@@ -54,14 +54,16 @@ public enum SensorType : String {
     case BLE
     /// Bluetooth Mesh (5.0+)
     case BLMESH
-    /// Awake location sensor - uses Location API to be alerted to screen on events
-    case AWAKE
+    /// Mobility sensor - uses Location API measure range travelled
+    case MOBILITY
     /// GPS location sensor - not used by default in Herald
     case GPS
     /// Physical beacon, e.g. iBeacon
     case BEACON
     /// Ultrasound audio beacon.
     case ULTRASOUND
+    /// Accelerometer motion sensor
+    case ACCELEROMETER
     /// Other - Incase of an extension between minor versions of Herald
     case OTHER
 }
@@ -84,11 +86,11 @@ public typealias TargetIdentifier = String
 /// Raw data for estimating proximity between sensor and target, e.g. RSSI for BLE.
 public struct Proximity {
     /// Unit of measurement, e.g. RSSI
-    let unit: ProximityMeasurementUnit
+    public let unit: ProximityMeasurementUnit
     /// Measured value, e.g. raw RSSI value.
-    let value: Double
+    public let value: Double
     /// Calibration data (optional), e.g. transmit power
-    let calibration: Calibration?
+    public let calibration: Calibration?
     /// Get plain text description of proximity data
     public var description: String { get {
         guard let calibration = calibration else {
@@ -97,7 +99,7 @@ public struct Proximity {
         return "\(unit.rawValue):\(value.description)[\(calibration.description)]"
     }}
     
-    init(unit: ProximityMeasurementUnit, value: Double, calibration: Calibration? = nil) {
+    public init(unit: ProximityMeasurementUnit, value: Double, calibration: Calibration? = nil) {
         self.unit = unit
         self.value = value
         self.calibration = calibration
@@ -115,9 +117,9 @@ public enum ProximityMeasurementUnit : String {
 /// Calibration data for interpreting proximity value between sensor and target, e.g. Transmit power for BLE.
 public struct Calibration {
     /// Unit of measurement, e.g. transmit power
-    let unit: CalibrationMeasurementUnit
+    public let unit: CalibrationMeasurementUnit
     /// Measured value, e.g. transmit power in BLE advert
-    let value: Double
+    public let value: Double
     /// Get plain text description of calibration data
     public var description: String { get {
         unit.rawValue + ":" + value.description
@@ -174,5 +176,29 @@ public struct PlacenameLocationReference : LocationReference {
     let name: String
     public var description: String { get {
         "PLACE(name=\(name))"
+        }}
+}
+
+/// Distance in metres
+public typealias Distance = Double
+
+/// Distance travelled in any direction in metres, as indicator of range of movement.
+public struct MobilityLocationReference : LocationReference {
+    let distance: Distance
+    public var description: String { get {
+        "Mobility(distance=\(distance))"
+        }}
+}
+
+/// Acceleration (x,y,z) in meters per second at point in time
+public struct InertiaLocationReference : LocationReference {
+    let x: Double
+    let y: Double
+    let z: Double
+    var magnitude: Double { get {
+        sqrt(x * x + y * y + z * z)
+    }}
+    public var description: String { get {
+        "Inertia(magnitude=\(magnitude),x=\(x),y=\(y),z=\(z))"
         }}
 }

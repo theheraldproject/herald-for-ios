@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TextFile {
+public class TextFile {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.TextFile")
     let url: URL?
     private let queue: DispatchQueue

@@ -8,10 +8,12 @@
 import UIKit
 import Herald
 
-class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate {
+class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, VenueDiaryDelegate {
+    
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    private var sensor: Sensor!
+    private var sensor: SensorArray!
+    private var foreground: Bool = true
     private let dateFormatter = DateFormatter()
     private let dateFormatterTime = DateFormatter()
 
@@ -33,9 +35,12 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     @IBOutlet weak var labelDidShareCount: UILabel!
     @IBOutlet weak var labelDidReceiveCount: UILabel!
     
+    // MARK:- Venue Diary
+    var venueDiary: VenueDiary?
+    
     // MARK:- Social mixing
     
-    private let socialMixingScore = SocialDistance()
+    private let socialMixingScore = SocialDistance(filename: "socialDistance.csv")
     private var socialMixingScoreUnit = TimeInterval(60)
     // Labels to show score over time, each label is a unit
     @IBOutlet weak var labelSocialMixingScore00: UILabel!
@@ -59,6 +64,14 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     @IBOutlet weak var buttonSocialMixingScoreUnitM15: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitM5: UIButton!
     @IBOutlet weak var buttonSocialMixingScoreUnitM1: UIButton!
+    // Immediate send elements
+    @IBOutlet weak var textMessageToSend: UITextField!
+    @IBOutlet weak var buttonMessageSend: UIButton!
+    @IBOutlet weak var labelMessageReceived: UILabel!
+    
+    // MARK:- Mobility
+    
+    private let mobility = Mobility(filename: "mobility.csv")
     
     // MARK:- Detected payloads
     
@@ -75,12 +88,28 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Now enable phone mode - initialises SensorArray
+        appDelegate.startPhone()
+        
         sensor = appDelegate.sensor
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
+        sensor.add(delegate: mobility)
+        
+        
+        // Added diary logger
+        if nil == venueDiary {
+            venueDiary = VenueDiary()
+        }
+        venueDiary!.add(self)
+        sensor.add(delegate: venueDiary!)
         
         dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         dateFormatterTime.dateFormat = "HH:mm:ss"
+        
+        textMessageToSend.delegate = self
+        textMessageToSend.text = "ping"
 
         labelDevice.text = SensorArray.deviceDescription
         if let payloadData = appDelegate.sensor?.payloadData {
@@ -89,8 +118,39 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         tableViewTargets.dataSource = self
         tableViewTargets.delegate = self
         enableCrashButton()
-    }
         
+        // Detect app moving to foreground and background
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        
+    }
+
+    @objc func willEnterForeground() {
+        foreground = true
+        logger.debug("app (state=foreground)")
+        updateCounts()
+        updateTargets()
+        updateSocialDistance(socialMixingScoreUnit)
+    }
+    
+    @objc func didEnterBackground() {
+        foreground = false
+        logger.debug("app (state=background)")
+    }
+    
+    @IBAction func sensorOnOffSwitchAction(_ sender: Any) {
+        guard let sensorOnOffSwitch = sender as? UISwitch else {
+            return
+        }
+        logger.debug("sensorOnOffSwitchAction (isOn=\(sensorOnOffSwitch.isOn))")
+        if sensorOnOffSwitch.isOn {
+            sensor.start()
+        } else {
+            sensor.stop()
+        }
+    }
+    
     // MARK:- Social mixing score
     
     private func socialMixingScoreUnit(_ setTo: UIButton, active: UIColor = .systemBlue, inactive: UIColor = .systemGray) {
@@ -162,24 +222,60 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         }
     }
     
-    // Update targets table
-    private func updateTargets() {
-        // De-duplicate targets based on short name and last updated at time stamp
-        var shortNames: [String:Target] = [:]
-        payloads.forEach() { payload, target in
-            let shortName = payload.shortName
-            guard let duplicate = shortNames[shortName] else {
-                shortNames[shortName] = target
-                return
-            }
-            if duplicate.lastUpdatedAt < target.lastUpdatedAt {
-                shortNames[shortName] = target
-            }
+    /// Update counts
+    private func updateCounts() {
+        DispatchQueue.main.async {
+            self.labelDidDetectCount.text = "\(self.didDetect)"
+            self.labelDidReadCount.text = "\(self.didRead)"
+            self.labelDidMeasureCount.text = "\(self.didMeasure)"
+            self.labelDidShareCount.text = "\(self.didShare)"
+            self.labelDidReceiveCount.text = "\(self.didReceive)"
         }
-        // Get target list in alphabetical order
-        targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
-        tableViewTargets.reloadData()
     }
+    
+    /// Update targets table
+    private func updateTargets() {
+        DispatchQueue.main.async {
+            // De-duplicate targets based on short name and last updated at time stamp
+            var shortNames: [String:Target] = [:]
+            self.payloads.forEach() { payload, target in
+                let shortName = payload.shortName
+                guard let duplicate = shortNames[shortName] else {
+                    shortNames[shortName] = target
+                    return
+                }
+                if duplicate.lastUpdatedAt < target.lastUpdatedAt {
+                    shortNames[shortName] = target
+                }
+            }
+            // Get target list in alphabetical order
+            self.targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
+            self.tableViewTargets.reloadData()
+        }
+    }
+    
+    // MARK:- Immediate Send
+    @IBAction func didClickSend(_ sender: UIButton) {
+        guard let text = textMessageToSend.text else {
+            return
+        }
+        if text.count == 0 {
+            return
+        }
+        guard let sensor = sensor else {
+            return
+        }
+        let ok = sensor.immediateSendAll(data: text.data(using: .utf8)!)
+        if !ok {
+            labelMessageReceived.text = "Failed to send"
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
+    }
+
 
     // MARK:- Crash app
     
@@ -206,11 +302,20 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
             exit(1)
         }
     }
+    
+    // MARK:- VenueDiaryDelegate
+    func venue(_ didUpdate: VenueDiaryEvent) {
+        // highlight item as Venue in the UI
+        logger.debug("venue didUpdate")
+    }
 
     // MARK:- SensorDelegate
 
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
         self.didDetect += 1
+        guard foreground else {
+            return
+        }
         DispatchQueue.main.async {
             self.labelDidDetectCount.text = "\(self.didDetect)"
         }
@@ -223,6 +328,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
             target.didRead = Date()
         } else {
             payloads[didRead] = Target(targetIdentifier: fromTarget, payloadData: didRead)
+        }
+        guard foreground else {
+            return
         }
         DispatchQueue.main.async {
             self.labelDidReadCount.text = "\(self.didRead)"
@@ -240,6 +348,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
                 payloads[didRead] = Target(targetIdentifier: fromTarget, payloadData: didRead)
             }
         }
+        guard foreground else {
+            return
+        }
         DispatchQueue.main.async {
             self.labelDidShareCount.text = "\(self.didShare)"
             self.updateTargets()
@@ -252,6 +363,9 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
             target.targetIdentifier = fromTarget
             target.proximity = didMeasure
         }
+        guard foreground else {
+            return
+        }
         DispatchQueue.main.async {
             self.labelDidMeasureCount.text = "\(self.didMeasure)"
             self.updateTargets()
@@ -259,13 +373,25 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
         }
     }
 
+    // Immediate send data (text in demo app), NOT payload data
     func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {
         self.didReceive += 1
-        let didRead = PayloadData(didReceive)
-        if let target = payloads[didRead] {
-            targetIdentifiers[fromTarget] = didRead
-            target.targetIdentifier = fromTarget
-            target.received = didReceive
+        let didRead = String(bytes: didReceive, encoding: .utf8)
+        DispatchQueue.main.async {
+            guard let read = didRead else {
+                self.labelMessageReceived.text = "<garbled>"
+                return
+            }
+            self.labelMessageReceived.text = read
+            // The following is for an easy demo flow
+            if read == "ping" {
+                self.textMessageToSend.text = "pong"
+            } else if read == "pong" {
+                self.textMessageToSend.text = "ping"
+            }
+        }
+        guard foreground else {
+            return
         }
         DispatchQueue.main.async {
             self.labelDidReceiveCount.text = "\(self.didReceive)"
@@ -286,21 +412,41 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "targetIdentifier", for: indexPath)
         let target = targets[indexPath.row]
-        var method = "Read"
+        // Event time interval statistics
+        var statistics = "R"
         if let mean = target.didReadTimeInterval.mean {
-            let didReadTimeInterval = String(format: "%.1f", mean)
-            method = "\(method)=\(didReadTimeInterval)s"
+            statistics = "\(statistics)=\(String(format: "%.1f", mean))s"
         }
         if let mean = target.didMeasureTimeInterval.mean {
-            let didMeasureTimeInterval = String(format: "%.1f", mean)
-            method = "\(method),Measure=\(didMeasureTimeInterval)s"
+            statistics = "\(statistics),M=\(String(format: "%.1f", mean))s"
         }
-        if target.didShare != nil {
-            method = "\(method),Share"
+        if let mean = target.didShareTimeInterval.mean {
+            statistics = "\(statistics),S=\(String(format: "%.1f", mean))s"
         }
-        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
-        cell.textLabel?.text = "\(target.payloadData.shortName) [\(method)]"
-        cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt))\(didReceive)"
+//        // Immediate send : Superceded in full UI
+//        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
+        // Venue
+        let shortName = target.payloadData.shortName
+        var labelText = "\(shortName)"
+        if let legacyPayloadData = target.payloadData as? LegacyPayloadData {
+            labelText += ":"
+            labelText += String(legacyPayloadData.protocolName.rawValue.prefix(1))
+        }
+        venueDiary?.listRecordableEvents().forEach({ (evt) in
+            self.logger.debug("listRecordableEvents item")
+            guard let eventPayload = evt.payload else {
+                return
+            }
+            if eventPayload.shortName == shortName {
+                labelText += " (Venue)"
+                // TODO set text to venue name, if provided
+                // TODO include area of venue on test UI too
+            } else {
+                self.logger.debug("listRecordableEvents  - shortNames don't match: \(shortName) vs. \(eventPayload.shortName)")
+            }
+        })
+        cell.textLabel?.text = labelText
+        cell.detailTextLabel?.text = "\(dateFormatter.string(from: target.lastUpdatedAt)) [\(statistics)]"
         return cell
     }
 
@@ -308,11 +454,34 @@ class ViewController: UIViewController, SensorDelegate, UITableViewDataSource, U
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let target = targets[indexPath.row]
-        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
-            return
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "targetvc") as? UIViewController {
+            self.present(viewController, animated: true, completion: {
+                self.logger.debug("completion callback - phone")
+                //viewController.presentationController?.delegate = self
+                if let tdvc = viewController as? TargetDetailsViewController {
+                    tdvc.display(target.targetIdentifier, payload: target.payloadData)
+                }
+            })
         }
-        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
-        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
+//        guard let sensor = appDelegate.sensor, let payloadData = appDelegate.sensor?.payloadData else {
+//            return
+//        }
+//        let result = sensor.immediateSend(data: payloadData, target.targetIdentifier)
+//        logger.debug("immediateSend (from=\(payloadData.shortName),to=\(target.payloadData.shortName),success=\(result))")
+    }
+    
+    @IBAction func showVenueDiary(_ sender: UIButton) {
+        let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "venuediaryvc") as? UIViewController {
+            self.present(viewController, animated: true, completion: {
+                self.logger.debug("completion callback - venue diary")
+                if let vdvc = viewController as? VenueDiaryViewController {
+                    self.logger.debug(" - Got VenueDiaryViewController")
+                    vdvc.setDiary(self.venueDiary!)
+                }
+            })
+        }
     }
 }
 
@@ -346,9 +515,17 @@ private class Target {
     var didMeasure: Date?
     let didMeasureTimeInterval = Sample()
     var didShare: Date? {
+        willSet(date) {
+            if let date = date, let didShare = didShare {
+                didShareTimeInterval.add(date.timeIntervalSince(didShare))
+            }
+        }
         didSet {
-            lastUpdatedAt = didRead
+            if let didShare = didShare {
+                lastUpdatedAt = didShare
+            }
         }}
+    let didShareTimeInterval = Sample()
     var didReceive: Date?
     init(targetIdentifier: TargetIdentifier, payloadData: PayloadData) {
         self.targetIdentifier = targetIdentifier

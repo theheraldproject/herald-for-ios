@@ -57,6 +57,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     private let statistics = TimeIntervalSample()
     /// Scan result queue for recording discovered devices with no immediate pending action.
     private var scanResults: [BLEDevice] = []
+    /// Enable programmatic control of receiver start/stop
+    private var receiverEnabled: Bool = false
     
     /// Create a BLE receiver that shares the same sequential dispatch queue as the transmitter because concurrent transmit and receive
     /// operations impacts CoreBluetooth stability. The receiver and transmitter share a common database of devices to enable the transmitter
@@ -83,22 +85,23 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     }
     
     func start() {
-        logger.debug("start")
-        guard central != nil else {
-            return
+        if !receiverEnabled {
+            receiverEnabled = true
+            logger.debug("start, receiver enabled to follow bluetooth state")
+        } else {
+            logger.fault("start, receiver already enabled to follow bluetooth state")
         }
-        // Start scanning
-        if central.state == .poweredOn {
-            scan("start")
-        }
+        scan("start")
     }
     
     func stop() {
-        logger.debug("stop")
-        guard central != nil else {
-            return
+        if receiverEnabled {
+            receiverEnabled = false
+            logger.debug("stop, receiver disabled")
+        } else {
+            logger.fault("stop, receiver already disabled")
         }
-        guard central.isScanning else {
+        guard central != nil, central.isScanning else {
             logger.fault("stop denied, already stopped")
             return
         }
@@ -132,13 +135,30 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         return true;
     }
     
+    func immediateSendAll(data: Data) -> Bool {
+        var toSend = Data([UInt8(BLESensorConfiguration.signalCharacteristicActionWriteImmediate)])
+        var length = Int16(data.count)
+        toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
+        toSend.append(data)
+        
+        let devicesToSendTo = database.devices().filter { $0.peripheral != nil && $0.peripheral!.state == .connected }
+        devicesToSendTo.forEach() { device in
+            queue.async { device.peripheral!.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse) }
+        }
+        return true;
+    }
+    
     // MARK:- Scan for peripherals and initiate connection if required
     
     /// All work starts from scan loop.
     func scan(_ source: String) {
+        guard receiverEnabled else {
+            logger.fault("scan disabled (source=\(source),receiverEnabled=false)")
+            return
+        }
         statistics.add()
         logger.debug("scan (source=\(source),statistics={\(statistics.description)})")
-        guard central.state == .poweredOn else {
+        guard central != nil, central.state == .poweredOn else {
             logger.fault("scan failed, bluetooth is not powered on")
             return
         }
@@ -235,8 +255,17 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskScanForPeripherals() {
         // Scan for peripherals -> didDiscover
+        var scanForServices: [CBUUID] = [BLESensorConfiguration.serviceUUID]
+        // Optionally include OpenTrace protocol as scan criteria
+        if BLESensorConfiguration.interopOpenTraceEnabled {
+            scanForServices.append(BLESensorConfiguration.interopOpenTraceServiceUUID)
+        }
+        // Optionally include interop advert only protocol as scan criteria
+        if BLESensorConfiguration.interopAdvertBasedProtocolEnabled {
+            scanForServices.append(BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID)
+        }
         central.scanForPeripherals(
-            withServices: [BLESensorConfiguration.serviceUUID],
+            withServices: scanForServices,
             options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.serviceUUID]])
     }
     
@@ -279,7 +308,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let devicesToRemove = database.devices().filter { Date().timeIntervalSince($0.lastUpdatedAt) > BLESensorConfiguration.peripheralCleanInterval }
         devicesToRemove.forEach() { device in
             logger.debug("taskRemoveExpiredDevices (remove=\(device))")
-            database.delete(device.identifier)
+            database.delete(device)
             if let peripheral = device.peripheral {
                 disconnect("taskRemoveExpiredDevices", peripheral)
             }
@@ -312,7 +341,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
             let discarding = (keeping.identifier == device.identifier ? duplicate : device)
             index[payloadData] = keeping
-            database.delete(discarding.identifier)
+            database.delete(discarding)
             self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.shortName),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=\(keeping.identifier))")
             // CoreBluetooth will eventually give warning and disconnect actual duplicate silently.
             // While calling disconnect here is cleaner but it will trigger didDiscover and
@@ -411,6 +440,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
             return true
         }
+        if BLESensorConfiguration.interopOpenTraceEnabled, device.protocolIsOpenTrace,
+           device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
+            return true
+        }
         // iOS should always be connected
         if device.operatingSystem == .ios, let peripheral = device.peripheral, peripheral.state != .connected {
             return true
@@ -465,7 +498,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 1. RSSI
             logger.debug("taskInitiateNextAction (goal=rssi,device=\(device))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
-        } else if device.signalCharacteristic == nil || device.payloadCharacteristic == nil {
+        } else if !(device.protocolIsHerald || device.protocolIsOpenTrace) {
             // 2. Characteristics
             logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
             discoverServices("taskInitiateNextAction|" + source, peripheral)
@@ -477,12 +510,17 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // 4. Payload update
             logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
             readPayload("taskInitiateNextAction|" + source, device)
+        } else if BLESensorConfiguration.interopOpenTraceEnabled, device.protocolIsOpenTrace,
+               device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
+            // 5. Payload update for OpenTrace
+            logger.debug("taskInitiateNextAction (goal=payloadUpdate|OpenTrace,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+            readPayload("taskInitiateNextAction|" + source, device)
         } else if device.operatingSystem != .ios {
-            // 5. Disconnect Android
+            // 6. Disconnect Android
             logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),device=\(device))")
             disconnect("taskInitiateNextAction|" + source, peripheral)
         } else {
-            // 6. Scan
+            // 7. Scan
             logger.debug("taskInitiateNextAction (goal=scan,device=\(device))")
             scheduleScan("taskInitiateNextAction|" + source)
         }
@@ -541,7 +579,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         let targetIdentifier = TargetIdentifier(peripheral: peripheral)
         logger.debug("disconnect (source=\(source),peripheral=\(targetIdentifier))")
         guard peripheral.state == .connected || peripheral.state == .connecting else {
-            logger.fault("disconnect denied, peripheral not connected or connecting (source=\(source),peripheral=\(targetIdentifier))")
+            logger.fault("disconnect denied, peripheral not connected or connecting (source=\(source),peripheral=\(targetIdentifier),state=\(peripheral.state))")
             return
         }
         queue.async { self.central.cancelPeripheralConnection(peripheral) }
@@ -568,7 +606,14 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             scheduleScan("discoverServices")
             return
         }
-        queue.async { peripheral.discoverServices([BLESensorConfiguration.serviceUUID]) }
+        queue.async {
+            var services: [CBUUID] = [BLESensorConfiguration.serviceUUID]
+            // Optionally include OpenTrace protocol as discovery criteria
+            if BLESensorConfiguration.interopOpenTraceEnabled {
+                services.append(BLESensorConfiguration.interopOpenTraceServiceUUID)
+            }
+            peripheral.discoverServices(services)
+        }
     }
     
     /// Read payload data from device
@@ -598,30 +643,20 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
     }
     
-    /// legacy protocol device, existing code will have the central \ receiver write to the peripheral after it has requested to read its payload
-    
-    private func writeLegacyPayload(_ source: String, peripheral: CBPeripheral) {
+    /// Write payload to legacy OpenTrace device
+    /// OpenTrace protocol : read payload -> write payload -> disconnect
+    private func writeLegacyPayload(_ source: String, _ peripheral: CBPeripheral) {
         let device = database.device(peripheral, delegate: self)
-        logger.debug("writeLegacyPayload (source=\(source),peripheral=\(device.identifier))")
-        
-        guard device.rssi != nil else {
-            logger.fault("writeLegacyPayload denied (source=\(source), rssi should be present in \(device.identifier) before write")
-            return
-        }
-        guard let characteristic = device.legacyPayloadCharacteristic else {
-            logger.fault("writeLegacyPayload denied (source=\(source),peripheral=\(device.identifier) legacyPayloadCharacteristic not present)")
-            return
-        }
-        let result : PayloadData? = payloadDataSupplier.legacyPayload(PayloadTimestamp(), device: device)
-        queue.async {
-            guard let payloadToWrite = result else {
-                self.logger.fault("writeLegacyPayload denied (source=\(source),peripheral=\(device.identifier) failed to obtain legacy payload value)")
-                return
+        if device.protocolIsOpenTrace,
+           let legacyPayloadCharacteristic = device.legacyPayloadCharacteristic,
+           let legacyPayload = payloadDataSupplier.legacyPayload(PayloadTimestamp(), device: device) {
+            queue.async {
+                self.logger.debug("writeLegacyPayload (source=\(source),peripheral=\(device.identifier),payload=\(legacyPayload.shortName))")
+                peripheral.writeValue(legacyPayload.data, for: legacyPayloadCharacteristic, type: .withResponse)
             }
-            self.logger.debug("writeLegacyPayload (source=\(source),peripheral=\(device.identifier) writing...)")
-            peripheral.writeValue(payloadToWrite, for: characteristic, type: .withResponse)
+            return
         }
-        
+        disconnect("writeLegacyPayload", peripheral)
     }
 
     /**
@@ -707,37 +742,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
         }
     }
-    
-    /// Share payload data across devices with the same pseudo device address
-    private func shareDataAcrossDevices(_ pseudoDeviceAddress: BLEPseudoDeviceAddress) {
-        // Get devices with the same pseudo address created recently
-        let devicesWithSamePseudoAddress = database.devices().filter({ pseudoDeviceAddress.address == $0.pseudoDeviceAddress?.address && $0.timeIntervalSinceCreated <= BLESensorConfiguration.androidAdvertRefreshTimeInterval })
-        // Get device with most recent version of payload amongst these devices
-        guard let mostRecentDevice = devicesWithSamePseudoAddress.filter({ $0.payloadData != nil }).sorted(by: { $0.payloadDataLastUpdatedAt > $1.payloadDataLastUpdatedAt }).first, let payloadData = mostRecentDevice.payloadData else {
-            return
-        }
-        // Copy data to all devices with the same pseudo address
-        let payloadDataLastUpdatedAt = mostRecentDevice.payloadDataLastUpdatedAt
-        let devicesToCopyPayload = devicesWithSamePseudoAddress.filter({ $0.payloadData == nil })
-        devicesToCopyPayload.forEach({
-            $0.signalCharacteristic = mostRecentDevice.signalCharacteristic
-            $0.payloadCharacteristic = mostRecentDevice.payloadCharacteristic
-            // Only Android devices have a pseudo address
-            $0.operatingSystem = .android
-            $0.payloadData = payloadData
-            $0.payloadDataLastUpdatedAt = payloadDataLastUpdatedAt
-            logger.debug("shareDataAcrossDevices, copied payload data (from=\(mostRecentDevice.description),to=\($0.description))")
-        })
-        // Get devices with the same payload
-        let devicesWithSamePayload = database.devices().filter({ payloadData == $0.payloadData })
-        // Copy pseudo address to all devices with the same payload
-        let devicesToCopyAddress = devicesWithSamePayload.filter({ $0.pseudoDeviceAddress == nil })
-        devicesToCopyAddress.forEach({
-            $0.pseudoDeviceAddress = pseudoDeviceAddress
-            logger.debug("shareDataAcrossDevices, copied pseudo address (payloadData=\(payloadData.shortName),to=\($0.description))")
-        })
-    }
-    
+        
     /// Device discovery will trigger connection to resolve operating system and read payload for iOS and Android devices.
     /// Connection is kept active for iOS devices for on-going RSSI measurements, and closed for Android devices, as this
     /// iOS device can rely on this discovery callback (triggered by regular scan calls) for on-going RSSI and TX power
@@ -745,18 +750,20 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// Android devices.
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         // Populate device database
-        let device = database.device(peripheral, delegate: self)
+        let device = database.device(peripheral, advertisementData: advertisementData, delegate: self)
         device.lastDiscoveredAt = Date()
         device.rssi = BLE_RSSI(RSSI.intValue)
-        if let pseudoDeviceAddress = BLEPseudoDeviceAddress(fromAdvertisementData: advertisementData) {
-            device.pseudoDeviceAddress = pseudoDeviceAddress
-            shareDataAcrossDevices(pseudoDeviceAddress)
-        }
         if let txPower = (advertisementData[CBAdvertisementDataTxPowerLevelKey] as? NSNumber)?.intValue {
             device.txPower = BLE_TxPower(txPower)
         }
         logger.debug("didDiscover (device=\(device),rssi=\((String(describing: device.rssi))),txPower=\((String(describing: device.txPower))))")
-        if deviceHasPendingTask(device) {
+        // Process legacy advert only protocol
+        let legacyAdvertOnlyProtocolData = (BLESensorConfiguration.interopAdvertBasedProtocolEnabled ? BLELegacyAdvertOnlyProtocolData(fromAdvertisementData: advertisementData) : nil)
+        if BLESensorConfiguration.interopAdvertBasedProtocolEnabled, let legacyAdvertOnlyProtocolData = legacyAdvertOnlyProtocolData {
+            device.payloadData = legacyAdvertOnlyProtocolData.payloadData
+            logger.debug("didDiscover, legacy payload (device=\(device),service=\(legacyAdvertOnlyProtocolData.service.description),payload=\(legacyAdvertOnlyProtocolData.payloadData.hexEncodedString))")
+        }
+        if (legacyAdvertOnlyProtocolData == nil || legacyAdvertOnlyProtocolData!.connectable), deviceHasPendingTask(device) {
             connect("didDiscover", peripheral);
         } else {
             scanResults.append(device)
@@ -784,7 +791,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("didFailToConnect (device=\(device),error=\(String(describing: error)))")
         if String(describing: error).contains("Device is invalid") {
             logger.debug("Unregister invalid device (device=\(device))")
-            database.delete(device.identifier)
+            database.delete(device)
         } else {
             connect("didFailToConnect", peripheral)
         }
@@ -835,8 +842,12 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         for service in services {
-            if (service.uuid == BLESensorConfiguration.serviceUUID) {
+            if service.uuid == BLESensorConfiguration.serviceUUID {
                 logger.debug("didDiscoverServices, found sensor service (device=\(device))")
+                queue.async { peripheral.discoverCharacteristics(nil, for: service) }
+                return
+            } else if BLESensorConfiguration.interopOpenTraceEnabled, service.uuid == BLESensorConfiguration.interopOpenTraceServiceUUID {
+                logger.debug("didDiscoverServices, found legacy service (device=\(device))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return
             }
@@ -871,28 +882,26 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             case BLESensorConfiguration.payloadCharacteristicUUID:
                 device.payloadCharacteristic = characteristic
                 logger.debug("didDiscoverCharacteristicsFor, found payload characteristic (device=\(device))")
-            case BLESensorConfiguration.legacyPayloadCharacteristicUUID:
-                if characteristics.count == 1 {
-                    device.legacyPayloadCharacteristic = characteristic
-                    logger.debug("didDiscoverCharacteristicsFor, found legacy payload characteristic (device=\(device))")
-                } else {
-                    logger.debug("didDiscoverCharacteristicsFor, found legacy payload characteristic but discarding as there are more characteristics, assuming new ble (device=\(device))")
-                }
+            case BLESensorConfiguration.interopOpenTracePayloadCharacteristicUUID:
+                device.legacyPayloadCharacteristic = characteristic
+                logger.debug("didDiscoverCharacteristicsFor, found legacy payload characteristic (device=\(device))")
             default:
                 logger.fault("didDiscoverCharacteristicsFor, found unknown characteristic (device=\(device),characteristic=\(characteristic.uuid))")
             }
         }
-        // Android -> Read payload
-        if device.operatingSystem == .android {
-            var payloadCharacteristic = device.payloadCharacteristic
-            if payloadCharacteristic == nil {
-                payloadCharacteristic = device.legacyPayloadCharacteristic
-                if nil != device.legacyPayloadCharacteristic {
-                    writeLegacyPayload("didDiscoverCharacteristicsFor|android", peripheral: peripheral)
-                }
+        // OpenTrace -> Read payload -> Write payload -> Disconnect
+        if device.protocolIsOpenTrace, let legacyPayloadCharacteristic = device.legacyPayloadCharacteristic {
+            if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
+                logger.debug("didDiscoverCharacteristicsFor, read legacy payload characteristic (device=\(device))")
+                queue.async { peripheral.readValue(for: legacyPayloadCharacteristic) }
+            } else {
+                disconnect("didDiscoverCharacteristicsFor|openTrace", peripheral)
             }
-            if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval, let characteristicToRead = payloadCharacteristic {
-                queue.async { peripheral.readValue(for: characteristicToRead) }
+        }
+        // HERALD Android -> Read payload -> Disconnect
+        else if device.protocolIsHerald, device.operatingSystem == .android, let payloadCharacteristic = device.payloadCharacteristic {
+            if device.payloadData == nil || device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
+                queue.async { peripheral.readValue(for: payloadCharacteristic) }
             } else {
                 disconnect("didDiscoverCharacteristicsFor|android", peripheral)
             }
@@ -909,6 +918,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Wrote characteristic -> Scan again
         let device = database.device(peripheral, delegate: self)
         logger.debug("didWriteValueFor (device=\(device),error=\(String(describing: error)))")
+        // OpenTrace -> read -> write -> disconnect
+        if device.protocolIsOpenTrace {
+            disconnect("didWriteValueFor|legacy", peripheral)
+        }
         // For all situations, scheduleScan would have been made earlier in the chain of async calls.
         // It is called again here to extend the time interval between scans, as this is usually the
         // last call made in all paths to wake the transmitter.
@@ -959,7 +972,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         case BLESensorConfiguration.androidSignalCharacteristicUUID:
             // Should not happen as Android signal is not notifying
             logger.fault("didUpdateValueFor (device=\(device),characteristic=androidSignalCharacteristic,error=\(String(describing: error)))")
-        case BLESensorConfiguration.payloadCharacteristicUUID, BLESensorConfiguration.legacyPayloadCharacteristicUUID:
+        case BLESensorConfiguration.payloadCharacteristicUUID:
             // Read payload data
             logger.debug("didUpdateValueFor (device=\(device),characteristic=payloadCharacteristic,error=\(String(describing: error)))")
             if let data = characteristic.value {
@@ -968,6 +981,15 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if device.operatingSystem == .android {
                 disconnect("didUpdateValueFor|payload|android", peripheral)
             }
+        case BLESensorConfiguration.interopOpenTracePayloadCharacteristicUUID:
+            // Read legacy payload data
+            logger.debug("didUpdateValueFor (device=\(device),characteristic=legacyPayloadCharacteristic,error=\(String(describing: error)))")
+            if let data = characteristic.value, let service = UUID(uuidString: BLESensorConfiguration.interopOpenTraceServiceUUID.uuidString) {
+                device.payloadData = LegacyPayloadData(service: service, data: data)
+            }
+            // Write legacy payload data after read
+            writeLegacyPayload("didUpdateValueFor|legacyPayload", peripheral)
+            return
         default:
             logger.fault("didUpdateValueFor, unknown characteristic (device=\(device),characteristic=\(characteristic.uuid),error=\(String(describing: error)))")
         }

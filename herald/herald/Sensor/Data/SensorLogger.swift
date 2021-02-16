@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import os
 
-protocol SensorLogger {
+public protocol SensorLogger {
     init(subsystem: String, category: String)
     
     func log(_ level: SensorLoggerLevel, _ message: String)
@@ -25,14 +25,14 @@ public enum SensorLoggerLevel: String {
     case off, debug, info, fault
 }
 
-class ConcreteSensorLogger: NSObject, SensorLogger {
+public class ConcreteSensorLogger: NSObject, SensorLogger {
     private let subsystem: String
     private let category: String
     private let dateFormatter = DateFormatter()
     private let log: OSLog?
     private static let logFile = TextFile(filename: "log.txt")
     
-    required init(subsystem: String, category: String) {
+    public required init(subsystem: String, category: String) {
         self.subsystem = subsystem
         self.category = category
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -57,7 +57,7 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
         }
     }
     
-    func log(_ level: SensorLoggerLevel, _ message: String) {
+    public func log(_ level: SensorLoggerLevel, _ message: String) {
         guard !suppress(level) else {
             return
         }
@@ -86,16 +86,16 @@ class ConcreteSensorLogger: NSObject, SensorLogger {
         }
     }
     
-    func debug(_ message: String) {
+    public func debug(_ message: String) {
         log(.debug, message)
     }
     
-    func info(_ message: String) {
-        log(.debug, message)
+    public func info(_ message: String) {
+        log(.info, message)
     }
     
-    func fault(_ message: String) {
-        log(.debug, message)
+    public func fault(_ message: String) {
+        log(.fault, message)
     }
     
 }

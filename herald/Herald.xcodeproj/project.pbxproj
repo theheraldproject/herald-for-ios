@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F273A4425862B1A0090B3B5 /* VenueDiary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F273A4325862B1A0090B3B5 /* VenueDiary.swift */; };
+		6F273A48258631190090B3B5 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F273A47258631190090B3B5 /* DateExtensions.swift */; };
+		6F273A4C258631AF0090B3B5 /* VenueDiaryEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F273A4B258631AF0090B3B5 /* VenueDiaryEventTests.swift */; };
+		6F273A50258641CA0090B3B5 /* VenueDiaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F273A4F258641CA0090B3B5 /* VenueDiaryTests.swift */; };
+		6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D4FE257C470B0097DD92 /* BeaconPayloadDataSupplier.swift */; };
+		6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */; };
+		6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D509257C4F750097DD92 /* ExtendedData.swift */; };
+		6FBC6F2025867508001A86CE /* DataExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */; };
 		6FE142FB2565C39A0084A59C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE142FA2565C39A0084A59C /* Device.swift */; };
 		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B637EF79251E56320072D238 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5E251E56320072D238 /* BLESensor.swift */; };
@@ -14,14 +22,9 @@
 		B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF60251E56320072D238 /* BLEUtilities.swift */; };
 		B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF61251E56320072D238 /* BLETransmitter.swift */; };
 		B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF62251E56320072D238 /* BLEReceiver.swift */; };
-		B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* AwakeSensor.swift */; };
+		B637EF7E251E56320072D238 /* MobilitySensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF64251E56320072D238 /* MobilitySensor.swift */; };
 		B637EF7F251E56320072D238 /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF65251E56320072D238 /* Sensor.swift */; };
-		B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */; };
-		B637EF81251E56320072D238 /* DayCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6A251E56320072D238 /* DayCodes.swift */; };
-		B637EF82251E56320072D238 /* SHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6B251E56320072D238 /* SHA.swift */; };
-		B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6C251E56320072D238 /* BeaconCodes.swift */; };
-		B637EF84251E56320072D238 /* JavaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6D251E56320072D238 /* JavaData.swift */; };
-		B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */; };
+		B637EF80251E56320072D238 /* TestPayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF68251E56320072D238 /* TestPayloadDataSupplier.swift */; };
 		B637EF86251E56320072D238 /* SensorArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF6F251E56320072D238 /* SensorArray.swift */; };
 		B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF70251E56320072D238 /* PayloadDataSupplier.swift */; };
 		B637EF88251E56320072D238 /* TextFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF72251E56320072D238 /* TextFile.swift */; };
@@ -34,7 +37,15 @@
 		B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */; };
 		B650152025229D480070F774 /* Herald.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B637EF50251E55E60072D238 /* Herald.framework */; platformFilter = ios; };
 		B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */; };
-		B6C41BE3255951B700F7E9FB /* StatisticsDidReadLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C41BE2255951B700F7E9FB /* StatisticsDidReadLog.swift */; };
+		B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */; };
+		B68DAB8A2580040400F396D7 /* EventTimeIntervalLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */; };
+		B69F189925B84B32001CC891 /* BLEAdvertParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189825B84B32001CC891 /* BLEAdvertParser.swift */; };
+		B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */; };
+		B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */; };
+		B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA10B225A78AF50071C08E /* CalibrationLog.swift */; };
+		B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */; };
+		B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */; };
+		B6EEC24625B5BC4400D1CDF9 /* DataExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC24525B5BC4400D1CDF9 /* DataExtensions.swift */; };
 		B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745EF255713C2003567B7 /* SocialDistance.swift */; };
 		B6F745F3255713C2003567B7 /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* Sample.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
@@ -46,6 +57,8 @@
 		B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */; };
 		B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74607255714C2003567B7 /* BloomFilterTests.swift */; };
 		B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74608255714C2003567B7 /* InteractionsTests.swift */; };
+		D301023D25B8DD8300598DF4 /* ExtendedDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */; };
+		D32988E425C34AE20066D9D4 /* PayloadDataFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32988E325C34AE20066D9D4 /* PayloadDataFormatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +72,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6F273A4325862B1A0090B3B5 /* VenueDiary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VenueDiary.swift; path = herald/Sensor/Analysis/VenueDiary.swift; sourceTree = SOURCE_ROOT; };
+		6F273A47258631190090B3B5 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DateExtensions.swift; path = Herald/Sensor/Extensions/DateExtensions.swift; sourceTree = SOURCE_ROOT; };
+		6F273A4B258631AF0090B3B5 /* VenueDiaryEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueDiaryEventTests.swift; sourceTree = "<group>"; };
+		6F273A4F258641CA0090B3B5 /* VenueDiaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueDiaryTests.swift; sourceTree = "<group>"; };
+		6F52D4FE257C470B0097DD92 /* BeaconPayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BeaconPayloadDataSupplier.swift; path = herald/Sensor/Payload/Beacon/BeaconPayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
+		6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconPayloadDataSupplierTests.swift; sourceTree = "<group>"; };
+		6F52D509257C4F750097DD92 /* ExtendedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedData.swift; path = herald/Sensor/Payload/Extended/ExtendedData.swift; sourceTree = SOURCE_ROOT; };
+		6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensionTests.swift; sourceTree = "<group>"; };
 		6FE142FA2565C39A0084A59C /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Device.swift; path = herald/Sensor/Device.swift; sourceTree = SOURCE_ROOT; };
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B637EF53251E55E60072D238 /* Herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Herald.h; sourceTree = "<group>"; };
@@ -68,14 +89,9 @@
 		B637EF60251E56320072D238 /* BLEUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEUtilities.swift; sourceTree = "<group>"; };
 		B637EF61251E56320072D238 /* BLETransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLETransmitter.swift; sourceTree = "<group>"; };
 		B637EF62251E56320072D238 /* BLEReceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLEReceiver.swift; sourceTree = "<group>"; };
-		B637EF64251E56320072D238 /* AwakeSensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AwakeSensor.swift; sourceTree = "<group>"; };
+		B637EF64251E56320072D238 /* MobilitySensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobilitySensor.swift; sourceTree = "<group>"; };
 		B637EF65251E56320072D238 /* Sensor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
-		B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SonarPayloadSupplier.swift; sourceTree = "<group>"; };
-		B637EF6A251E56320072D238 /* DayCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DayCodes.swift; sourceTree = "<group>"; };
-		B637EF6B251E56320072D238 /* SHA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHA.swift; sourceTree = "<group>"; };
-		B637EF6C251E56320072D238 /* BeaconCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeaconCodes.swift; sourceTree = "<group>"; };
-		B637EF6D251E56320072D238 /* JavaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JavaData.swift; sourceTree = "<group>"; };
-		B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = C19XPayloadSupplier.swift; sourceTree = "<group>"; };
+		B637EF68251E56320072D238 /* TestPayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestPayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF6F251E56320072D238 /* SensorArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorArray.swift; sourceTree = "<group>"; };
 		B637EF70251E56320072D238 /* PayloadDataSupplier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataSupplier.swift; sourceTree = "<group>"; };
 		B637EF72251E56320072D238 /* TextFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFile.swift; sourceTree = "<group>"; };
@@ -88,8 +104,16 @@
 		B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SimplePayloadDataSupplier.swift; path = herald/Sensor/Payload/Simple/SimplePayloadDataSupplier.swift; sourceTree = SOURCE_ROOT; };
 		B650151B25229D480070F774 /* HeraldTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeraldTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataSupplierTests.swift; sourceTree = "<group>"; };
-		B6C41BE2255951B700F7E9FB /* StatisticsDidReadLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatisticsDidReadLog.swift; path = herald/Sensor/Data/StatisticsDidReadLog.swift; sourceTree = SOURCE_ROOT; };
+		B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InertiaSensor.swift; path = herald/Sensor/Motion/InertiaSensor.swift; sourceTree = SOURCE_ROOT; };
+		B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventTimeIntervalLog.swift; path = herald/Sensor/Data/EventTimeIntervalLog.swift; sourceTree = SOURCE_ROOT; };
+		B69F189825B84B32001CC891 /* BLEAdvertParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BLEAdvertParser.swift; path = herald/Sensor/BLE/BLEAdvertParser.swift; sourceTree = SOURCE_ROOT; };
+		B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertParserTests.swift; sourceTree = "<group>"; };
+		B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PseudoDeviceAddressTests.swift; sourceTree = "<group>"; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6DA10B225A78AF50071C08E /* CalibrationLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalibrationLog.swift; path = herald/Sensor/Data/CalibrationLog.swift; sourceTree = SOURCE_ROOT; };
+		B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Mobility.swift; path = herald/Sensor/Analysis/Mobility.swift; sourceTree = SOURCE_ROOT; };
+		B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventLog.swift; path = herald/Sensor/Data/EventLog.swift; sourceTree = SOURCE_ROOT; };
+		B6EEC24525B5BC4400D1CDF9 /* DataExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DataExtensions.swift; path = herald/Sensor/Extensions/DataExtensions.swift; sourceTree = SOURCE_ROOT; };
 		B6F745EF255713C2003567B7 /* SocialDistance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistance.swift; sourceTree = "<group>"; };
 		B6F745F0255713C2003567B7 /* Sample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
@@ -101,6 +125,8 @@
 		B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcherTests.swift; sourceTree = "<group>"; };
 		B6F74607255714C2003567B7 /* BloomFilterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilterTests.swift; sourceTree = "<group>"; };
 		B6F74608255714C2003567B7 /* InteractionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractionsTests.swift; sourceTree = "<group>"; };
+		D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedDataTests.swift; sourceTree = "<group>"; };
+		D32988E325C34AE20066D9D4 /* PayloadDataFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PayloadDataFormatter.swift; path = herald/Sensor/Data/PayloadDataFormatter.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +148,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6F52D4FB257C46D30097DD92 /* Beacon */ = {
+			isa = PBXGroup;
+			children = (
+				6F52D4FE257C470B0097DD92 /* BeaconPayloadDataSupplier.swift */,
+			);
+			path = Beacon;
+			sourceTree = "<group>";
+		};
+		6F52D508257C4F4A0097DD92 /* Extended */ = {
+			isa = PBXGroup;
+			children = (
+				6F52D509257C4F750097DD92 /* ExtendedData.swift */,
+			);
+			path = Extended;
+			sourceTree = "<group>";
+		};
 		B637EF46251E55E60072D238 = {
 			isa = PBXGroup;
 			children = (
@@ -153,6 +195,8 @@
 		B637EF5C251E56320072D238 /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				B6EEC24425B5BC2B00D1CDF9 /* Extensions */,
+				B6599D0125A4EAE600AC306D /* Motion */,
 				B6F745EE255713C2003567B7 /* Analysis */,
 				B637EF5D251E56320072D238 /* BLE */,
 				B637EF63251E56320072D238 /* Location */,
@@ -176,6 +220,7 @@
 				B637EF60251E56320072D238 /* BLEUtilities.swift */,
 				B637EF61251E56320072D238 /* BLETransmitter.swift */,
 				B637EF62251E56320072D238 /* BLEReceiver.swift */,
+				B69F189825B84B32001CC891 /* BLEAdvertParser.swift */,
 			);
 			path = BLE;
 			sourceTree = "<group>";
@@ -183,7 +228,7 @@
 		B637EF63251E56320072D238 /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				B637EF64251E56320072D238 /* AwakeSensor.swift */,
+				B637EF64251E56320072D238 /* MobilitySensor.swift */,
 			);
 			path = Location;
 			sourceTree = "<group>";
@@ -191,31 +236,20 @@
 		B637EF66251E56320072D238 /* Payload */ = {
 			isa = PBXGroup;
 			children = (
+				6F52D508257C4F4A0097DD92 /* Extended */,
+				6F52D4FB257C46D30097DD92 /* Beacon */,
 				B650151225229CED0070F774 /* Simple */,
-				B637EF67251E56320072D238 /* Sonar */,
-				B637EF69251E56320072D238 /* C19X */,
+				B637EF67251E56320072D238 /* Test */,
 			);
 			path = Payload;
 			sourceTree = "<group>";
 		};
-		B637EF67251E56320072D238 /* Sonar */ = {
+		B637EF67251E56320072D238 /* Test */ = {
 			isa = PBXGroup;
 			children = (
-				B637EF68251E56320072D238 /* SonarPayloadSupplier.swift */,
+				B637EF68251E56320072D238 /* TestPayloadDataSupplier.swift */,
 			);
-			path = Sonar;
-			sourceTree = "<group>";
-		};
-		B637EF69251E56320072D238 /* C19X */ = {
-			isa = PBXGroup;
-			children = (
-				B637EF6A251E56320072D238 /* DayCodes.swift */,
-				B637EF6B251E56320072D238 /* SHA.swift */,
-				B637EF6C251E56320072D238 /* BeaconCodes.swift */,
-				B637EF6D251E56320072D238 /* JavaData.swift */,
-				B637EF6E251E56320072D238 /* C19XPayloadSupplier.swift */,
-			);
-			path = C19X;
+			path = Test;
 			sourceTree = "<group>";
 		};
 		B637EF71251E56320072D238 /* Data */ = {
@@ -226,8 +260,11 @@
 				B637EF74251E56320072D238 /* DetectionLog.swift */,
 				B637EF75251E56320072D238 /* SensorLogger.swift */,
 				B637EF76251E56320072D238 /* ContactLog.swift */,
+				B6DA10B225A78AF50071C08E /* CalibrationLog.swift */,
 				B637EF77251E56320072D238 /* StatisticsLog.swift */,
-				B6C41BE2255951B700F7E9FB /* StatisticsDidReadLog.swift */,
+				B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */,
+				B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */,
+				D32988E325C34AE20066D9D4 /* PayloadDataFormatter.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -252,8 +289,32 @@
 				B6F74608255714C2003567B7 /* InteractionsTests.swift */,
 				B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */,
 				B6F74605255714C2003567B7 /* SocialDistanceTests.swift */,
+				6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */,
+				6F273A4B258631AF0090B3B5 /* VenueDiaryEventTests.swift */,
+				6F273A4F258641CA0090B3B5 /* VenueDiaryTests.swift */,
+				6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */,
+				B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */,
+				D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */,
+				B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */,
 			);
 			path = HeraldTests;
+			sourceTree = "<group>";
+		};
+		B6599D0125A4EAE600AC306D /* Motion */ = {
+			isa = PBXGroup;
+			children = (
+				B6599D0225A4EB0C00AC306D /* InertiaSensor.swift */,
+			);
+			path = Motion;
+			sourceTree = "<group>";
+		};
+		B6EEC24425B5BC2B00D1CDF9 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6F273A47258631190090B3B5 /* DateExtensions.swift */,
+				B6EEC24525B5BC4400D1CDF9 /* DataExtensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		B6F745EE255713C2003567B7 /* Analysis */ = {
@@ -262,6 +323,8 @@
 				B6F745EF255713C2003567B7 /* SocialDistance.swift */,
 				B6F745F0255713C2003567B7 /* Sample.swift */,
 				B6F745F1255713C2003567B7 /* Interactions.swift */,
+				6F273A4325862B1A0090B3B5 /* VenueDiary.swift */,
+				B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */,
 			);
 			path = Analysis;
 			sourceTree = "<group>";
@@ -375,38 +438,44 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B69F189925B84B32001CC891 /* BLEAdvertParser.swift in Sources */,
 				B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */,
 				B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */,
-				B637EF85251E56320072D238 /* C19XPayloadSupplier.swift in Sources */,
 				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
+				B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
-				B6C41BE3255951B700F7E9FB /* StatisticsDidReadLog.swift in Sources */,
+				6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */,
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
-				B637EF83251E56320072D238 /* BeaconCodes.swift in Sources */,
 				B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */,
+				6F273A4425862B1A0090B3B5 /* VenueDiary.swift in Sources */,
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
-				B637EF84251E56320072D238 /* JavaData.swift in Sources */,
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
-				B637EF7E251E56320072D238 /* AwakeSensor.swift in Sources */,
+				D32988E425C34AE20066D9D4 /* PayloadDataFormatter.swift in Sources */,
+				B637EF7E251E56320072D238 /* MobilitySensor.swift in Sources */,
+				6F273A48258631190090B3B5 /* DateExtensions.swift in Sources */,
 				B637EF7C251E56320072D238 /* BLETransmitter.swift in Sources */,
-				B637EF82251E56320072D238 /* SHA.swift in Sources */,
-				B637EF81251E56320072D238 /* DayCodes.swift in Sources */,
+				B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */,
+				B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */,
 				B637EF8C251E56320072D238 /* ContactLog.swift in Sources */,
+				B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */,
 				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				6FE142FB2565C39A0084A59C /* Device.swift in Sources */,
 				B6F745FE25571475003567B7 /* XXH3.swift in Sources */,
+				6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
-				B637EF80251E56320072D238 /* SonarPayloadSupplier.swift in Sources */,
+				B637EF80251E56320072D238 /* TestPayloadDataSupplier.swift in Sources */,
 				B6F745F3255713C2003567B7 /* Sample.swift in Sources */,
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
 				B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */,
 				B637EF88251E56320072D238 /* TextFile.swift in Sources */,
+				B68DAB8A2580040400F396D7 /* EventTimeIntervalLog.swift in Sources */,
 				B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */,
+				B6EEC24625B5BC4400D1CDF9 /* DataExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,9 +485,16 @@
 			files = (
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
 				B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */,
+				D301023D25B8DD8300598DF4 /* ExtendedDataTests.swift in Sources */,
+				6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */,
 				B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */,
+				6FBC6F2025867508001A86CE /* DataExtensionTests.swift in Sources */,
+				6F273A4C258631AF0090B3B5 /* VenueDiaryEventTests.swift in Sources */,
 				B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */,
 				B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */,
+				B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */,
+				B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */,
+				6F273A50258641CA0090B3B5 /* VenueDiaryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -559,8 +635,10 @@
 		B637EF59251E55E60072D238 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -577,15 +655,17 @@
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		B637EF5A251E55E60072D238 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -602,7 +682,7 @@
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -610,8 +690,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Z4G2H2H6CW;
 				INFOPLIST_FILE = HeraldTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -620,7 +701,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.HeraldTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -628,8 +709,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Z4G2H2H6CW;
 				INFOPLIST_FILE = HeraldTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -638,7 +720,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.HeraldTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

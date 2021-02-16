@@ -20,72 +20,135 @@ public struct BLESensorConfiguration {
     /// then discover services to identify actual beacons.
     /// - Service and characteristic UUIDs are V4 UUIDs that have been randomly generated and tested
     /// for uniqueness by conducting web searches to ensure it returns no results.
-    public static var serviceUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
+    public static var serviceUUID: CBUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
-    public static var androidSignalCharacteristicUUID = CBUUID(string: "f617b813-092e-437a-8324-e09a80821a11")
+    public static var androidSignalCharacteristicUUID: CBUUID = CBUUID(string: "f617b813-092e-437a-8324-e09a80821a11")
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
-    public static var iosSignalCharacteristicUUID = CBUUID(string: "0eb0d5f2-eae4-4a9a-8af3-a4adb02d4363")
+    public static var iosSignalCharacteristicUUID: CBUUID = CBUUID(string: "0eb0d5f2-eae4-4a9a-8af3-a4adb02d4363")
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
-    public static var payloadCharacteristicUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
-    public static var legacyPayloadCharacteristicUUID : CBUUID? = nil
-    /// Legacy characteristic. E.g. could be set to: CBMutableCharacteristic(type: BLESensorConfiguration.legacyPayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable])
-    public static var legacyPayloadCharacteristic : CBMutableCharacteristic? = nil
+    public static var payloadCharacteristicUUID: CBUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
     /// Manufacturer data is being used on Android to store pseudo device address
     /// - Pending update to dedicated ID
-    public static var manufacturerIdForSensor = UInt16(65530)
+    public static var manufacturerIdForSensor: UInt16 = UInt16(65530)
 
+    
+    // MARK:- Interoperability with OpenTrace
+
+    /// OpenTrace service UUID, characteristic UUID, and manufacturer ID
+    /// - Enables capture of OpenTrace payloads, e.g. for transition to HERALD
+    /// - HERALD will discover devices advertising OpenTrace service UUID (can be the same as HERALD service UUID)
+    /// - HERALD will search for OpenTrace characteristic, write payload of self to target,
+    ///   read payload from target, and capture payload written to self by target.
+    /// - HERALD will read/write payload from/to OpenTrace at regular intervals if update time
+    ///   interval is not .never. Tests have confirmed that using this feature, instead of relying
+    ///   solely on OpenTrace advert updates on idle Android and iOS devices offers more
+    ///   regular measurements for OpenTrace.
+    /// - OpenTrace payloads will be reported via SensorDelegate:didRead where the payload
+    ///   has type LegacyPayloadData, and service will be the OpenTrace characteristic UUID.
+    /// - Set interopOpenTraceEnabled = false to disable feature
+    public static var interopOpenTraceEnabled: Bool = false
+    public static var interopOpenTraceServiceUUID: CBUUID = CBUUID(string: "A6BA4286-C550-4794-A888-9467EF0B31A8")
+    public static var interopOpenTracePayloadCharacteristicUUID: CBUUID  = CBUUID(string: "D1034710-B11E-42F2-BCA3-F481177D5BB2")
+    public static var interopOpenTraceManufacturerId: UInt16 = UInt16(1023)
+    public static var interopOpenTracePayloadDataUpdateTimeInterval: TimeInterval = TimeInterval.minute * 5
+
+
+    // MARK:- Interoperability with Advert based protocols
+
+    /// Advert based protocol service UUID, service data key
+    /// - Enable capture of advert based protocol payloads, e.g. for transition to HERALD
+    /// - HERALD will discover devices advertising protocol service UUID (can be the same as HERALD service UUID)
+    /// - HERALD will parse service data to read payload from target
+    /// - Protocol payloads will be reported via SensorDelegate:didRead where the payload
+    ///   has type LegacyPayloadData, and service will be the protocol service UUID.
+    /// - Set interopAdvertBasedProtocolEnabled = false to disable feature
+    /// - Scan for 16-bit service UUID by setting the value xxxx in base UUID 0000xxxx-0000-1000-8000-00805F9B34FB
+    public static var interopAdvertBasedProtocolEnabled: Bool = false
+    public static var interopAdvertBasedProtocolServiceUUID: CBUUID = CBUUID(string: "0000FD6F-0000-1000-8000-00805F9B34FB")
+    public static var interopAdvertBasedProtocolServiceDataKey: CBUUID = CBUUID(string: "FD6F")
+
+    
     // MARK:- BLE signal characteristic action codes
     
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
-    public static var signalCharacteristicActionWritePayload = UInt8(1)
+    public static var signalCharacteristicActionWritePayload: UInt8 = UInt8(1)
     /// Signal characteristic action code for write RSSI, expect 1 byte action code followed by 4 byte little-endian Int32 integer value for RSSI value
-    public static var signalCharacteristicActionWriteRSSI = UInt8(2)
+    public static var signalCharacteristicActionWriteRSSI: UInt8 = UInt8(2)
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload sharing data length, then payload sharing data
-    public static var signalCharacteristicActionWritePayloadSharing = UInt8(3)
+    public static var signalCharacteristicActionWritePayloadSharing: UInt8 = UInt8(3)
     /// Signal characteristic action code for arbitrary immediate write
-    public static var signalCharacteristicActionWriteImmediate = UInt8(4)
+    public static var signalCharacteristicActionWriteImmediate: UInt8 = UInt8(4)
 
     // MARK:- BLE event timing
     
     /// Time delay between notifications for subscribers.
-    public static var notificationDelay = DispatchTimeInterval.seconds(2)
+    public static var notificationDelay: DispatchTimeInterval = DispatchTimeInterval.seconds(2)
     /// Time delay between advert restart
-    public static var advertRestartTimeInterval = TimeInterval.hour
+    public static var advertRestartTimeInterval: TimeInterval = TimeInterval.hour
     /// Maximum number of concurrent BLE connections
-    public static var concurrentConnectionQuota = 12
+    public static var concurrentConnectionQuota: Int = 12
     /// Advert refresh time interval on Android devices
-    public static var androidAdvertRefreshTimeInterval = TimeInterval.minute * 15
+    public static var androidAdvertRefreshTimeInterval: TimeInterval = TimeInterval.minute * 15
     /// Herald internal connection expiry timeout
-    public static var connectionAttemptTimeout = TimeInterval(12)
+    public static var connectionAttemptTimeout: TimeInterval = TimeInterval(12)
+    
+    // MARK:- Venue check-in configuration
+    /// The amount of time after which a diary venue event will stay in the log file (may be shown in the UI as 'pending' before this limit)
+    public static var venueCheckInTimeLimit: TimeInterval = TimeInterval.minute * 2
+    /// The amount of time after which a venue presence diary event will be said to have been finished
+    public static var venueCheckOutTimeLimit: TimeInterval = TimeInterval.minute * 5
+    // TODO consider a variable 'sensitivity' RSSI slider here, local to this person, as a preference
+    /// The default number of days to save venue diary visits for, set by preference of the user. May be nil (no limit) or 0 (don't record anything, ever)
+    public static var venueDiaryDefaultRecordingDays: UInt8? = 31
+    /// If sharing a venue diary (E.g. via email to contact tracers), the number of days by default to share. nil means all. 0 means none
+    public static var venueDiaryDefaultShareDays: UInt8? = 14
+    /// If sharing a venue diary (E.g. via email to contact tracers), the email address to send the diary to by default when 'share' is clicked
+    public static var venueDiaryDefaultShareEmail: String? = nil
     
     // MARK:- App configurable BLE features
 
     /// Log level for BLESensor
     public static var logLevel: SensorLoggerLevel = .debug
     
-    /// Are Location Permissions enabled in the app, and thus awake on screen on enabled
-    public static var awakeOnLocationEnabled: Bool = true
+    /// Mobility sensor for estimating range of travel without recording location
+    /// - Use this for prioritising positive cases that may have spread the disease over significant distances
+    /// - Enabling location permission also has the benefit of enabling  awake on screen for iOS-iOS background detection
+    /// - Set to nil to disable sensor, set to distance in metres to enable sensor for mobility sensing at given resolution.
+    public static var mobilitySensorEnabled: Distance? = ConcreteMobilitySensor.minimumResolution
     
     /// Payload update at regular intervals, in addition to default HERALD communication process.
     /// - Use this to enable regular payload reads according to app payload lifespan.
     /// - Set to .never to disable this function.
     /// - Payload updates are reported to SensorDelegate as didRead.
     /// - Setting take immediate effect, no need to restart BLESensor, can also be applied while BLESensor is active.
-    public static var payloadDataUpdateTimeInterval = TimeInterval.never
+    public static var payloadDataUpdateTimeInterval: TimeInterval = TimeInterval.never
     
     /// Filter duplicate payload data and suppress sensor(didRead:fromTarget) delegate calls
     /// - Set to .never to disable this feature
     /// - Set time interval N to filter duplicate payload data seen in last N seconds
     /// - Example : 60 means filter duplicates in last minute
     /// - Filters all occurrences of payload data from all targets
-    public static var filterDuplicatePayloadData = TimeInterval.never
+    public static var filterDuplicatePayloadData: TimeInterval = TimeInterval.never
 
-    /// Remove old peripheral records that haven't been seen.
-    /// - Set to greater than the BLE MAC address rotation period (>15 mins)
-    public static var peripheralCleanInterval = 20 * TimeInterval.minute
+    /// Remove peripheral records that haven't been updated for some time.
+    /// - Herald aims to maintain a regular "connection" to all peripherals to gather precise proximity and duration data for all peripheral records.
+    /// - A regular connection in this context means frequent data sampling that may or may not require an actual connection.
+    /// - For example, RSSI measurements are taken from adverts, thus do not require an active connection; even the connection on iOS is just an illusion for ease of understanding.
+    /// - A peripheral record stops updating if the device has gone out of range, therefore the record can be deleted to reduce workload.
+    /// - Upper bound : Set this value to iOS Bluetooth address rotation period (roughly 15 minutes) to maximise continuity when devices go out of range, then return back in range (connection resume period = 15 mins max).
+    /// - Lower bound : Set this value to Android scan-process period (roughly 2 minutes) to minimise workload, but iOS connection resume will be more reliant on re-discovery (connection resume period = 2 mins or more dependent on external factors).
+    /// - iOS-iOS connections may resume beyond the set interval value if the addresses have not changed, due to other mechanisms in Herald.
+    public static var peripheralCleanInterval: TimeInterval = TimeInterval.minute * 2
+    
+    /// Enable inertia sensor
+    /// - Inertia sensor (accelerometer) measures acceleration in meters per second (m/s) along device X, Y and Z axis
+    /// - Generates SensorDelegate:didVisit callbacks with InertiaLocationReference data
+    /// - Set to false to disable sensor, and true value to enable sensor
+    /// - This is used for automated capture of RSSI at different distances, where the didVisit data is used as markers
+    public static var inertiaSensorEnabled: Bool = false
 }
 
 
@@ -118,15 +181,13 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     func start() {
         logger.debug("start")
         receiver.start()
-        // BLE receivers start on powerOn event, on status change the transmitter will be started.
-        // This is to request permissions and turn on dialogs sequentially
+        transmitter.start()
     }
 
     func stop() {
         logger.debug("stop")
         transmitter.stop()
         receiver.stop()
-        // BLE transmitter and receivers stops on powerOff event
     }
     
     func add(delegate: SensorDelegate) {
@@ -137,6 +198,10 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
     
     func immediateSend(data: Data,_ targetIdentifier: TargetIdentifier) -> Bool {
         return receiver.immediateSend(data:data,targetIdentifier);
+    }
+    
+    func immediateSendAll(data: Data) -> Bool {
+        return receiver.immediateSendAll(data:data);
     }
     
     // MARK:- BLEDatabaseDelegate

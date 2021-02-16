@@ -5,4 +5,7 @@ Herald-for-iOS.xcodeproj/xcuserdata/
 herald/Herald.xcodeproj/xcshareddata/
 herald/Herald.xcodeproj/xcuserdata/
 git-template
+herald/docs
+herald/build
+sync.sh
 

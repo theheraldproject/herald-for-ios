@@ -64,6 +64,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     private var notifyTimer: DispatchSourceTimer?
     /// Dedicated sequential queue for the shifting timer.
     private let notifyTimerQueue = DispatchQueue(label: "Sensor.BLE.ConcreteBLETransmitter.Timer")
+    private var transmitterEnabled: Bool = false
 
     /**
      Create a transmitter  that uses the same sequential dispatch queue as the receiver.
@@ -90,16 +91,37 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     }
     
     func start() {
-        logger.debug("start")
-        guard peripheral != nil else {
+        if !transmitterEnabled {
+            transmitterEnabled = true
+            logger.debug("start, transmitter enabled to follow bluetooth state")
+        } else {
+            logger.fault("start, transmitter already enabled to follow bluetooth state")
+        }
+        startAdvertising()
+    }
+    
+    func stop() {
+        if transmitterEnabled {
+            transmitterEnabled = false
+            logger.debug("stop, transmitter disabled")
+        } else {
+            logger.fault("stop, transmitter already disabled")
+        }
+        stopAdvertising()
+    }
+    
+    private func startAdvertising() {
+        logger.debug("startAdvertising (transmitterEnabled=\(transmitterEnabled))")
+        guard transmitterEnabled else {
             return
         }
-        guard peripheral.state == .poweredOn else {
-            logger.fault("start denied, not powered on")
+        guard peripheral != nil, peripheral.state == .poweredOn else {
+            logger.fault("startAdvertising, starting advert with existing characteristics")
             return
         }
-        if signalCharacteristic != nil, payloadCharacteristic != nil, legacyPayloadCharacteristic != nil {
-            logger.debug("starting advert with existing characteristics")
+        if signalCharacteristic != nil, payloadCharacteristic != nil,
+           (!BLESensorConfiguration.interopOpenTraceEnabled || legacyPayloadCharacteristic != nil) {
+            logger.debug("startAdvertising, starting advert with existing characteristics")
             if !peripheral.isAdvertising {
                 startAdvertising(withNewCharacteristics: false)
             } else {
@@ -108,10 +130,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                     self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
                 }
             }
-            logger.debug("start successful, for existing characteristics")
         } else {
+            logger.debug("startAdvertising, starting advert with new characteristics")
             startAdvertising(withNewCharacteristics: true)
-            logger.debug("start successful, for new characteristics")
         }
         signalCharacteristic?.subscribedCentrals?.forEach() { central in
             // FEATURE : Symmetric connection on subscribe
@@ -120,24 +141,12 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         notifySubscribers("start")
     }
     
-    func stop() {
-        logger.debug("stop")
-        guard peripheral != nil else {
-            return
-        }
-        guard peripheral.isAdvertising else {
-            logger.fault("stop denied, already stopped (source=%s)")
-            return
-        }
-        stopAdvertising()
-    }
-    
     private func startAdvertising(withNewCharacteristics: Bool) {
         logger.debug("startAdvertising (withNewCharacteristics=\(withNewCharacteristics))")
         if withNewCharacteristics || signalCharacteristic == nil || payloadCharacteristic == nil || legacyPayloadCharacteristic == nil {
             signalCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.iosSignalCharacteristicUUID, properties: [.write, .notify], value: nil, permissions: [.writeable])
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
-            legacyPayloadCharacteristic = BLESensorConfiguration.legacyPayloadCharacteristic
+            legacyPayloadCharacteristic = (BLESensorConfiguration.interopOpenTraceEnabled ? CBMutableCharacteristic(type: BLESensorConfiguration.interopOpenTracePayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable]) : nil)
         }
         let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
         signalCharacteristic?.value = nil
@@ -158,6 +167,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     private func stopAdvertising() {
         logger.debug("stopAdvertising()")
+        guard peripheral != nil, peripheral.isAdvertising else {
+            return
+        }
         queue.async {
             self.peripheral.stopAdvertising()
         }
@@ -168,6 +180,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     /// All work starts from notify subscribers loop.
     /// Generate updateValue notification after 8 seconds to notify all subscribers and keep the iOS receivers awake.
     private func notifySubscribers(_ source: String) {
+        guard transmitterEnabled else {
+            return
+        }
         notifyTimer?.cancel()
         notifyTimer = DispatchSource.makeTimerSource(queue: notifyTimerQueue)
         notifyTimer?.schedule(deadline: DispatchTime.now() + BLESensorConfiguration.notificationDelay)
@@ -239,7 +254,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // Bluetooth on -> Advertise
         if (peripheral.state == .poweredOn) {
             logger.debug("Update state (state=poweredOn)")
-            start()
+            startAdvertising()
         } else {
             if #available(iOS 10.0, *) {
                 logger.debug("Update state (state=\(peripheral.state.description))")
@@ -309,9 +324,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         logger.debug("didReceiveWrite (central=\(targetIdentifier),action=writePayload)")
                         // writePayload data format
                         // 0-0 : actionCode
-                        // 1-2 : payload data count in bytes (Int16)
+                        // 1-2 : payload data count in bytes (UInt16)
                         // 3.. : payload data
-                        if let payloadDataCount = data.int16(1) {
+                        if let payloadDataCount = data.uint16(1) {
                             logger.debug("didReceiveWrite -> didDetect=\(targetIdentifier)")
                             delegateQueue.async {
                                 self.delegates.forEach { $0.sensor(.BLE, didDetect: targetIdentifier) }
@@ -354,9 +369,9 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         // writePayloadSharing data format
                         // 0-0 : actionCode
                         // 1-2 : rssi value (Int16)
-                        // 3-4 : payload sharing data count in bytes (Int16)
+                        // 3-4 : payload sharing data count in bytes (UInt16)
                         // 5.. : payload sharing data (to be parsed by payload data supplier)
-                        if let rssi = data.int16(1), let payloadDataCount = data.int16(3) {
+                        if let rssi = data.int16(1), let payloadDataCount = data.uint16(3) {
                             if data.count == (5 + payloadDataCount) {
                                 let payloadSharingData = payloadDataSupplier.payload(data.subdata(in: 5..<data.count))
                                 logger.debug("didReceiveWrite -> didShare=\(payloadSharingData.description),fromTarget=\(targetIdentifier)")
@@ -388,7 +403,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                         // 0-0 : actionCode
                         // 1-2 : data count in bytes (Int16)
                         // 3.. : data (to be parsed by app - external to payload handling)
-                        if let immediateDataCount = data.int16(1) {
+                        if let immediateDataCount = data.uint16(1) {
                             if data.count == (3 + immediateDataCount) {
                                 let datasubset = data.subdata(in: 3..<data.count)
                                 queue.async { peripheral.respond(to: request, withResult: .success) }
@@ -422,18 +437,18 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         switch request.characteristic.uuid {
         case BLESensorConfiguration.payloadCharacteristicUUID:
             logger.debug("Read (central=\(central.description),characteristic=payload,offset=\(request.offset))")
-            let pd = payloadDataSupplier.payload(PayloadTimestamp(), device: central)
-            guard let data = pd else {
+            let payloadDataSupplied = payloadDataSupplier.payload(PayloadTimestamp(), device: central)
+            guard let payloadData = payloadDataSupplied else {
                 logger.fault("Read, no payload data supplied (central=\(central.description),characteristic=payload,offset=\(request.offset),data=BLANK)")
                 queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }
                 return
             }
-            guard request.offset < data.count else {
-                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(data.count))")
+            guard request.offset < payloadData.count else {
+                logger.fault("Read, invalid offset (central=\(central.description),characteristic=payload,offset=\(request.offset),data=\(payloadData.count))")
                 queue.async { peripheral.respond(to: request, withResult: .invalidOffset) }
                 return
             }
-            request.value = (request.offset == 0 ? data : data.subdata(in: request.offset..<data.count))
+            request.value = (request.offset == 0 ? payloadData.data : payloadData.subdata(in: request.offset..<payloadData.count))
             queue.async { peripheral.respond(to: request, withResult: .success) }
         default:
             logger.fault("Read (central=\(central.description),characteristic=unknown)")
@@ -459,86 +474,5 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         // FEATURE : Symmetric connection on unsubscribe
         _ = database.device(central.identifier.uuidString)
         notifySubscribers("didUnsubscribeFrom")
-    }
-}
-
-extension Data {
-    /// Get Int8 from byte array (little-endian).
-    func int8(_ index: Int) -> Int8? {
-        guard let value = uint8(index) else {
-            return nil
-        }
-        return Int8(bitPattern: value)
-    }
-
-    /// Get UInt8 from byte array (little-endian).
-    func uint8(_ index: Int) -> UInt8? {
-        let bytes = [UInt8](self)
-        guard index < bytes.count else {
-            return nil
-        }
-        return bytes[index]
-    }
-    
-    /// Get Int16 from byte array (little-endian).
-    func int16(_ index: Int) -> Int16? {
-        guard let value = uint16(index) else {
-            return nil
-        }
-        return Int16(bitPattern: value)
-    }
-    
-    /// Get UInt16 from byte array (little-endian).
-    func uint16(_ index: Int) -> UInt16? {
-        let bytes = [UInt8](self)
-        guard index < (bytes.count - 1) else {
-            return nil
-        }
-        return UInt16(bytes[index]) |
-            UInt16(bytes[index + 1]) << 8
-    }
-    
-    /// Get Int32 from byte array (little-endian).
-    func int32(_ index: Int) -> Int32? {
-        guard let value = uint32(index) else {
-            return nil
-        }
-        return Int32(bitPattern: value)
-    }
-    
-    /// Get UInt32 from byte array (little-endian).
-    func uint32(_ index: Int) -> UInt32? {
-        let bytes = [UInt8](self)
-        guard index < (bytes.count - 3) else {
-            return nil
-        }
-        return UInt32(bytes[index]) |
-            UInt32(bytes[index + 1]) << 8 |
-            UInt32(bytes[index + 2]) << 16 |
-            UInt32(bytes[index + 3]) << 24
-    }
-
-    /// Get Int64 from byte array (little-endian).
-    func int64(_ index: Int) -> Int64? {
-        guard let value = uint64(index) else {
-            return nil
-        }
-        return Int64(bitPattern: value)
-    }
-    
-    /// Get UInt64 from byte array (little-endian).
-    func uint64(_ index: Int) -> UInt64? {
-        let bytes = [UInt8](self)
-        guard index < (bytes.count - 7) else {
-            return nil
-        }
-        return UInt64(bytes[index]) |
-            UInt64(bytes[index + 1]) << 8 |
-            UInt64(bytes[index + 2]) << 16 |
-            UInt64(bytes[index + 3]) << 24 |
-            UInt64(bytes[index + 4]) << 32 |
-            UInt64(bytes[index + 5]) << 40 |
-            UInt64(bytes[index + 6]) << 48 |
-            UInt64(bytes[index + 7]) << 56
     }
 }
