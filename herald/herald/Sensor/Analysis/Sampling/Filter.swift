@@ -7,48 +7,48 @@
 
 import Foundation
 
-public class Filter<T: DoubleValue> {
-    public func test(item: Sample<T>) -> Bool {
+public class Filter {
+    public func test(item: Sample) -> Bool {
         return true
     }
 }
 
 // MARK: - Filters
 
-public class NoOp<T: DoubleValue>: Filter<T> {
+public class NoOp: Filter {
 
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return true
     }
 }
 
 // MARK: - Value filters
 
-public class GreaterThan<T: DoubleValue>: Filter<T> {
+public class GreaterThan: Filter {
     private let min: Double
 
     public init(_ min: Double) {
         self.min = min
     }
 
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return item.value.doubleValue() > min
     }
 }
 
-public class LessThan<T: DoubleValue>: Filter<T> {
+public class LessThan: Filter {
     private let max: Double
 
     public init(_ max: Double) {
         self.max = max
     }
 
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return item.value.doubleValue() < max
     }
 }
 
-public class InRange<T: DoubleValue>: Filter<T> {
+public class InRange: Filter {
     private let min: Double
     private let max: Double
 
@@ -57,14 +57,14 @@ public class InRange<T: DoubleValue>: Filter<T> {
         self.max = max
     }
 
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return item.value.doubleValue() >= min && item.value.doubleValue() <= max
     }
 }
 
 // MARK: - Time filters
 
-public class Since<T: DoubleValue>: Filter<T> {
+public class Since: Filter {
     private let after: Date
 
     public init(_ after: Date) {
@@ -83,12 +83,12 @@ public class Since<T: DoubleValue>: Filter<T> {
         self.init(Date(timeIntervalSinceNow: -recent))
     }
     
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return item.taken >= after
     }
 }
 
-public class Until<T: DoubleValue>: Filter<T> {
+public class Until: Filter {
     private let before: Date
 
     public init(_ before: Date) {
@@ -107,12 +107,12 @@ public class Until<T: DoubleValue>: Filter<T> {
         self.init(Date(timeIntervalSinceNow: -recent))
     }
     
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return item.taken <= before
     }
 }
 
-public class InPeriod<T: DoubleValue>: Filter<T> {
+public class InPeriod: Filter {
     private let after: Date
     private let before: Date
 
@@ -133,7 +133,7 @@ public class InPeriod<T: DoubleValue>: Filter<T> {
             Date(timeIntervalSince1970: beforeTimeIntervalSince1970))
     }
     
-    public override func test(item: Sample<T>) -> Bool {
+    public override func test(item: Sample) -> Bool {
         return after <= item.taken && item.taken <= before
     }
 }

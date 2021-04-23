@@ -10,7 +10,7 @@ import Foundation
 /// A Basic sample but non scientific risk aggregation model.
 /// Similar in function to the Oxford Risk Model, but without its calibration values and scaling.
 /// NOT FOR PRODUCTION EPIDEMIOLOGICAL USE - SAMPLE ONLY!!!
-public class RiskAggregationBasic<T: DoubleValue>: Aggregate<T> {
+public class RiskAggregationBasic: Aggregate {
     override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var timeScale: Double
@@ -48,7 +48,7 @@ public class RiskAggregationBasic<T: DoubleValue>: Aggregate<T> {
         }
     }
 
-    public override func map(value: Sample<T>) {
+    public override func map(value: Sample) {
         nMinusOne = n
         timeMinusOne = time
         n = value.value.doubleValue()

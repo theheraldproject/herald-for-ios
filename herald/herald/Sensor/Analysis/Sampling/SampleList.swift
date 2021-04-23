@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class SampleList<T: DoubleValue> {
-    private var data: [Sample<T>?]
+public class SampleList {
+    private var data: [Sample?]
     private var oldestPosition, newestPosition: Int
     public var description: String { get {
         guard size() > 0 else {
@@ -29,47 +29,47 @@ public class SampleList<T: DoubleValue> {
     }}
     
     public init(_ size: Int) {
-        self.data = [Sample<T>?](repeating: nil, count: size)
+        self.data = [Sample?](repeating: nil, count: size)
         self.oldestPosition = size
         self.newestPosition = size
     }
     
-    public convenience init(_ size: Int, samples: [Sample<T>]) {
+    public convenience init(_ size: Int, samples: [Sample]) {
         self.init(size)
         samples.forEach({ sample in push(sample: sample) })
     }
     
-    public convenience init(samples: [Sample<T>]) {
+    public convenience init(samples: [Sample]) {
         self.init(samples.count, samples: samples)
     }
     
-    public convenience init(iterator: SampleIterator<T>) {
+    public convenience init(iterator: SampleIterator) {
         self.init(samples: SampleList.toArray(iterator))
     }
     
-    private static func toArray(_ iterator: SampleIterator<T>) -> [Sample<T>] {
-        var array: [Sample<T>] = []
+    private static func toArray(_ iterator: SampleIterator) -> [Sample] {
+        var array: [Sample] = []
         while let item = iterator.next() {
             array.append(item)
         }
         return array
     }
     
-    public func push(sample: Sample<T>) {
+    public func push(sample: Sample) {
         incrementNewest()
         data[newestPosition] = sample
     }
     
-    public func push(taken: Date, value: T) {
-        push(sample: Sample<T>(taken: taken, value: value))
+    public func push(taken: Date, value: DoubleValue) {
+        push(sample: Sample(taken: taken, value: value))
     }
     
-    public func push(timeIntervalSince1970: TimeInterval, value: T) {
-        push(sample: Sample<T>(timeIntervalSince1970: timeIntervalSince1970, value: value))
+    public func push(timeIntervalSince1970: TimeInterval, value: DoubleValue) {
+        push(sample: Sample(timeIntervalSince1970: timeIntervalSince1970, value: value))
     }
     
-    public func push(secondsSinceUnixEpoch: Int64, value: T) {
-        push(sample: Sample<T>(secondsSinceUnixEpoch: secondsSinceUnixEpoch, value: value))
+    public func push(secondsSinceUnixEpoch: Int64, value: DoubleValue) {
+        push(sample: Sample(secondsSinceUnixEpoch: secondsSinceUnixEpoch, value: value))
     }
     
     public func size() -> Int {
@@ -84,7 +84,7 @@ public class SampleList<T: DoubleValue> {
         return (1 + newestPosition) + (data.count - oldestPosition)
     }
     
-    public func get(_ index: Int) -> Sample<T>? {
+    public func get(_ index: Int) -> Sample? {
         if newestPosition >= oldestPosition {
             guard let item = data[index + oldestPosition] else {
                 return nil
@@ -138,7 +138,7 @@ public class SampleList<T: DoubleValue> {
         return item.taken
     }
     
-    public func latestValue() -> T? {
+    public func latestValue() -> DoubleValue? {
         guard newestPosition != data.count, let item = data[newestPosition] else {
             return nil
         }
@@ -168,15 +168,15 @@ public class SampleList<T: DoubleValue> {
         }
     }
 
-    public func makeIterator() -> SampleIterator<T> {
-        return SampleListIterator<T>(self)
+    public func makeIterator() -> SampleIterator {
+        return SampleListIterator(self)
     }
     
-    public func filter(_ filter: Filter<T>) -> SampleIterator<T> {
+    public func filter(_ filter: Filter) -> SampleIterator {
         return SampleIteratorProxy(makeIterator(), filter)
     }
 
-    public func aggregate(_ aggregates: [Aggregate<T>]) -> Summary<T> {
+    public func aggregate(_ aggregates: [Aggregate]) -> Summary {
         var maxRuns = 0
         for aggregate in aggregates {
             if aggregate.runs > maxRuns {
@@ -190,40 +190,40 @@ public class SampleList<T: DoubleValue> {
                 aggregates.forEach({ $0.map(value: sample) })
             }
         }
-        return Summary<T>(aggregates)
+        return Summary(aggregates)
     }
 }
 
 
 
 
-public class SampleIterator<T: DoubleValue> {
-    public func next() -> Sample<T>? {
+public class SampleIterator {
+    public func next() -> Sample? {
         return nil
     }
     
-    public func toView() -> SampleList<T> {
-        return SampleList<T>(iterator: self)
+    public func toView() -> SampleList {
+        return SampleList(iterator: self)
     }
 
-    public func filter(_ filter: Filter<T>) -> SampleIterator<T> {
+    public func filter(_ filter: Filter) -> SampleIterator {
         return SampleIteratorProxy(self, filter)
     }
 
-    public func aggregate(_ aggregates: [Aggregate<T>]) -> Summary<T> {
+    public func aggregate(_ aggregates: [Aggregate]) -> Summary {
         return toView().aggregate(aggregates);
     }
 }
 
-public class SampleListIterator<T: DoubleValue>: SampleIterator<T> {
-    private let sampleList: SampleList<T>
+public class SampleListIterator: SampleIterator {
+    private let sampleList: SampleList
     private var index = 0
 
-    init(_ sampleList: SampleList<T>) {
+    init(_ sampleList: SampleList) {
         self.sampleList = sampleList
     }
 
-    public override func next() -> Sample<T>? {
+    public override func next() -> Sample? {
         guard index < sampleList.size(), let item = sampleList.get(index) else {
             return nil
         }
@@ -232,18 +232,18 @@ public class SampleListIterator<T: DoubleValue>: SampleIterator<T> {
     }
 }
 
-public class SampleIteratorProxy<T: DoubleValue>: SampleIterator<T> {
-    private var source: SampleIterator<T>
-    private let filter: Filter<T>
-    private var nextItem: Sample<T>?
+public class SampleIteratorProxy: SampleIterator {
+    private var source: SampleIterator
+    private let filter: Filter
+    private var nextItem: Sample?
     private var nextItemSet: Bool = false
 
-    init(_ source: SampleIterator<T>, _ filter: Filter<T>) {
+    init(_ source: SampleIterator, _ filter: Filter) {
         self.source = source
         self.filter = filter
     }
 
-    public override func next() -> Sample<T>? {
+    public override func next() -> Sample? {
         guard nextItemSet || moveToNextItem() else {
             return nil
         }
@@ -263,14 +263,14 @@ public class SampleIteratorProxy<T: DoubleValue>: SampleIterator<T> {
     }
 }
 
-public class Summary<T: DoubleValue> {
-    private let aggregates: [Aggregate<T>]
+public class Summary {
+    private let aggregates: [Aggregate]
 
-    public init(_ aggregates: [Aggregate<T>]) {
+    public init(_ aggregates: [Aggregate]) {
         self.aggregates = aggregates
     }
 
-    public func get<U: Aggregate<T>>(_ byClass: U.Type) -> Double? {
+    public func get<U: Aggregate>(_ byClass: U.Type) -> Double? {
         for aggregate in aggregates {
             if type(of: aggregate) == byClass {
                 return aggregate.reduce()

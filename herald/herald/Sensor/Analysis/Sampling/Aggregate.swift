@@ -7,13 +7,13 @@
 
 import Foundation
 
-public class Aggregate<T: DoubleValue> {
+public class Aggregate {
     var runs: Int { get { 0 }}
     
     func beginRun(thisRun: Int) {
     }
 
-    func map(value : Sample<T>) {
+    func map(value : Sample) {
     }
 
     func reduce() -> Double? {
@@ -26,7 +26,7 @@ public class Aggregate<T: DoubleValue> {
 
 // MARK: - Aggregates
 
-public class Mean<T: DoubleValue>: Aggregate<T> {
+public class Mean: Aggregate {
     override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var count: Int64 = 0
@@ -36,7 +36,7 @@ public class Mean<T: DoubleValue>: Aggregate<T> {
         run = thisRun
     }
 
-    public override func map(value: Sample<T>) {
+    public override func map(value: Sample) {
         guard run == 1 else {
             return
         }
@@ -58,7 +58,7 @@ public class Mean<T: DoubleValue>: Aggregate<T> {
     }
 }
 
-public class Variance<T: DoubleValue>: Aggregate<T> {
+public class Variance: Aggregate {
     override var runs: Int { get { 2 }}
     private var run: Int = 1
     private var count: Int64 = 0
@@ -81,7 +81,7 @@ public class Variance<T: DoubleValue>: Aggregate<T> {
 
     }
 
-    public override func map(value: Sample<T>) {
+    public override func map(value: Sample) {
         if run == 1 {
             sum += value.value.doubleValue()
         } else {
@@ -107,7 +107,7 @@ public class Variance<T: DoubleValue>: Aggregate<T> {
     }
 }
 
-public class Mode<T: DoubleValue>: Aggregate<T> {
+public class Mode: Aggregate {
     override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var counts: [Double:Int64] = [:]
@@ -116,7 +116,7 @@ public class Mode<T: DoubleValue>: Aggregate<T> {
         run = thisRun
     }
 
-    public override func map(value: Sample<T>) {
+    public override func map(value: Sample) {
         guard run == 1 else {
             return
         }
@@ -147,7 +147,7 @@ public class Mode<T: DoubleValue>: Aggregate<T> {
     }
 }
 
-public class Median<T: DoubleValue>: Aggregate<T> {
+public class Median: Aggregate {
     override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var values: [Double] = []
@@ -157,7 +157,7 @@ public class Median<T: DoubleValue>: Aggregate<T> {
         run = thisRun
     }
 
-    public override func map(value: Sample<T>) {
+    public override func map(value: Sample) {
         guard run == 1 else {
             return
         }
@@ -191,7 +191,7 @@ public class Median<T: DoubleValue>: Aggregate<T> {
 }
 
 
-public class Gaussian<T: DoubleValue>: Aggregate<T> {
+public class Gaussian: Aggregate {
     override var runs: Int { get { 1 }}
     private var run: Int = 1
     public var model: SampleStatistics = SampleStatistics()
@@ -200,7 +200,7 @@ public class Gaussian<T: DoubleValue>: Aggregate<T> {
         run = thisRun
     }
 
-    public override func map(value: Sample<T>) {
+    public override func map(value: Sample) {
         guard run == 1 else {
             return
         }

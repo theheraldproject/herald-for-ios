@@ -16,9 +16,9 @@ class SampleTests: XCTestCase {
     }
 
     func testSample() {
-        let s1 = Sample<Value>(taken: Date(timeIntervalSince1970: 1), value: Value(doubleValue: 1))
-        let s1Copy = Sample<Value>(taken: Date(timeIntervalSince1970: 1), value: Value(doubleValue: 1))
-        let s2 = Sample<Value>(taken: Date(timeIntervalSince1970: 2), value: Value(doubleValue: 2))
+        let s1 = Sample(taken: Date(timeIntervalSince1970: 1), value: Value(doubleValue: 1))
+        let s1Copy = Sample(taken: Date(timeIntervalSince1970: 1), value: Value(doubleValue: 1))
+        let s2 = Sample(taken: Date(timeIntervalSince1970: 2), value: Value(doubleValue: 2))
         
         XCTAssertEqual(s1.taken, s1Copy.taken)
         XCTAssertEqual(s1.value.doubleValue(), s1Copy.value.doubleValue())

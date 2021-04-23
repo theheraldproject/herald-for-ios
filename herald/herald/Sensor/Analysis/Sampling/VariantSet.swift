@@ -9,13 +9,13 @@ import Foundation
 
 public class VariantSet {
     private let defaultListSize: Int
-    private var map: [String:ListManager<DoubleValue>] = [:]
+    private var map: [ValueType:ListManager] = [:]
     
     public init(_ defaultListSize: Int) {
         self.defaultListSize = defaultListSize
     }
     
-    public func variants() -> Set<String> {
+    public func variants() -> Set<ValueType> {
         return Set<String>(map.keys)
     }
     
@@ -25,23 +25,27 @@ public class VariantSet {
         return sampledIDs
     }
     
-    public func add<T:DoubleValue>(variant: T.Type, listSize: Int) -> ListManager<DoubleValue> {
-        let listManager = ListManager<DoubleValue>(listSize)
+    public func add(variant: ValueType, listSize: Int) -> ListManager {
+        let listManager = ListManager(listSize)
         let typeName = String(describing: variant)
         map[typeName] = listManager
         return listManager
     }
     
-    public func remove<T:DoubleValue>(variant: T.Type) {
+    public func remove(variant: ValueType) {
         let typeName = String(describing: variant)
         map.removeValue(forKey: typeName)
+    }
+    
+    public func remove<T:DoubleValue>(_ type: T.Type) {
+        remove(variant: ValueType(describing: type))
     }
     
     public func remove(sampledID: SampledID) {
         map.values.forEach({ $0.remove(sampledID) })
     }
     
-    public func listManager<T:DoubleValue>(variant: T.Type) -> ListManager<DoubleValue> {
+    public func listManager(variant: ValueType) -> ListManager {
         let typeName = String(describing: variant)
         if let listManager = map[typeName] {
             return listManager
@@ -50,21 +54,23 @@ public class VariantSet {
         }
     }
     
-    public func push<T:DoubleValue>(sampledID: SampledID, sample: Sample<T>) {
-        //listManager(variant: sample.valueType).push(sampledID, sample)
+    public func listManager<T:DoubleValue>(_ type: T.Type) -> ListManager {
+        return listManager(variant: ValueType(describing: type))
+    }
+    
+    public func listManager(variant: ValueType, listFor: SampledID) -> SampleList {
+        return listManager(variant: variant).list(listFor)
+    }
+    
+    public func listManager<T:DoubleValue>(_ type: T.Type, _ listFor: SampledID) -> SampleList {
+        return listManager(variant: ValueType(describing: type), listFor: listFor)
+    }
+
+    public func size() -> Int {
+        return map.count
+    }
+    
+    public func push(_ sampledID: SampledID, _ sample: Sample) {
+        listManager(variant: sample.valueType).push(sampledID, sample)
     }
 }
-//
-//    public <T extends DoubleValue> SampleList<T> listManager(final Class<T> variant, final SampledID listFor) {
-//        final ListManager<T> listManager = listManager(variant);
-//        return listManager.list(listFor);
-//    }
-//
-//    public int size() {
-//        return map.size();
-//    }
-//
-//    public <T extends DoubleValue> void push(final SampledID sampledID, final Sample<T> sample) {
-//        ((ListManager<T>) listManager(sample.value().getClass())).push(sampledID, sample);
-//    }
-//}
