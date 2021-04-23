@@ -511,9 +511,9 @@ private class Target {
         didSet {
             lastUpdatedAt = didRead
         }}
-    let didReadTimeInterval = Sample()
+    let didReadTimeInterval = SampleStatistics()
     var didMeasure: Date?
-    let didMeasureTimeInterval = Sample()
+    let didMeasureTimeInterval = SampleStatistics()
     var didShare: Date? {
         willSet(date) {
             if let date = date, let didShare = didShare {
@@ -525,7 +525,7 @@ private class Target {
                 lastUpdatedAt = didShare
             }
         }}
-    let didShareTimeInterval = Sample()
+    let didShareTimeInterval = SampleStatistics()
     var didReceive: Date?
     init(targetIdentifier: TargetIdentifier, payloadData: PayloadData) {
         self.targetIdentifier = targetIdentifier

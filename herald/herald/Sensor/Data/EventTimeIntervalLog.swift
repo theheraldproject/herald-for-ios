@@ -14,7 +14,7 @@ public class EventTimeIntervalLog: NSObject, SensorDelegate {
     private let eventType: EventTimeIntervalLogEventType
     private var targetIdentifierToPayload: [TargetIdentifier:String] = [:]
     private var payloadToTime: [String:Date] = [:]
-    private var payloadToSample: [String:Sample] = [:]
+    private var payloadToSample: [String:SampleStatistics] = [:]
     
     public init(filename: String, payloadData: PayloadData, eventType: EventTimeIntervalLogEventType) {
         textFile = TextFile(filename: filename)
@@ -29,7 +29,7 @@ public class EventTimeIntervalLog: NSObject, SensorDelegate {
     private func add(payload: String) {
         guard let time = payloadToTime[payload], let sample = payloadToSample[payload] else {
             payloadToTime[payload] = Date()
-            payloadToSample[payload] = Sample()
+            payloadToSample[payload] = SampleStatistics()
             return
         }
         let now = Date()

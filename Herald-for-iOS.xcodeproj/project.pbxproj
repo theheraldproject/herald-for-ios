@@ -169,7 +169,7 @@
 				CLASSPREFIX = com.vmware.herald;
 				LastSwiftUpdateCheck = 1160;
 				LastUpgradeCheck = 1160;
-				ORGANIZATIONNAME = "VMware, Inc.";
+				ORGANIZATIONNAME = "Herald Project Contributors";
 				TargetAttributes = {
 					B692CA8F24CADA7500F45AEE = {
 						CreatedOnToolsVersion = 11.6;
@@ -387,7 +387,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Z4G2H2H6CW;
+				DEVELOPMENT_TEAM = "";
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -407,7 +407,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Z4G2H2H6CW;
+				DEVELOPMENT_TEAM = "";
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
