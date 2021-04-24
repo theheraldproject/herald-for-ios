@@ -104,7 +104,7 @@ class AnalysisRunnerTests: XCTestCase {
         
         let runner = AnalysisRunner(apm, adm, defaultListSize: 25)
 
-        // run at different times and ensure that it only actually runs three times (sample size == 3)
+        // run at different times
         src.run(20, runner)
         src.run(40, runner) // Runs here, because we have data for 10,20,>>30<<,40 <- next run time based on this 'latest' data time
         src.run(60, runner)
@@ -121,6 +121,42 @@ class AnalysisRunnerTests: XCTestCase {
         print(samples.description)
     }
     
+    public func test_analysisrunner_smoothedLinearModel() {
+        let srcData = SampleList(25)
+        srcData.push(secondsSinceUnixEpoch: 0, value: RSSI(-68))
+        srcData.push(secondsSinceUnixEpoch: 10, value: RSSI(-68))
+        srcData.push(secondsSinceUnixEpoch: 20, value: RSSI(-68))
+        srcData.push(secondsSinceUnixEpoch: 30, value: RSSI(-68))
+        srcData.push(secondsSinceUnixEpoch: 40, value: RSSI(-68))
+        srcData.push(secondsSinceUnixEpoch: 50, value: RSSI(-68))
+        srcData.push(secondsSinceUnixEpoch: 60, value: RSSI(-68))
+        let src = DummyRSSISource(SampledID(1234), srcData)
+        
+        let distanceAnalyser = SmoothedLinearModelAnalyser(interval: 10, smoothingWindow: TimeInterval.minute, intercept: -17.7275, coefficient: -0.2754)
+        let myDelegate = DummyDistanceDelegate()
+        
+        let adm = AnalysisDelegateManager([myDelegate])
+        let apm = AnalysisProviderManager([distanceAnalyser])
+        
+        let runner = AnalysisRunner(apm, adm, defaultListSize: 25)
+
+        // run at different times and ensure that it only actually runs once
+        src.run(60, 10, runner)
+        src.run(60, 20, runner)
+        src.run(60, 30, runner)
+        src.run(60, 40, runner)
+        src.run(60, 50, runner)
+        src.run(60, 60, runner) // Runs here, because we have data for 0,10,20,>>30<<,40,50,60 <- next run time based on this 'latest' data time
+
+        XCTAssertEqual(myDelegate.lastSampledID, SampledID(1234))
+        let samples = myDelegate.samples
+        XCTAssertEqual(samples.size(), 1)
+        let sample = samples.get(0)!
+        XCTAssertEqual(sample.taken.secondsSinceUnixEpoch, 30)
+        XCTAssertEqual(sample.value.doubleValue(), 1.0, accuracy: 0.001)
+        print(samples.description)
+    }
+    
     private class DummyRSSISource {
         private let sampledID: SampledID
         private let data: SampleList
@@ -131,6 +167,7 @@ class AnalysisRunnerTests: XCTestCase {
         }
         
         public func run(_ timeTo: Int64, _ runner: AnalysisRunner) {
+            runner.variantSet.removeAll()
             let i = data.makeIterator()
             while let v = i.next() {
                 if (v.taken.secondsSinceUnixEpoch <= timeTo) {
@@ -141,6 +178,7 @@ class AnalysisRunnerTests: XCTestCase {
         }
 
         public func run(_ sampleTimeTo: Int64, _ analysisTimeTo: Int64, _ runner: AnalysisRunner) {
+            runner.variantSet.removeAll()
             let i = data.makeIterator()
             while let v = i.next() {
                 if (v.taken.secondsSinceUnixEpoch <= sampleTimeTo) {
@@ -163,44 +201,4 @@ class AnalysisRunnerTests: XCTestCase {
             lastSampledID = sampled
         }
     }
-
-    
-    //
-    //    @Test
-    //    public void analysisrunner_smoothedLinearModel() {
-    //        final SampleList<RSSI> srcData = new SampleList<>(25);
-    //        srcData.push(0, new RSSI(-68));
-    //        srcData.push(10, new RSSI(-68));
-    //        srcData.push(20, new RSSI(-68));
-    //        srcData.push(30, new RSSI(-68));
-    //        srcData.push(40, new RSSI(-68));
-    //        srcData.push(50, new RSSI(-68));
-    //        srcData.push(60, new RSSI(-68));
-    //        final DummyRSSISource src = new DummyRSSISource(new SampledID(1234), srcData);
-    //
-    //        final AnalysisProvider<RSSI, Distance> distanceAnalyser = new SmoothedLinearModelAnalyser(10, TimeInterval.minute, -17.7275, -0.2754);
-    //        final AnalysisDelegate<Distance> myDelegate = new DummyDistanceDelegate();
-    //
-    //        final AnalysisDelegateManager adm = new AnalysisDelegateManager(myDelegate);
-    //        final AnalysisProviderManager apm = new AnalysisProviderManager(distanceAnalyser);
-    //        final AnalysisRunner runner = new AnalysisRunner(apm, adm, 25);
-    //
-    //        // run at different times and ensure that it only actually runs three times (sample size == 3)
-    //        src.run(60, 10, runner);
-    //        src.run(60, 20, runner);
-    //        src.run(60, 30, runner); // Runs here, because we have data for 0,10,20,>>30<<,40,50,60 <- next run time based on this 'latest' data time
-    //        src.run(60, 40, runner);
-    //
-    //
-    //        assertEquals(((DummyDistanceDelegate) myDelegate).lastSampledID.value, 1234);
-    //        final SampleList<Distance> samples = myDelegate.samples();
-    //        // didn't reach 4x30 seconds, so no tenth sample, and didn't run at 60 because previous run was at time 40
-    //        assertEquals(samples.size(), 1);
-    //        assertEquals(samples.get(0).taken().secondsSinceUnixEpoch(), 30);
-    //        assertEquals(samples.get(0).value().value, 1.0, 0.001);
-    //    }
-    //
-    
-    //
- 
 }

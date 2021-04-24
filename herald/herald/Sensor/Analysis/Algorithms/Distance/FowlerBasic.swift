@@ -50,14 +50,10 @@ public class FowlerBasicAnalyser: AnalysisProvider {
     private var lastRan: Date = Date(timeIntervalSince1970: 0)
     private let valid: Filter = InRange(-99, -10)
 
-    public init(interval: TimeInterval, intercept: Double, coefficient: Double) {
+    public init(interval: TimeInterval = TimeInterval(10), intercept: Double = -11, coefficient: Double = -0.4) {
         self.interval = interval
         self.basic = FowlerBasic(intercept: intercept, coefficient: coefficient)
         super.init(ValueType(describing: RSSI.self), ValueType(describing: PhysicalDistance.self))
-    }
-
-    public convenience init() {
-        self.init(interval: TimeInterval(10), intercept: -11, coefficient: -0.4)
     }
 
     public override func analyse(timeNow: Date, sampled: SampledID, input: SampleList, output: SampleList, callable: CallableForNewSample) -> Bool {

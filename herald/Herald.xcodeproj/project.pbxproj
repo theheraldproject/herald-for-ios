@@ -58,6 +58,7 @@
 		B6C484132632CD8C0007BFD1 /* AnalysisProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C484122632CD8C0007BFD1 /* AnalysisProvider.swift */; };
 		B6C484172632D15B0007BFD1 /* AnalysisRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C484162632D15B0007BFD1 /* AnalysisRunner.swift */; };
 		B6C4841B2632D3710007BFD1 /* DoubleValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C4841A2632D3710007BFD1 /* DoubleValue.swift */; };
+		B6C4841F2633444B0007BFD1 /* SmoothedLinearModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C4841E2633444B0007BFD1 /* SmoothedLinearModel.swift */; };
 		B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA10B225A78AF50071C08E /* CalibrationLog.swift */; };
 		B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */; };
 		B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */; };
@@ -141,6 +142,7 @@
 		B6C484122632CD8C0007BFD1 /* AnalysisProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AnalysisProvider.swift; path = herald/Sensor/Analysis/Sampling/AnalysisProvider.swift; sourceTree = SOURCE_ROOT; };
 		B6C484162632D15B0007BFD1 /* AnalysisRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AnalysisRunner.swift; path = herald/Sensor/Analysis/Sampling/AnalysisRunner.swift; sourceTree = SOURCE_ROOT; };
 		B6C4841A2632D3710007BFD1 /* DoubleValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DoubleValue.swift; path = herald/Sensor/Analysis/Algorithms/DoubleValue.swift; sourceTree = SOURCE_ROOT; };
+		B6C4841E2633444B0007BFD1 /* SmoothedLinearModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SmoothedLinearModel.swift; path = herald/Sensor/Analysis/Algorithms/Distance/SmoothedLinearModel.swift; sourceTree = SOURCE_ROOT; };
 		B6D8A56E25229F33000E6CC2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6DA10B225A78AF50071C08E /* CalibrationLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalibrationLog.swift; path = herald/Sensor/Data/CalibrationLog.swift; sourceTree = SOURCE_ROOT; };
 		B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Mobility.swift; path = herald/Sensor/Analysis/Mobility.swift; sourceTree = SOURCE_ROOT; };
@@ -374,6 +376,7 @@
 			isa = PBXGroup;
 			children = (
 				B6C483F32631D4520007BFD1 /* FowlerBasic.swift */,
+				B6C4841E2633444B0007BFD1 /* SmoothedLinearModel.swift */,
 			);
 			path = Distance;
 			sourceTree = "<group>";
@@ -536,6 +539,7 @@
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
 				B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */,
 				6F273A4425862B1A0090B3B5 /* VenueDiary.swift in Sources */,
+				B6C4841F2633444B0007BFD1 /* SmoothedLinearModel.swift in Sources */,
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,

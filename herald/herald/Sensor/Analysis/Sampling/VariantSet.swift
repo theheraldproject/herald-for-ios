@@ -45,6 +45,10 @@ public class VariantSet {
         map.values.forEach({ $0.remove(sampledID) })
     }
     
+    public func removeAll() {
+        map.removeAll()
+    }
+    
     public func listManager(variant: ValueType) -> ListManager {
         let typeName = String(describing: variant)
         if let listManager = map[typeName] {
