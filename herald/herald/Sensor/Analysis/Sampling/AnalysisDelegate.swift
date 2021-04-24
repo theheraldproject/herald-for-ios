@@ -49,7 +49,7 @@ public class AnalysisDelegateManager: CallableForNewSample {
     private var lists: [ValueType:[AnalysisDelegate]] = [:]
     private let queue = DispatchQueue(label: "Sensor.Analysis.Sampling.AnalysisDelegateManager")
 
-    public init(_ delegates: [AnalysisDelegate]) {
+    public init(_ delegates: [AnalysisDelegate] = []) {
         super.init()
         delegates.forEach({ add($0) })
     }

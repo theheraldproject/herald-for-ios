@@ -23,7 +23,11 @@ public class DoubleValue: CustomStringConvertible {
 public class RSSI: DoubleValue {
     public let value: Int
     public override var description: String { get { "RSSI{value=\(value.description)}" }}
-    init(_ value: Int) {
+    public init(_ value: Double) {
+        self.value = Int(round(value))
+        super.init(doubleValue: value)
+    }
+    public init(_ value: Int) {
         self.value = value
         super.init(doubleValue: Double(value))
     }
@@ -33,8 +37,7 @@ public class RSSI: DoubleValue {
 public class PhysicalDistance: DoubleValue {
     public var value: Double { get { doubleValue() }}
     public override var description: String { get { "PhysicalDistance{value=\(value.description)}" }}
-
-    init(_ value: Double) {
+    public init(_ value: Double) {
         super.init(doubleValue: value)
     }
 

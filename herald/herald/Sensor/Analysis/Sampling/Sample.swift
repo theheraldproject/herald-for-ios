@@ -38,6 +38,34 @@ public class Sample {
     }
 }
 
-public typealias SampledID = Int64
+public class SampledID: Equatable, Comparable, Hashable, CustomStringConvertible {
+    public let value: Int64
+    public var description: String { get { value.description }}
+    
+    public init(_ value: Int64) {
+        self.value = value
+    }
+    
+    public init(_ data: Data) {
+        var hashValue: [UInt8] = [0,0,0,0,0,0,0,0]
+        for i in 0...data.count-1 {
+            let j = i % 8
+            hashValue[j] = hashValue[j] ^ data[i]
+        }
+        self.value = Data(hashValue).int64(0)!
+    }
+    
+    public static func == (lhs: SampledID, rhs: SampledID) -> Bool {
+        return lhs.value == rhs.value
+    }
+    
+    public static func < (lhs: SampledID, rhs: SampledID) -> Bool {
+        return lhs.value < rhs.value
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(value)
+    }
+}
 
 public typealias ValueType = String
