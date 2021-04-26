@@ -33,12 +33,11 @@ public class RSSI: DoubleValue {
     }
 }
 
-/// Physical distance in KM
-public class PhysicalDistance: DoubleValue {
+/// Physical distance in metres
+public class Distance: DoubleValue {
     public var value: Double { get { doubleValue() }}
-    public override var description: String { get { "PhysicalDistance{value=\(value.description)}" }}
+    public override var description: String { get { "Distance{value=\(value.description)}" }}
     public init(_ value: Double) {
         super.init(doubleValue: value)
     }
-
 }

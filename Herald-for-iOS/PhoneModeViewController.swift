@@ -69,7 +69,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     
     // MARK:- Distance estimation
     let analysisProviderManager = AnalysisProviderManager([SmoothedLinearModelAnalyser()])
-    let analysisDelegate = AnalysisDelegate(PhysicalDistance.self, listSize: 5)
+    let analysisDelegate = AnalysisDelegate(Distance.self, listSize: 5)
     let analysisDelegateManager = AnalysisDelegateManager()
     var analysisRunner: AnalysisRunner!
     
@@ -260,7 +260,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
                 let sampledID = SampledID(target.payloadData.data)
                 let sampleList = self.analysisDelegate.samples(sampledID: sampledID)
                 guard let value = sampleList.filter(Since(recent: 90)).toView().latestValue(),
-                      let distance = value as? PhysicalDistance else {
+                      let distance = value as? Distance else {
                     return
                 }
                 target.distance = distance
@@ -534,7 +534,7 @@ private class Target {
             lastUpdatedAt = date
             didMeasure = lastUpdatedAt
         }}
-    var distance: PhysicalDistance?
+    var distance: Distance?
     var received: Data? {
         didSet {
             lastUpdatedAt = Date()

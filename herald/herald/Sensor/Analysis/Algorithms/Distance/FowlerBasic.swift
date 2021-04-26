@@ -53,7 +53,7 @@ public class FowlerBasicAnalyser: AnalysisProvider {
     public init(interval: TimeInterval = TimeInterval(10), intercept: Double = -11, coefficient: Double = -0.4) {
         self.interval = interval
         self.basic = FowlerBasic(intercept: intercept, coefficient: coefficient)
-        super.init(ValueType(describing: RSSI.self), ValueType(describing: PhysicalDistance.self))
+        super.init(ValueType(describing: RSSI.self), ValueType(describing: Distance.self))
     }
 
     public override func analyse(timeNow: Date, sampled: SampledID, input: SampleList, output: SampleList, callable: CallableForNewSample) -> Bool {
@@ -75,7 +75,7 @@ public class FowlerBasicAnalyser: AnalysisProvider {
             return false
         }
         lastRan = latestTime
-        let newSample = Sample(taken: latestTime, value: PhysicalDistance(distance))
+        let newSample = Sample(taken: latestTime, value: Distance(distance))
         output.push(sample: newSample)
         callable.newSample(sampled: sampled, item: newSample)
         return true

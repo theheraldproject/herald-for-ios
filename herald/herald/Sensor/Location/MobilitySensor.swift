@@ -30,7 +30,7 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
     private let resolution: Distance
     private var lastLocation: CLLocation?
     private var lastUpdate: Date?
-    private var cummulativeDistance: Distance = 0
+    private var cummulativeDistance: Distance = Distance(0)
 
     init(resolution: Distance = minimumResolution, rangeForBeacon: UUID? = nil) {
         self.resolution = resolution
@@ -46,7 +46,7 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
         }
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.desiredAccuracy = accuracy
-        locationManager.distanceFilter = resolution
+        locationManager.distanceFilter = resolution.value
         locationManager.allowsBackgroundLocationUpdates = true
         if #available(iOS 11.0, *) {
             logger.debug("init(ios>=11.0)")
@@ -58,16 +58,16 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
     
     /// Establish location accuracy required based on distance resolution required
     private static func locationAccuracy(_ resolution: Distance) -> CLLocationAccuracy {
-        if resolution < 10 {
+        if resolution.value < 10 {
             return kCLLocationAccuracyBest
         }
-        if resolution < 100 {
+        if resolution.value < 100 {
             return kCLLocationAccuracyNearestTenMeters
         }
-        if resolution < 1000 {
+        if resolution.value < 1000 {
             return kCLLocationAccuracyHundredMeters
         }
-        if resolution < 3000 {
+        if resolution.value < 3000 {
             return kCLLocationAccuracyKilometer
         }
         return kCLLocationAccuracyThreeKilometers
@@ -187,14 +187,14 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
             // data. This is a deliberate design decision to decouple
             // mobility data from actual location data.
             let distance = location.distance(from: lastLocation)
-            cummulativeDistance += distance
+            cummulativeDistance = Distance(cummulativeDistance.value + distance)
             logger.debug("didUpdateLocations(distance=\(distance))")
             // Mobility data is only reported in unit lengths to further
             // decouple mobility data from actual location data.
-            if cummulativeDistance >= resolution {
+            if cummulativeDistance.value >= resolution.value {
                 let didVisit = Location(value: MobilityLocationReference(distance: cummulativeDistance), time: (start: lastUpdate, end: location.timestamp))
                 delegates.forEach { $0.sensor(.MOBILITY, didVisit: didVisit) }
-                cummulativeDistance = 0
+                cummulativeDistance = Distance(0)
                 self.lastUpdate = location.timestamp
             }
             self.lastLocation = location

@@ -33,7 +33,7 @@ class AnalysisRunnerTests: XCTestCase {
         listManager.remove(SampledID(1))
         XCTAssertEqual(listManager.sampledIDs().count, 1)
         var iterator = listManager.sampledIDs().makeIterator()
-        XCTAssertEqual(iterator.next()!, 2)
+        XCTAssertEqual(iterator.next()!.value, 2)
         listManager.clear()
         XCTAssertEqual(listManager.sampledIDs().count, 0)
     }
@@ -193,7 +193,7 @@ class AnalysisRunnerTests: XCTestCase {
         public var lastSampledID: SampledID = SampledID(0)
         
         public init() {
-            super.init(inputType: ValueType(describing: PhysicalDistance.self), listSize: 25)
+            super.init(inputType: ValueType(describing: Distance.self), listSize: 25)
         }
         
         public override func newSample(sampled: SampledID, item: Sample) {

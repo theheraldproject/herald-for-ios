@@ -109,7 +109,7 @@ public class SmoothedLinearModelAnalyser: AnalysisProvider {
         self.interval = Int64(interval)
         self.smoothingWindow = Int64(smoothingWindow)
         self.model = SmoothedLinearModel(intercept: intercept, coefficient: coefficient)
-        super.init(ValueType(describing: RSSI.self), ValueType(describing: PhysicalDistance.self))
+        super.init(ValueType(describing: RSSI.self), ValueType(describing: Distance.self))
     }
 
     public override func analyse(timeNow: Date, sampled: SampledID, input: SampleList, output: SampleList, callable: CallableForNewSample) -> Bool {
@@ -150,7 +150,7 @@ public class SmoothedLinearModelAnalyser: AnalysisProvider {
         }
         let timeMiddle = Date(timeIntervalSince1970: timeEnd.timeIntervalSince1970 - (timeEnd.timeIntervalSince1970 - timeStart.timeIntervalSince1970) / 2)
         logger.debug("analyse (timeStart=\(timeStart),timeEnd=\(timeEnd),timeMiddle=\(timeMiddle),samples=\(window.size()),medianOfRssi=\(String(describing: model.medianOfRssi())),distance=\(distance))")
-        let newSample = Sample(taken: timeMiddle, value: PhysicalDistance(distance))
+        let newSample = Sample(taken: timeMiddle, value: Distance(distance))
         output.push(sample: newSample)
         callable.newSample(sampled: sampled, item: newSample)
         return true
