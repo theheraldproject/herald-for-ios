@@ -40,7 +40,7 @@ public class Mean: Aggregate {
         guard run == 1 else {
             return
         }
-        sum += value.value.doubleValue()
+        sum += value.value.value
         count += 1
     }
 
@@ -83,10 +83,10 @@ public class Variance: Aggregate {
 
     public override func map(value: Sample) {
         if run == 1 {
-            sum += value.value.doubleValue()
+            sum += value.value.value
         } else {
             // run == 2
-            let dv = value.value.doubleValue()
+            let dv = value.value.value
             sum += (dv - mean) * (dv - mean)
         }
         count += 1
@@ -120,10 +120,10 @@ public class Mode: Aggregate {
         guard run == 1 else {
             return
         }
-        if let count = counts[value.value.doubleValue()] {
-            counts[value.value.doubleValue()] = count + 1
+        if let count = counts[value.value.value] {
+            counts[value.value.value] = count + 1
         } else {
-            counts[value.value.doubleValue()] = 1
+            counts[value.value.value] = 1
         }
     }
 
@@ -161,7 +161,7 @@ public class Median: Aggregate {
         guard run == 1 else {
             return
         }
-        values.append(value.value.doubleValue())
+        values.append(value.value.value)
     }
 
     public override func reduce() -> Double? {
@@ -204,7 +204,7 @@ public class Gaussian: Aggregate {
         guard run == 1 else {
             return
         }
-        model.add(value.value.doubleValue())
+        model.add(value.value.value)
     }
 
     public override func reduce() -> Double? {

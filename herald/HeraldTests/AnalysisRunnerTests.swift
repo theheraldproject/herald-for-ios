@@ -11,17 +11,6 @@ import XCTest
 class AnalysisRunnerTests: XCTestCase {
     
     private class Int8: DoubleValue {
-        var value: Int { get { Int(doubleValue()) }}
-        init(_ value: Int) {
-            super.init(doubleValue: Double(value))
-        }
-    }
-
-    private class RSSI: DoubleValue {
-        var value: Int { get { Int(doubleValue()) }}
-        init(_ value: Int) {
-            super.init(doubleValue: Double(value))
-        }
     }
 
     func test_listmanager() {
@@ -115,9 +104,9 @@ class AnalysisRunnerTests: XCTestCase {
         let samples = myDelegate.samples
         XCTAssertEqual(samples.size(), 2)
         XCTAssertEqual(samples.get(0)?.taken.secondsSinceUnixEpoch, 40)
-        XCTAssertTrue(samples.get(0)?.value.doubleValue() != 0)
+        XCTAssertTrue(samples.get(0)?.value.value != 0)
         XCTAssertEqual(samples.get(1)?.taken.secondsSinceUnixEpoch, 80)
-        XCTAssertTrue(samples.get(1)?.value.doubleValue() != 0)
+        XCTAssertTrue(samples.get(1)?.value.value != 0)
         print(samples.description)
     }
     
@@ -153,7 +142,7 @@ class AnalysisRunnerTests: XCTestCase {
         XCTAssertEqual(samples.size(), 1)
         let sample = samples.get(0)!
         XCTAssertEqual(sample.taken.secondsSinceUnixEpoch, 30)
-        XCTAssertEqual(sample.value.doubleValue(), 1.0, accuracy: 0.001)
+        XCTAssertEqual(sample.value.value, 1.0, accuracy: 0.001)
         print(samples.description)
     }
     

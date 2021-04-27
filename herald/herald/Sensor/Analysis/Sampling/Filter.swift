@@ -32,7 +32,7 @@ public class GreaterThan: Filter {
     }
 
     public override func test(item: Sample) -> Bool {
-        return item.value.doubleValue() > min
+        return item.value.value > min
     }
 }
 
@@ -44,7 +44,7 @@ public class LessThan: Filter {
     }
 
     public override func test(item: Sample) -> Bool {
-        return item.value.doubleValue() < max
+        return item.value.value < max
     }
 }
 
@@ -58,7 +58,7 @@ public class InRange: Filter {
     }
 
     public override func test(item: Sample) -> Bool {
-        return item.value.doubleValue() >= min && item.value.doubleValue() <= max
+        return item.value.value >= min && item.value.value <= max
     }
 }
 

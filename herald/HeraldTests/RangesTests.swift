@@ -13,24 +13,6 @@ import XCTest
 class RangesTests: XCTestCase {
 
     private class Int32: DoubleValue {
-        var value: Int { get { Int(doubleValue()) }}
-        init(_ value: Int) {
-            super.init(doubleValue: Double(value))
-        }
-    }
-
-    private class RSSI: DoubleValue {
-        var value: Int { get { Int(doubleValue()) }}
-        init(_ value: Int) {
-            super.init(doubleValue: Double(value))
-        }
-    }
-
-    private class Distance: DoubleValue {
-        var value: Double { get { doubleValue() }}
-        init(_ value: Double) {
-            super.init(doubleValue: value)
-        }
     }
 
     func test_ranges_iterator_proxy() {
@@ -41,11 +23,11 @@ class RangesTests: XCTestCase {
         ages.push(secondsSinceUnixEpoch: 40, value: Int32(45))
         ages.push(secondsSinceUnixEpoch: 50, value: Int32(66))
         let proxy = ages.filter(NoOp())
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 12)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 14)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 19)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 45)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 66)
+        XCTAssertEqual(proxy.next()!.value.value, 12)
+        XCTAssertEqual(proxy.next()!.value.value, 14)
+        XCTAssertEqual(proxy.next()!.value.value, 19)
+        XCTAssertEqual(proxy.next()!.value.value, 45)
+        XCTAssertEqual(proxy.next()!.value.value, 66)
         XCTAssertNil(proxy.next())
     }
 
@@ -58,8 +40,8 @@ class RangesTests: XCTestCase {
         ages.push(secondsSinceUnixEpoch: 40, value: Int32(45))
         ages.push(secondsSinceUnixEpoch: 50, value: Int32(66))
         let proxy = ages.filter(workingAge)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 19)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), 45)
+        XCTAssertEqual(proxy.next()!.value.value, 19)
+        XCTAssertEqual(proxy.next()!.value.value, 45)
         XCTAssertNil(proxy.next())
     }
 
@@ -73,12 +55,12 @@ class RangesTests: XCTestCase {
         ages.push(secondsSinceUnixEpoch: 50, value: Int32(66))
         let workingAges = ages.filter(workingAge).toView()
         let iter = workingAges.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), 19)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), 45)
+        XCTAssertEqual(iter.next()!.value.value, 19)
+        XCTAssertEqual(iter.next()!.value.value, 45)
         XCTAssertNil(iter.next())
         XCTAssertEqual(workingAges.size(), 2)
-        XCTAssertEqual(workingAges.get(0)!.value.doubleValue(), 19)
-        XCTAssertEqual(workingAges.get(1)!.value.doubleValue(), 45)
+        XCTAssertEqual(workingAges.get(0)!.value.value, 19)
+        XCTAssertEqual(workingAges.get(1)!.value.value, 45)
     }
 
     func test_ranges_filter_multi() {
@@ -92,10 +74,10 @@ class RangesTests: XCTestCase {
         ages.push(secondsSinceUnixEpoch: 50, value: Int32(66))
         let workingAges = ages.filter(workingAge).filter(over21).toView()
         let iter = workingAges.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), 45)
+        XCTAssertEqual(iter.next()!.value.value, 45)
         XCTAssertNil(iter.next())
         XCTAssertEqual(workingAges.size(), 1)
-        XCTAssertEqual(workingAges.get(0)!.value.doubleValue(), 45)
+        XCTAssertEqual(workingAges.get(0)!.value.value, 45)
     }
 
     func test_ranges_filter_rssisamples() {
@@ -106,11 +88,11 @@ class RangesTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1282, value: RSSI(-61))
         sl.push(secondsSinceUnixEpoch: 1294, value: RSSI(-100))
         let proxy = sl.filter(NoOp())
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), -9)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), -60)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), -58)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), -61)
-        XCTAssertEqual(proxy.next()!.value.doubleValue(), -100)
+        XCTAssertEqual(proxy.next()!.value.value, -9)
+        XCTAssertEqual(proxy.next()!.value.value, -60)
+        XCTAssertEqual(proxy.next()!.value.value, -58)
+        XCTAssertEqual(proxy.next()!.value.value, -61)
+        XCTAssertEqual(proxy.next()!.value.value, -100)
         XCTAssertNil(proxy.next())
     }
 
@@ -125,12 +107,12 @@ class RangesTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1294, value: RSSI(-100))
         let values = sl.filter(valid).filter(strong).toView()
         let iter = values.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -60)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -61)
+        XCTAssertEqual(iter.next()!.value.value, -60)
+        XCTAssertEqual(iter.next()!.value.value, -61)
         XCTAssertNil(iter.next())
         XCTAssertEqual(values.size(), 2)
-        XCTAssertEqual(values.get(0)!.value.doubleValue(), -60)
-        XCTAssertEqual(values.get(1)!.value.doubleValue(), -61)
+        XCTAssertEqual(values.get(0)!.value.value, -60)
+        XCTAssertEqual(values.get(1)!.value.value, -61)
     }
     
     func test_ranges_filter_multi_summarise() {

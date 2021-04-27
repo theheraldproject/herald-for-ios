@@ -30,7 +30,7 @@ public class Mobility: EventLog<MobilityEvent> {
     
     public func reduce(into timeWindow: TimeInterval) -> [(time: Date, distance: Distance)] {
         let timeWindows = super.reduce(into: timeWindow)
-        return timeWindows.map({ ($0.time, $0.events.reduce(into: Distance(0), { total, event in total = Distance(total.value +  event.distance.value) })) })
+        return timeWindows.map({ ($0.time, $0.events.reduce(into: Distance(0), { total, event in total.value += event.distance.value })) })
     }
 }
 

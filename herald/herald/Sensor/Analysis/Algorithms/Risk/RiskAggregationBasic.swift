@@ -51,7 +51,7 @@ public class RiskAggregationBasic: Aggregate {
     public override func map(value: Sample) {
         nMinusOne = n
         timeMinusOne = time
-        n = value.value.doubleValue()
+        n = value.value.value
         time = value.taken.secondsSinceUnixEpoch
     }
 

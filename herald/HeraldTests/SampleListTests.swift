@@ -12,18 +12,10 @@ import XCTest
 
 class SampleListTests: XCTestCase {
 
-    private class RSSI: DoubleValue {
-        var value: Int { get { Int(doubleValue() )}}
-        
-        init(_ rssi: Int) {
-            super.init(doubleValue: Double(rssi))
-        }
-    }
-    
     func test_sample_basic() {
         let s = Sample(secondsSinceUnixEpoch: 1234, value: RSSI(-55))
         XCTAssertEqual(s.taken.secondsSinceUnixEpoch, 1234)
-        XCTAssertEqual(s.value.doubleValue(), -55)
+        XCTAssertEqual(s.value.value, -55)
     }
 
     
@@ -31,7 +23,7 @@ class SampleListTests: XCTestCase {
         let s = Sample(secondsSinceUnixEpoch: 1234, value: RSSI(-55))
         let s2 = Sample(taken: s.taken, value: s.value)
         XCTAssertEqual(s2.taken.secondsSinceUnixEpoch, 1234)
-        XCTAssertEqual(s2.value.doubleValue(), -55)
+        XCTAssertEqual(s2.value.value, -55)
     }
 
     
@@ -39,21 +31,21 @@ class SampleListTests: XCTestCase {
         let s = Sample(secondsSinceUnixEpoch: 1234, value: RSSI(-55))
         let s2 = Sample(taken: Date(timeIntervalSince1970: s.taken.timeIntervalSince1970), value: s.value)
         XCTAssertEqual(s2.taken.secondsSinceUnixEpoch, 1234)
-        XCTAssertEqual(s2.value.doubleValue(), -55)
+        XCTAssertEqual(s2.value.value, -55)
     }
 
     func test_sample_copy_ctor() {
         let s = Sample(secondsSinceUnixEpoch: 1234, value: RSSI(-55))
         let s2 = Sample(sample: s)
         XCTAssertEqual(s2.taken.secondsSinceUnixEpoch, 1234)
-        XCTAssertEqual(s2.value.doubleValue(), -55)
+        XCTAssertEqual(s2.value.value, -55)
     }
 
     func test_sample_copy_assign() {
         let s = Sample(secondsSinceUnixEpoch: 1234, value: RSSI(-55))
         let s2 = s
         XCTAssertEqual(s2.taken.secondsSinceUnixEpoch, 1234)
-        XCTAssertEqual(s2.value.doubleValue(), -55)
+        XCTAssertEqual(s2.value.value, -55)
     }
 
     func test_samplelist_empty() {
@@ -67,9 +59,9 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1244, value: RSSI(-60))
         sl.push(secondsSinceUnixEpoch: 1265, value: RSSI(-58))
         XCTAssertEqual(sl.size(), 3)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -55)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -60)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -58)
+        XCTAssertEqual(sl.get(0)!.value.value, -55)
+        XCTAssertEqual(sl.get(1)!.value.value, -60)
+        XCTAssertEqual(sl.get(2)!.value.value, -58)
     }
 
     func test_samplelist_exactlyfull() {
@@ -80,11 +72,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1282, value: RSSI(-61))
         sl.push(secondsSinceUnixEpoch: 1294, value: RSSI(-54))
         XCTAssertEqual(sl.size(), 5)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -55)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -60)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -58)
-        XCTAssertEqual(sl.get(3)!.value.doubleValue(), -61)
-        XCTAssertEqual(sl.get(4)!.value.doubleValue(), -54)
+        XCTAssertEqual(sl.get(0)!.value.value, -55)
+        XCTAssertEqual(sl.get(1)!.value.value, -60)
+        XCTAssertEqual(sl.get(2)!.value.value, -58)
+        XCTAssertEqual(sl.get(3)!.value.value, -61)
+        XCTAssertEqual(sl.get(4)!.value.value, -54)
     }
 
     func test_samplelist_oneover() {
@@ -96,11 +88,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1294, value: RSSI(-54))
         sl.push(secondsSinceUnixEpoch: 1302, value: RSSI(-47))
         XCTAssertEqual(sl.size(), 5)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -60)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -58)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -61)
-        XCTAssertEqual(sl.get(3)!.value.doubleValue(), -54)
-        XCTAssertEqual(sl.get(4)!.value.doubleValue(), -47)
+        XCTAssertEqual(sl.get(0)!.value.value, -60)
+        XCTAssertEqual(sl.get(1)!.value.value, -58)
+        XCTAssertEqual(sl.get(2)!.value.value, -61)
+        XCTAssertEqual(sl.get(3)!.value.value, -54)
+        XCTAssertEqual(sl.get(4)!.value.value, -47)
     }
 
     func test_samplelist_threeover() {
@@ -114,11 +106,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1304, value: RSSI(-48))
         sl.push(secondsSinceUnixEpoch: 1305, value: RSSI(-49))
         XCTAssertEqual(sl.size(), 5)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -61)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -54)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -47)
-        XCTAssertEqual(sl.get(3)!.value.doubleValue(), -48)
-        XCTAssertEqual(sl.get(4)!.value.doubleValue(), -49)
+        XCTAssertEqual(sl.get(0)!.value.value, -61)
+        XCTAssertEqual(sl.get(1)!.value.value, -54)
+        XCTAssertEqual(sl.get(2)!.value.value, -47)
+        XCTAssertEqual(sl.get(3)!.value.value, -48)
+        XCTAssertEqual(sl.get(4)!.value.value, -49)
     }
 
     func test_samplelist_justunderfullagain() {
@@ -133,11 +125,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1305, value: RSSI(-49))
         sl.push(secondsSinceUnixEpoch: 1306, value: RSSI(-45))
         XCTAssertEqual(sl.size(), 5)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -54)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -47)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -48)
-        XCTAssertEqual(sl.get(3)!.value.doubleValue(), -49)
-        XCTAssertEqual(sl.get(4)!.value.doubleValue(), -45)
+        XCTAssertEqual(sl.get(0)!.value.value, -54)
+        XCTAssertEqual(sl.get(1)!.value.value, -47)
+        XCTAssertEqual(sl.get(2)!.value.value, -48)
+        XCTAssertEqual(sl.get(3)!.value.value, -49)
+        XCTAssertEqual(sl.get(4)!.value.value, -45)
     }
 
     func test_samplelist_fullagain() {
@@ -153,11 +145,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1306, value: RSSI(-45))
         sl.push(secondsSinceUnixEpoch: 1307, value: RSSI(-44))
         XCTAssertEqual(sl.size(), 5)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -47)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -48)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -49)
-        XCTAssertEqual(sl.get(3)!.value.doubleValue(), -45)
-        XCTAssertEqual(sl.get(4)!.value.doubleValue(), -44)
+        XCTAssertEqual(sl.get(0)!.value.value, -47)
+        XCTAssertEqual(sl.get(1)!.value.value, -48)
+        XCTAssertEqual(sl.get(2)!.value.value, -49)
+        XCTAssertEqual(sl.get(3)!.value.value, -45)
+        XCTAssertEqual(sl.get(4)!.value.value, -44)
     }
 
     // MARK: - Now handle deletion by time
@@ -176,10 +168,10 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1307, value: RSSI(-44))
         sl.clearBeforeDate(Date(timeIntervalSince1970: 1304))
         XCTAssertEqual(sl.size(), 4)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -48)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -49)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -45)
-        XCTAssertEqual(sl.get(3)!.value.doubleValue(), -44)
+        XCTAssertEqual(sl.get(0)!.value.value, -48)
+        XCTAssertEqual(sl.get(1)!.value.value, -49)
+        XCTAssertEqual(sl.get(2)!.value.value, -45)
+        XCTAssertEqual(sl.get(3)!.value.value, -44)
     }
 
     func test_samplelist_clearfourold() {
@@ -196,7 +188,7 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1307, value: RSSI(-44))
         sl.clearBeforeDate(Date(timeIntervalSince1970: 1307))
         XCTAssertEqual(sl.size(), 1)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -44)
+        XCTAssertEqual(sl.get(0)!.value.value, -44)
     }
 
     func test_samplelist_clearallold() {
@@ -244,7 +236,7 @@ class SampleListTests: XCTestCase {
         let sl = SampleList(5)
         sl.push(secondsSinceUnixEpoch: 1234, value: RSSI(-55))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -55)
+        XCTAssertEqual(iter.next()!.value.value, -55)
         XCTAssertNil(iter.next())
     }
 
@@ -254,9 +246,9 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1244, value: RSSI(-60))
         sl.push(secondsSinceUnixEpoch: 1265, value: RSSI(-58))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -55)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -60)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -58)
+        XCTAssertEqual(iter.next()!.value.value, -55)
+        XCTAssertEqual(iter.next()!.value.value, -60)
+        XCTAssertEqual(iter.next()!.value.value, -58)
         XCTAssertNil(iter.next())
     }
 
@@ -268,11 +260,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1282, value: RSSI(-61))
         sl.push(secondsSinceUnixEpoch: 1294, value: RSSI(-54))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -55)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -60)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -58)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -61)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -54)
+        XCTAssertEqual(iter.next()!.value.value, -55)
+        XCTAssertEqual(iter.next()!.value.value, -60)
+        XCTAssertEqual(iter.next()!.value.value, -58)
+        XCTAssertEqual(iter.next()!.value.value, -61)
+        XCTAssertEqual(iter.next()!.value.value, -54)
         XCTAssertNil(iter.next())
     }
 
@@ -285,11 +277,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1294, value: RSSI(-54))
         sl.push(secondsSinceUnixEpoch: 1302, value: RSSI(-47))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -60)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -58)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -61)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -54)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -47)
+        XCTAssertEqual(iter.next()!.value.value, -60)
+        XCTAssertEqual(iter.next()!.value.value, -58)
+        XCTAssertEqual(iter.next()!.value.value, -61)
+        XCTAssertEqual(iter.next()!.value.value, -54)
+        XCTAssertEqual(iter.next()!.value.value, -47)
         XCTAssertNil(iter.next())
     }
 
@@ -303,11 +295,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1302, value: RSSI(-47))
         sl.push(secondsSinceUnixEpoch: 1304, value: RSSI(-48))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -58)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -61)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -54)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -47)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -48)
+        XCTAssertEqual(iter.next()!.value.value, -58)
+        XCTAssertEqual(iter.next()!.value.value, -61)
+        XCTAssertEqual(iter.next()!.value.value, -54)
+        XCTAssertEqual(iter.next()!.value.value, -47)
+        XCTAssertEqual(iter.next()!.value.value, -48)
         XCTAssertNil(iter.next())
     }
 
@@ -323,11 +315,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1304, value: RSSI(-48))
         sl.push(secondsSinceUnixEpoch: 1305, value: RSSI(-49))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -61)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -54)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -47)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -48)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -49)
+        XCTAssertEqual(iter.next()!.value.value, -61)
+        XCTAssertEqual(iter.next()!.value.value, -54)
+        XCTAssertEqual(iter.next()!.value.value, -47)
+        XCTAssertEqual(iter.next()!.value.value, -48)
+        XCTAssertEqual(iter.next()!.value.value, -49)
         XCTAssertNil(iter.next())
     }
 
@@ -343,11 +335,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1305, value: RSSI(-49))
         sl.push(secondsSinceUnixEpoch: 1306, value: RSSI(-45))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -54)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -47)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -48)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -49)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -45)
+        XCTAssertEqual(iter.next()!.value.value, -54)
+        XCTAssertEqual(iter.next()!.value.value, -47)
+        XCTAssertEqual(iter.next()!.value.value, -48)
+        XCTAssertEqual(iter.next()!.value.value, -49)
+        XCTAssertEqual(iter.next()!.value.value, -45)
         XCTAssertNil(iter.next())
     }
 
@@ -364,11 +356,11 @@ class SampleListTests: XCTestCase {
         sl.push(secondsSinceUnixEpoch: 1306, value: RSSI(-45))
         sl.push(secondsSinceUnixEpoch: 1307, value: RSSI(-44))
         let iter = sl.makeIterator()
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -47)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -48)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -49)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -45)
-        XCTAssertEqual(iter.next()!.value.doubleValue(), -44)
+        XCTAssertEqual(iter.next()!.value.value, -47)
+        XCTAssertEqual(iter.next()!.value.value, -48)
+        XCTAssertEqual(iter.next()!.value.value, -49)
+        XCTAssertEqual(iter.next()!.value.value, -45)
+        XCTAssertEqual(iter.next()!.value.value, -44)
         XCTAssertNil(iter.next())
     }
 
@@ -394,7 +386,7 @@ class SampleListTests: XCTestCase {
     func test_sample_init() {
         let sample = Sample(secondsSinceUnixEpoch: 10, value: RSSI(-55))
         XCTAssertEqual(sample.taken.secondsSinceUnixEpoch, 10)
-        XCTAssertEqual(sample.value.doubleValue(), -55)
+        XCTAssertEqual(sample.value.value, -55)
     }
 
     func test_samplelist_init_list() {
@@ -403,11 +395,11 @@ class SampleListTests: XCTestCase {
         let sample3 = Sample(secondsSinceUnixEpoch: 30, value: RSSI(-75))
         let sl = SampleList(3, samples: [sample1, sample2, sample3])
         XCTAssertEqual(sl.get(0)!.taken.secondsSinceUnixEpoch, 10)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -55)
+        XCTAssertEqual(sl.get(0)!.value.value, -55)
         XCTAssertEqual(sl.get(1)!.taken.secondsSinceUnixEpoch, 20)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -65)
+        XCTAssertEqual(sl.get(1)!.value.value, -65)
         XCTAssertEqual(sl.get(2)!.taken.secondsSinceUnixEpoch, 30)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -75)
+        XCTAssertEqual(sl.get(2)!.value.value, -75)
     }
 
     func test_samplelist_init_deduced() {
@@ -416,11 +408,11 @@ class SampleListTests: XCTestCase {
         let sample3 = Sample(secondsSinceUnixEpoch: 30, value: RSSI(-75))
         let sl = SampleList(samples: [sample1, sample2, sample3])
         XCTAssertEqual(sl.get(0)!.taken.secondsSinceUnixEpoch, 10)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -55)
+        XCTAssertEqual(sl.get(0)!.value.value, -55)
         XCTAssertEqual(sl.get(1)!.taken.secondsSinceUnixEpoch, 20)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -65)
+        XCTAssertEqual(sl.get(1)!.value.value, -65)
         XCTAssertEqual(sl.get(2)!.taken.secondsSinceUnixEpoch, 30)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -75)
+        XCTAssertEqual(sl.get(2)!.value.value, -75)
     }
 
     func test_samplelist_init_alldeduced() {
@@ -429,10 +421,10 @@ class SampleListTests: XCTestCase {
                                     Sample(secondsSinceUnixEpoch: 20, value: RSSI(-65)),
                                     Sample(secondsSinceUnixEpoch: 30, value: RSSI(-75))])
         XCTAssertEqual(sl.get(0)!.taken.secondsSinceUnixEpoch, 10)
-        XCTAssertEqual(sl.get(0)!.value.doubleValue(), -55)
+        XCTAssertEqual(sl.get(0)!.value.value, -55)
         XCTAssertEqual(sl.get(1)!.taken.secondsSinceUnixEpoch, 20)
-        XCTAssertEqual(sl.get(1)!.value.doubleValue(), -65)
+        XCTAssertEqual(sl.get(1)!.value.value, -65)
         XCTAssertEqual(sl.get(2)!.taken.secondsSinceUnixEpoch, 30)
-        XCTAssertEqual(sl.get(2)!.value.doubleValue(), -75)
+        XCTAssertEqual(sl.get(2)!.value.value, -75)
     }
 }

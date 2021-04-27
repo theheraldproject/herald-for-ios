@@ -187,7 +187,7 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
             // data. This is a deliberate design decision to decouple
             // mobility data from actual location data.
             let distance = location.distance(from: lastLocation)
-            cummulativeDistance = Distance(cummulativeDistance.value + distance)
+            cummulativeDistance.value += distance
             logger.debug("didUpdateLocations(distance=\(distance))")
             // Mobility data is only reported in unit lengths to further
             // decouple mobility data from actual location data.
