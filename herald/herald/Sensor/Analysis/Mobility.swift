@@ -30,7 +30,7 @@ public class Mobility: EventLog<MobilityEvent> {
     
     public func reduce(into timeWindow: TimeInterval) -> [(time: Date, distance: Distance)] {
         let timeWindows = super.reduce(into: timeWindow)
-        return timeWindows.map({ ($0.time, $0.events.reduce(into: Distance(0), { total, event in total += event.distance })) })
+        return timeWindows.map({ ($0.time, $0.events.reduce(into: Distance(0), { total, event in total.value += event.distance.value })) })
     }
 }
 
@@ -43,7 +43,7 @@ public class MobilityEvent: Event {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let f0 = dateFormatter.string(from: timestamp)
-        let f1 = String(round(distance))
+        let f1 = String(round(distance.value))
         return "\(f0),\(f1)"
     }}
     
@@ -65,9 +65,9 @@ public class MobilityEvent: Event {
             return nil
         }
         self.timestamp = timestamp
-        guard let distance = Distance(String(fields[1])) else {
+        guard let value = Double(String(fields[1])) else {
             return nil
         }
-        self.distance = distance
+        self.distance = Distance(value)
     }
 }

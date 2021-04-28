@@ -127,12 +127,12 @@ public class Interactions: NSObject, SensorDelegate {
     /// Get all target devices, duration and proximity distribution. The result is a table of payload data
     /// and summary information, including last seen at time, total duration of exposure, and distribution
     /// of proximity (RSSI) values.
-    public func reduceByTarget(_ encounters: [Encounter]) -> [PayloadData:(lastSeenAt: Date, duration: TimeInterval, proximity: Sample)] {
-        var targets: [PayloadData:(lastSeenAt: Date, duration: TimeInterval, proximity: Sample)] = [:]
+    public func reduceByTarget(_ encounters: [Encounter]) -> [PayloadData:(lastSeenAt: Date, duration: TimeInterval, proximity: SampleStatistics)] {
+        var targets: [PayloadData:(lastSeenAt: Date, duration: TimeInterval, proximity: SampleStatistics)] = [:]
         encounters.filter({ $0.proximity.unit == .RSSI }).forEach { encounter in
             guard let (lastSeenAt, duration, proximity) = targets[encounter.payload] else {
                 // One encounter is assumed to be at least 1 second minimum
-                let proximity = Sample(encounter.proximity.value, 1)
+                let proximity = SampleStatistics(encounter.proximity.value, 1)
                 targets[encounter.payload] = (encounter.timestamp, 1, proximity)
                 return
             }

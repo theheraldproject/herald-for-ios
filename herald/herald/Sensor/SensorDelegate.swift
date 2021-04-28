@@ -179,9 +179,6 @@ public struct PlacenameLocationReference : LocationReference {
         }}
 }
 
-/// Distance in metres
-public typealias Distance = Double
-
 /// Distance travelled in any direction in metres, as indicator of range of movement.
 public struct MobilityLocationReference : LocationReference {
     let distance: Distance
