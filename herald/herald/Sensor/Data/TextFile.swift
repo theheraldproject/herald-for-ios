@@ -19,11 +19,31 @@ public class TextFile {
         queue = DispatchQueue(label: "Sensor.Data.TextFile(\(filename))")
     }
     
+    /// Get contents of file
+    func contentsOf() -> String {
+        queue.sync {
+            guard let file = url else {
+                return ""
+            }
+            guard let contents = try? String(contentsOf: file, encoding: .utf8) else {
+                return ""
+            }
+            return contents
+        }
+    }
+    
     func empty() -> Bool {
         guard let file = url else {
             return true
         }
-        return !FileManager.default.fileExists(atPath: file.path)
+        guard FileManager.default.fileExists(atPath: file.path) else {
+            return true
+        }
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: file.path),
+              let size = attributes[FileAttributeKey.size] as? UInt64 else {
+            return true
+        }
+        return size == 0
     }
     
     /// Append line to new or existing file

@@ -15,6 +15,10 @@ public class DoubleValue: CustomStringConvertible {
     public init(_ value: Double) {
         self.value = value
     }
+
+    public init(_ value: Int) {
+        self.value = Double(value)
+    }
 }
 
 /// Received signal strength indicator (RSSI)

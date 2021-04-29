@@ -121,7 +121,7 @@ class AnalysisRunnerTests: XCTestCase {
         srcData.push(secondsSinceUnixEpoch: 60, value: RSSI(-68))
         let src = DummyRSSISource(SampledID(1234), srcData)
         
-        let distanceAnalyser = SmoothedLinearModelAnalyser(interval: 10, smoothingWindow: TimeInterval.minute, intercept: -17.7275, coefficient: -0.2754)
+        let distanceAnalyser = SmoothedLinearModelAnalyser(interval: 10, smoothingWindow: TimeInterval.minute, model: SmoothedLinearModel(intercept: -17.7275, coefficient: -0.2754))
         let myDelegate = DummyDistanceDelegate()
         
         let adm = AnalysisDelegateManager([myDelegate])

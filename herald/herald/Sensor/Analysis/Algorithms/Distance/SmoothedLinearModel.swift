@@ -45,8 +45,8 @@ public class SmoothedLinearModel: Aggregate {
     override var runs: Int { get { 1 }}
     private var run: Int = 1
     private let median: Median = Median()
-    public let intercept: Double
-    public let coefficient: Double
+    public var intercept: Double
+    public var coefficient: Double
     public static let defaultIntercept: Double = -17.102080
     public static let defaultCoefficient: Double = -0.266793
     
@@ -105,10 +105,10 @@ public class SmoothedLinearModelAnalyser: AnalysisProvider {
     private var lastRan: Date = Date(timeIntervalSince1970: 0)
     private let valid: Filter = InRange(-99, -10)
 
-    public init(interval: TimeInterval = 4, smoothingWindow: TimeInterval = TimeInterval.minute, intercept: Double = SmoothedLinearModel.defaultIntercept, coefficient: Double = SmoothedLinearModel.defaultCoefficient) {
+    public init(interval: TimeInterval = 4, smoothingWindow: TimeInterval = TimeInterval.minute, model: SmoothedLinearModel = SmoothedLinearModel()) {
         self.interval = Int64(interval)
         self.smoothingWindow = Int64(smoothingWindow)
-        self.model = SmoothedLinearModel(intercept: intercept, coefficient: coefficient)
+        self.model = model
         super.init(ValueType(describing: RSSI.self), ValueType(describing: Distance.self))
     }
 
