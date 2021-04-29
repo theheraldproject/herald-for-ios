@@ -68,10 +68,14 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     @IBOutlet weak var labelMessageReceived: UILabel!
     
     // MARK:- Distance estimation
-    let analysisProviderManager = AnalysisProviderManager([SmoothedLinearModelAnalyser()])
-    let analysisDelegate = AnalysisDelegate(Distance.self, listSize: 5)
+    let analysisProviderManager = AnalysisProviderManager()
     let analysisDelegateManager = AnalysisDelegateManager()
     var analysisRunner: AnalysisRunner!
+    let smoothedLinearModel = SelfCalibratedModel(
+        min: Distance(0), mean: Distance(3.7),
+        withinMin: .minute * 5, withinMean: .hour * 8,
+        textFile: TextFile(filename: "rssi_histogram.csv"))
+    let analysisDelegate = AnalysisDelegate(Distance.self, listSize: 5)
     
     // MARK:- Mobility
     private let mobility = Mobility(filename: "mobility.csv")
@@ -129,6 +133,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         
         // Distance estimation
+        analysisProviderManager.add(SmoothedLinearModelAnalyser(interval: 1, smoothingWindow: 60, model: smoothedLinearModel))
         analysisDelegateManager.add(analysisDelegate)
         analysisRunner = AnalysisRunner(analysisProviderManager, analysisDelegateManager, defaultListSize: 120)
     }
@@ -452,7 +457,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         // Distance
         var distance = ""
         if let distanceValue = target.distance {
-            distance = String(format: "%.1f", distanceValue.doubleValue()) + "m"
+            distance = String(format: "%.1f", distanceValue.value) + "m"
         }
 //        // Immediate send : Superceded in full UI
 //        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")

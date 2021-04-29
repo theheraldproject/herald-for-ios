@@ -89,10 +89,6 @@ public class SmoothedLinearModel: Aggregate {
     public func medianOfRssi() -> Double? {
         return median.reduce()
     }
-    
-    public func maximumRssi() -> Double {
-        return -intercept / coefficient
-    }
 }
 
 
@@ -139,8 +135,8 @@ public class SmoothedLinearModelAnalyser: AnalysisProvider {
         }
         // Estimate distance based on smoothed linear model
         model.reset()
-        guard let distance = window.aggregate([model]).get(SmoothedLinearModel.self) else {
-            logger.debug("analyse, skipped (reason=outOfModelRange,mediaOfRssi=\(String(describing: model.medianOfRssi())),maximumRssiAtZeroDistance=\(model.maximumRssi()))")
+        guard let distance = window.aggregate([model]).get(0) else {
+            logger.debug("analyse, skipped (reason=outOfModelRange,mediaOfRssi=\(String(describing: model.medianOfRssi()))")
             return false
         }
         // Publish distance data

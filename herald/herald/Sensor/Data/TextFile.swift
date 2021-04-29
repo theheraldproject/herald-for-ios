@@ -12,7 +12,7 @@ public class TextFile {
     let url: URL?
     private let queue: DispatchQueue
     
-    init(filename: String) {
+    public init(filename: String) {
         url = try? FileManager.default
         .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         .appendingPathComponent(filename)
