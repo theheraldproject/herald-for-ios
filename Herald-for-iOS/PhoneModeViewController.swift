@@ -135,7 +135,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         // Distance estimation
         analysisProviderManager.add(SmoothedLinearModelAnalyser(interval: 1, smoothingWindow: 60, model: smoothedLinearModel))
         analysisDelegateManager.add(analysisDelegate)
-        analysisRunner = AnalysisRunner(analysisProviderManager, analysisDelegateManager, defaultListSize: 120)
+        analysisRunner = AnalysisRunner(analysisProviderManager, analysisDelegateManager, defaultListSize: 1200)
     }
 
     @objc func willEnterForeground() {
