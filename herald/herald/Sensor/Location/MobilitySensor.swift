@@ -1,7 +1,7 @@
 //
 //  MobilitySensor.swift
 //
-//  Copyright 2021 VMware, Inc.
+//  Copyright 2021 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 

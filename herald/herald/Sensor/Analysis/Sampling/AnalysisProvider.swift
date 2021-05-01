@@ -30,7 +30,7 @@ public class AnalysisProviderManager {
     private var providers: [AnalysisProvider] = []
     private let queue = DispatchQueue(label: "Sensor.Analysis.Sampling.AnalysisProviderManager")
 
-    public init(_ providers: [AnalysisProvider]) {
+    public init(_ providers: [AnalysisProvider] = []) {
         providers.forEach({ add($0) })
     }
     

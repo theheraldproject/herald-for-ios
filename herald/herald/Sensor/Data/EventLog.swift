@@ -1,7 +1,7 @@
 //
 //  EventLog.swift
 //
-//  Copyright 2021 VMware, Inc.
+//  Copyright 2021 Herald Project Contributors
 //  SPDX-License-Identifier: MIT
 //
 
