@@ -19,7 +19,7 @@ Herald supports iOS, Android, and embedded devices.
   spec.ios.deployment_target = "9.3"
   spec.swift_version = "5"
 
-  spec.source        = { :git => "https://github.com/vmware/herald-for-ios.git", :tag => "v#{spec.version}" }
+  spec.source        = { :git => "https://github.com/theheraldproject/herald-for-ios.git", :tag => "v#{spec.version}" }
   spec.source_files  = "herald/herald/**/*.{h,m,swift}"
 
   pod_target_xcconfig = { "EXCLUDED_ARCHS[sdk=iphonesimulator*]" => "arm64" }
