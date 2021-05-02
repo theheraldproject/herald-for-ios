@@ -9,9 +9,9 @@ assignees: ''
 
 **WARNING*:: IF YOU ARE REPORTING AN ISSUE THAT COULD CAUSE
 IMMEDIATE SECURITY CONCERNS THAT PUT DEVICES OR PEOPLE AT RISK THEN
-PLEASE INSTEAD FOLLOW THE VMWARE SECURITY VULNERABILITY PROCEDURE:-
+PLEASE INSTEAD EMAIL THE TSC CHAIR:-
 
-https://hackerone.com/vmware?type=team
+adam@adamfowler.org
 
 For other security concerns, please continue.
 
@@ -82,5 +82,5 @@ Add any other context about the problem here.
 
 DO NOT MODIFY THE BELOW - it will alert the maintainers once you submit your report.
 
-@vmware/herald-maintainers
+@theheraldproject/committers
 
