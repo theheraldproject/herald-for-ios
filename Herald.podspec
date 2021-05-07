@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "Herald"
-  spec.version      = "1.3.0"
+  spec.version      = "2.0.0-beta1"
   spec.summary      = "Reliable Bluetooth communication library for iOS"
 
   spec.description  = <<-DESC
@@ -12,7 +12,7 @@ In addition, the Herald community defines suggested payloads to be exchanged ove
 Herald supports iOS, Android, and embedded devices.
                    DESC
 
-  spec.homepage     = "https://vmware.github.io/herald"
+  spec.homepage     = "https://heraldprox.io/"
   spec.license      = { :type => "Apache-2.0", :file => "LICENSE.txt" }
   spec.author       = { "adamfowleruk" => "adam@adamfowler.org" }
 
