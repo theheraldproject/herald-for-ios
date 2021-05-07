@@ -1,7 +1,7 @@
 //
 //  SensorDelegate.swift
 //
-//  Copyright 2020 VMware, Inc.
+//  Copyright 2020-2021 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -178,9 +178,6 @@ public struct PlacenameLocationReference : LocationReference {
         "PLACE(name=\(name))"
         }}
 }
-
-/// Distance in metres
-public typealias Distance = Double
 
 /// Distance travelled in any direction in metres, as indicator of range of movement.
 public struct MobilityLocationReference : LocationReference {

@@ -169,7 +169,7 @@
 				CLASSPREFIX = com.vmware.herald;
 				LastSwiftUpdateCheck = 1160;
 				LastUpgradeCheck = 1160;
-				ORGANIZATIONNAME = "VMware, Inc.";
+				ORGANIZATIONNAME = "Herald Project Contributors";
 				TargetAttributes = {
 					B692CA8F24CADA7500F45AEE = {
 						CreatedOnToolsVersion = 11.6;
@@ -395,6 +395,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.herald.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -415,6 +416,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.herald.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

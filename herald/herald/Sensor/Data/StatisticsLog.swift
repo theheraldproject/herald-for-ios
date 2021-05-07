@@ -1,7 +1,7 @@
 //
 //  StatisticsLog.swift
 //
-//  Copyright 2020 VMware, Inc.
+//  Copyright 2020-2021 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -13,7 +13,7 @@ public class StatisticsLog: NSObject, SensorDelegate {
     private let payloadData: PayloadData
     private var identifierToPayload: [TargetIdentifier:String] = [:]
     private var payloadToTime: [String:Date] = [:]
-    private var payloadToSample: [String:Sample] = [:]
+    private var payloadToSample: [String:SampleStatistics] = [:]
     
     public init(filename: String, payloadData: PayloadData) {
         textFile = TextFile(filename: filename)
@@ -34,7 +34,7 @@ public class StatisticsLog: NSObject, SensorDelegate {
     private func add(payload: String) {
         guard let time = payloadToTime[payload], let sample = payloadToSample[payload] else {
             payloadToTime[payload] = Date()
-            payloadToSample[payload] = Sample()
+            payloadToSample[payload] = SampleStatistics()
             return
         }
         let now = Date()

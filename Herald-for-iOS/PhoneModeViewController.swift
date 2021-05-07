@@ -1,7 +1,7 @@
 //
 //  ViewController.swift
 //
-//  Copyright 2020 VMware, Inc.
+//  Copyright 2020-2021 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -22,7 +22,6 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     @IBOutlet weak var labelPayload: UILabel!
     
     // MARK:- Events
-
     private var didDetect = 0
     private var didRead = 0
     private var didMeasure = 0
@@ -39,7 +38,6 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     var venueDiary: VenueDiary?
     
     // MARK:- Social mixing
-    
     private let socialMixingScore = SocialDistance(filename: "socialDistance.csv")
     private var socialMixingScoreUnit = TimeInterval(60)
     // Labels to show score over time, each label is a unit
@@ -69,12 +67,20 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     @IBOutlet weak var buttonMessageSend: UIButton!
     @IBOutlet weak var labelMessageReceived: UILabel!
     
-    // MARK:- Mobility
+    // MARK:- Distance estimation
+    let analysisProviderManager = AnalysisProviderManager()
+    let analysisDelegateManager = AnalysisDelegateManager()
+    var analysisRunner: AnalysisRunner!
+    let smoothedLinearModel = SelfCalibratedModel(
+        min: Distance(0), mean: Distance(3.7),
+        withinMin: .minute * 5, withinMean: .hour * 8,
+        textFile: TextFile(filename: "rssi_histogram.csv"))
+    let analysisDelegate = AnalysisDelegate(Distance.self, listSize: 5)
     
+    // MARK:- Mobility
     private let mobility = Mobility(filename: "mobility.csv")
     
     // MARK:- Detected payloads
-    
     private var targetIdentifiers: [TargetIdentifier:PayloadData] = [:]
     private var payloads: [PayloadData:Target] = [:]
     private var targets: [Target] = []
@@ -83,6 +89,8 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     // MARK:- Crash app
     
     @IBOutlet weak var buttonCrash: UIButton!
+    
+    
     
     // MARK:- UIViewController
     
@@ -124,6 +132,10 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         notificationCenter.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         
+        // Distance estimation
+        analysisProviderManager.add(SmoothedLinearModelAnalyser(interval: 1, smoothingWindow: 60, model: smoothedLinearModel))
+        analysisDelegateManager.add(analysisDelegate)
+        analysisRunner = AnalysisRunner(analysisProviderManager, analysisDelegateManager, defaultListSize: 1200)
     }
 
     @objc func willEnterForeground() {
@@ -248,6 +260,16 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
                     shortNames[shortName] = target
                 }
             }
+            // Get target distance from analysis delegate
+            shortNames.values.forEach({ target in
+                let sampledID = SampledID(target.payloadData.data)
+                let sampleList = self.analysisDelegate.samples(sampledID: sampledID)
+                guard let value = sampleList.filter(Since(recent: 90)).toView().latestValue(),
+                      let distance = value as? Distance else {
+                    return
+                }
+                target.distance = distance
+            })
             // Get target list in alphabetical order
             self.targets = shortNames.values.sorted(by: { $0.payloadData.shortName < $1.payloadData.shortName })
             self.tableViewTargets.reloadData()
@@ -362,6 +384,15 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         if let didRead = targetIdentifiers[fromTarget], let target = payloads[didRead] {
             target.targetIdentifier = fromTarget
             target.proximity = didMeasure
+            // Supply raw RSSI measurements to distance estimation algorithm
+            if didMeasure.unit == ProximityMeasurementUnit.RSSI {
+                let sampledID = SampledID(didRead.data)
+                analysisRunner.newSample(sampled: sampledID, item: Sample(value: RSSI(didMeasure.value)))
+                // Analysis runner doesn't need to be executed as often as updates
+                // but the overhead is minimal as the demonstration distance analyser
+                // will only perform calculations and offer updates at fixed intervals
+                analysisRunner.run()
+            }
         }
         guard foreground else {
             return
@@ -423,6 +454,11 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         if let mean = target.didShareTimeInterval.mean {
             statistics = "\(statistics),S=\(String(format: "%.1f", mean))s"
         }
+        // Distance
+        var distance = ""
+        if let distanceValue = target.distance {
+            distance = String(format: "%.1f", distanceValue.value) + "m"
+        }
 //        // Immediate send : Superceded in full UI
 //        let didReceive = (target.didReceive == nil ? "" : " (receive \(dateFormatterTime.string(from: target.didReceive!)))")
         // Venue
@@ -431,6 +467,10 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         if let legacyPayloadData = target.payloadData as? LegacyPayloadData {
             labelText += ":"
             labelText += String(legacyPayloadData.protocolName.rawValue.prefix(1))
+        }
+        if !distance.isEmpty {
+            labelText += " ~ "
+            labelText += distance
         }
         venueDiary?.listRecordableEvents().forEach({ (evt) in
             self.logger.debug("listRecordableEvents item")
@@ -499,6 +539,7 @@ private class Target {
             lastUpdatedAt = date
             didMeasure = lastUpdatedAt
         }}
+    var distance: Distance?
     var received: Data? {
         didSet {
             lastUpdatedAt = Date()
@@ -511,9 +552,9 @@ private class Target {
         didSet {
             lastUpdatedAt = didRead
         }}
-    let didReadTimeInterval = Sample()
+    let didReadTimeInterval = SampleStatistics()
     var didMeasure: Date?
-    let didMeasureTimeInterval = Sample()
+    let didMeasureTimeInterval = SampleStatistics()
     var didShare: Date? {
         willSet(date) {
             if let date = date, let didShare = didShare {
@@ -525,7 +566,7 @@ private class Target {
                 lastUpdatedAt = didShare
             }
         }}
-    let didShareTimeInterval = Sample()
+    let didShareTimeInterval = SampleStatistics()
     var didReceive: Date?
     init(targetIdentifier: TargetIdentifier, payloadData: PayloadData) {
         self.targetIdentifier = targetIdentifier

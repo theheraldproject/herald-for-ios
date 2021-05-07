@@ -1,14 +1,14 @@
 //
-//  Sample.swift
+//  SampleStatistics.swift
 //
-//  Copyright 2020 VMware, Inc.
+//  Copyright 2020-2021 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
 
 /// Sample statistics, assumes normal distribution.
-public class Sample {
+public class SampleStatistics {
     private var n:Int64 = 0
     private var m1:Double = 0.0
     private var m2:Double = 0.0
@@ -85,11 +85,11 @@ public class Sample {
     
     /// Add sample value x, n times.
     func add(_ x:Double, _ n:Int) {
-        add(Sample(x, Int64(n)))
+        add(SampleStatistics(x, Int64(n)))
     }
     
     /// Add samples to this sample.
-    func add(_ sample: Sample) {
+    func add(_ sample: SampleStatistics) {
         guard sample.n > 0 else {
             return
         }
@@ -103,7 +103,7 @@ public class Sample {
             max = sample.max
             return
         }
-        let combined = Sample()
+        let combined = SampleStatistics()
         combined.n = n + sample.n
 
         let delta: Double = sample.m1 - m1
@@ -133,13 +133,13 @@ public class Sample {
     }
     
     /// Estimate distance between this sample's distribution and another sample's distribution, 1 means identical and 0 means completely different.
-    func distance(_ sample: Sample) -> Double? {
+    func distance(_ sample: SampleStatistics) -> Double? {
         return bhattacharyyaDistance(self, sample)
     }
     
     /// Bhattacharyya distance between two distributions estimate  the likelihood that the two distributions are the same.
     /// bhattacharyyaDistance = 1 means the two distributions are identical; value = 0 means they are different.
-    private func bhattacharyyaDistance(_ d1: Sample, _ d2: Sample) -> Double? {
+    private func bhattacharyyaDistance(_ d1: SampleStatistics, _ d2: SampleStatistics) -> Double? {
         guard let v1 = d1.variance, let v2 = d2.variance, let m1 = d1.mean, let m2 = d2.mean else {
             return nil
         }

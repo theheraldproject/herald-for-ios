@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "Herald"
-  spec.version      = "1.2.0"
+  spec.version      = "1.3.0"
   spec.summary      = "Reliable Bluetooth communication library for iOS"
 
   spec.description  = <<-DESC
@@ -14,12 +14,12 @@ Herald supports iOS, Android, and embedded devices.
 
   spec.homepage     = "https://vmware.github.io/herald"
   spec.license      = { :type => "Apache-2.0", :file => "LICENSE.txt" }
-  spec.author       = { "adamfowleruk" => "adamfowleruk@gmail.com" }
+  spec.author       = { "adamfowleruk" => "adam@adamfowler.org" }
 
   spec.ios.deployment_target = "9.3"
   spec.swift_version = "5"
 
-  spec.source        = { :git => "https://github.com/vmware/herald-for-ios.git", :tag => "v#{spec.version}" }
+  spec.source        = { :git => "https://github.com/theheraldproject/herald-for-ios.git", :tag => "v#{spec.version}" }
   spec.source_files  = "herald/herald/**/*.{h,m,swift}"
 
   pod_target_xcconfig = { "EXCLUDED_ARCHS[sdk=iphonesimulator*]" => "arm64" }
