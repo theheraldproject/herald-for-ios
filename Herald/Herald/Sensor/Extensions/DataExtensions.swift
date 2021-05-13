@@ -81,6 +81,19 @@ public extension Data {
         append(Data(bytes: &int64, count: MemoryLayout<Int64>.size))
     }
     
+    mutating func append(_ value: UIntBig) {
+        let magnitude = value.magnitude
+        // Magnitude length
+        append(UInt32(magnitude.count))
+        // Magnitude values
+        guard magnitude.count > 0 else {
+            return
+        }
+        for i in 0...magnitude.count - 1 {
+            append(UInt16(magnitude[i]))
+        }
+    }
+    
     @available(iOS 14.0, *)
     mutating func append(_ value: Float16) {
         var input: [Float16] = [value]
@@ -218,6 +231,28 @@ public extension Data {
             UInt64(bytes[index + 5]) << 40 |
             UInt64(bytes[index + 6]) << 48 |
             UInt64(bytes[index + 7]) << 56
+    }
+    
+    /// Get UIntBig from byte array
+    func uintBig(_ index: Int) -> UIntBig? {
+        guard index >= 0 else {
+            return nil
+        }
+        guard let length = uint32(index), length <= Int32.max else {
+            return nil
+        }
+        var magnitude: [UInt16] = Array<UInt16>(repeating: 0, count: Int(truncatingIfNeeded: length))
+        var i = 0
+        var j = index + 4
+        while i < magnitude.count {
+            guard let value = uint16(j) else {
+                return nil
+            }
+            magnitude[i] = value
+            i += 1
+            j += 2
+        }
+        return UIntBig(magnitude)
     }
     
     func string(_ index: Int, _ encoding: StringLengthEncodingOption = .UINT8) -> (value:String, start:Int, end:Int)? {
