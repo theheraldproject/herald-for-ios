@@ -9,6 +9,7 @@ import Foundation
 
 /// Mutable unsigned integer of unlimited size (for 32-bit architectures)
 public class UIntBig: Equatable, Hashable, Comparable {
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Datatype.UIntBig")
     // Unsigned value (LSB ... MSB)
     public var magnitude: [UInt16]
     // Common values
@@ -169,14 +170,38 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let base = UIntBig(self)
         base.mod(modulus)
         let exp = UIntBig(exponent)
+        var i = UInt64(0), t = UInt64(0);
+        var tTimes = UInt64(0), tTimesCount = UInt64(0)
+        var tMod = UInt64(0), tModCount = UInt64(0)
         while !exp.isZero {
+            let t0 = DispatchTime.now()
             if exp.isOdd {
+                let tTimesStart = DispatchTime.now()
                 result.times(base)
+                let tTimesEnd = DispatchTime.now()
+                tTimes += (tTimesEnd.uptimeNanoseconds - tTimesStart.uptimeNanoseconds)
+                tTimesCount += 1
+                let tModStart = DispatchTime.now()
                 result.mod(modulus)
+                let tModEnd = DispatchTime.now()
+                tMod += (tModEnd.uptimeNanoseconds - tModStart.uptimeNanoseconds)
+                tModCount += 1
             }
             exp.rightShiftByOne()
+            let tTimesStart = DispatchTime.now()
             base.times(base)
+            let tTimesEnd = DispatchTime.now()
+            tTimes += (tTimesEnd.uptimeNanoseconds - tTimesStart.uptimeNanoseconds)
+            tTimesCount += 1
+            let tModStart = DispatchTime.now()
             base.mod(modulus)
+            let tModEnd = DispatchTime.now()
+            tMod += (tModEnd.uptimeNanoseconds - tModStart.uptimeNanoseconds)
+            tModCount += 1
+            let t1 = DispatchTime.now()
+            i += 1
+            t += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+            logger.debug("modPow(i=\(i),t=\(t),avg=\(t/i)ns,times=\(tTimes / tTimesCount)ns,mod=\(tMod / tModCount)ns)")
         }
         return result
     }
