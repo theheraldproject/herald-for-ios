@@ -36,13 +36,14 @@ public class UIntBig: Equatable, Hashable, Comparable {
 
     /// Positive Int64 value as unlimited value
     public convenience init(_ uint64: UInt64) {
-        let value: [UInt16] = [
+        var value: [UInt16] = [
             UInt16(truncatingIfNeeded: uint64 & 0xFFFF),         // LSB
             UInt16(truncatingIfNeeded: (uint64 >> 16) & 0xFFFF),
             UInt16(truncatingIfNeeded: (uint64 >> 32) & 0xFFFF),
             UInt16(truncatingIfNeeded: (uint64 >> 48) & 0xFFFF)  // MSB
         ]
-        self.init(UIntBig.trimZeroMSBs(value))
+        UIntBig.trimZeroMSBs(&value)
+        self.init(value)
     }
 
 
@@ -201,7 +202,7 @@ public class UIntBig: Equatable, Hashable, Comparable {
             let t1 = DispatchTime.now()
             i += 1
             t += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
-            logger.debug("modPow(i=\(i),t=\(t),avg=\(t/i)ns,times=\(tTimes / tTimesCount)ns,mod=\(tMod / tModCount)ns)")
+            //logger.debug("modPow(i=\(i),t=\(t),avg=\(t/i)ns,times=\(tTimes / tTimesCount)ns,mod=\(tMod / tModCount)ns)")
         }
         return result
     }
@@ -211,7 +212,8 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let a = modulus.magnitude
         var b = magnitude
         UIntBig.mod(a, &b)
-        magnitude = UIntBig.trimZeroMSBs(b)
+        UIntBig.trimZeroMSBs(&b)
+        magnitude = b
     }
 
     /// Reduce b until b < a at offset by repeatedly deducting a from b at offset
@@ -333,7 +335,8 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let a = value.magnitude
         var b = magnitude
         let underflow = UIntBig.subtract(a, multiplier, &b, offset)
-        magnitude = UIntBig.trimZeroMSBs(b)
+        UIntBig.trimZeroMSBs(&b)
+        magnitude = b
         return underflow
     }
 
@@ -350,7 +353,8 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let b = multiplier.magnitude.map({ UInt32($0) })
         var product: [UInt32] = Array<UInt32>(repeating: 0, count: a.count + b.count)
         UIntBig.times(a, b, &product)
-        magnitude = UIntBig.trimZeroMSBs(product.map({ UInt16(truncatingIfNeeded: $0) }))
+        magnitude = product.map({ UInt16(truncatingIfNeeded: $0) })
+        UIntBig.trimZeroMSBs(&magnitude)
     }
     
     /// Optimised times function "product = a * b", this is the fastest implementation in Swift
@@ -384,29 +388,32 @@ public class UIntBig: Equatable, Hashable, Comparable {
             return
         }
         var i = 0
-        while i < magnitude.count - 1 {
-            magnitude[i] >>= 1
-            magnitude[i] |= magnitude[i+1] << 15
-            i += 1
+        let ie = magnitude.count - 1
+        withUnsafeMutablePointer(to: &magnitude) { pointer in
+            while i < ie {
+                pointer.pointee[i] = (pointer.pointee[i] >> 1) | (pointer.pointee[i + 1] << 15)
+                i += 1
+            }
+            pointer.pointee[ie] >>= 1
         }
-        magnitude[magnitude.count - 1] >>= 1
-        magnitude = UIntBig.trimZeroMSBs(magnitude)
+        UIntBig.trimZeroMSBs(&magnitude)
     }
     
     /// Remove leading zeros from array
-    static func trimZeroMSBs(_ magnitude: [UInt16]) -> [UInt16] {
-        var i = magnitude.count - 1;
+    static func trimZeroMSBs(_ magnitude: inout [UInt16]) {
+        let ie = magnitude.count - 1
+        var i = ie
         while i > 0, magnitude[i] == UIntBig.zero {
             i -= 1
         }
         if i == 0, magnitude[0] == UIntBig.zero {
-            return UIntBig.magnitudeZero
+            magnitude = UIntBig.magnitudeZero
+            return
         }
-        if i == magnitude.count - 1 {
-            return magnitude
+        if i == ie {
+            return
         }
-        let trimmed = magnitude.dropLast(magnitude.count - i - 1)
-        return Array<UInt16>(trimmed)
+        magnitude.removeLast(ie - i)
     }
 
     /// Count of bits based on highest set bit

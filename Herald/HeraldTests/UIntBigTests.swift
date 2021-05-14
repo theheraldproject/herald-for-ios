@@ -43,6 +43,34 @@ class UIntBigTests: XCTestCase {
         XCTAssertFalse(UIntBig(UInt64(Int64.max) - 1).isOdd)
         XCTAssertTrue(UIntBig(UInt64(Int64.max)).isOdd)
     }
+    
+    // MARK: - Trim leading zero
+    
+    public func testTrimZeroMSBs() {
+        for i in 0...64 {
+            var magnitude = Array<UInt16>(repeating: 1, count: i)
+            magnitude.append(contentsOf: Array<UInt16>(repeating: 0, count: 64 - i))
+            UIntBig.trimZeroMSBs(&magnitude)
+            XCTAssertEqual(i, magnitude.count)
+        }
+    }
+
+    // Baseline : 5,006ns
+    // RemoveLast : 4,646ns
+    public func testTrimZeroMSBsPerformance() {
+        let samples = UInt64(2000)
+        var elapsed = UInt64(0)
+        for _ in 1...samples {
+            var magnitude = Array<UInt16>(repeating: 1, count: 2)
+            magnitude.append(contentsOf: Array<UInt16>(repeating: 0, count: 254))
+            let t0 = DispatchTime.now()
+            UIntBig.trimZeroMSBs(&magnitude)
+            let t1 = DispatchTime.now()
+            elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+        }
+        let speed = elapsed / samples
+        print("UIntBig.trimZeroMSBs() = \(speed)ns/call")
+    }
 
     // MARK: - Right shift by one
 
@@ -58,9 +86,12 @@ class UIntBigTests: XCTestCase {
         }
     }
     
-    // Baseline implementation : 17,933,717ns
+    // Baseline implementation : 76,879ns
+    // Fixed ie = magnitude.count - 1 : 71,910ns
+    // WithUnsafeMutablePointer : 63,431ns
+    // Combined >>= and |= to = : 60,431ns
     public func testRightShiftByOnePerformance() {
-        let samples = UInt64(100)
+        let samples = UInt64(1000)
         let hex = String(repeating: "FF", count: 256)
         var elapsed = UInt64(0)
         for _ in 1...samples {
