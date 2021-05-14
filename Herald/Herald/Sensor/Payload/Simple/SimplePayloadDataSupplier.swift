@@ -271,9 +271,13 @@ private class F {
     fileprivate static func binary16(_ value: Float) -> Binary16 {
         var source: [Float] = [value]
         var target: [UInt16] = [0]
-        var sourceBuffer = vImage_Buffer(data: &source, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        var targetBuffer = vImage_Buffer(data: &target, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        vImageConvert_PlanarFtoPlanar16F(&sourceBuffer, &targetBuffer, 0)
+        source.withUnsafeMutableBufferPointer { sourceBP in
+            var sourceBuffer = vImage_Buffer(data: sourceBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
+            target.withUnsafeMutableBufferPointer { targetBP in
+                var targetBuffer = vImage_Buffer(data: targetBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
+                vImageConvert_PlanarFtoPlanar16F(&sourceBuffer, &targetBuffer, 0)
+            }
+        }
         let binary16 = Binary16(target[0])
         return binary16
     }
@@ -283,9 +287,13 @@ private class F {
     fileprivate static func float(_ value: Binary16) -> Float {
         var source: [UInt16] = [value]
         var target: [Float] = [0]
-        var sourceBuffer = vImage_Buffer(data: &source, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        var targetBuffer = vImage_Buffer(data: &target, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        vImageConvert_Planar16FtoPlanarF(&sourceBuffer, &targetBuffer, 0)
+        source.withUnsafeMutableBufferPointer { sourceBP in
+            var sourceBuffer = vImage_Buffer(data: sourceBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
+            target.withUnsafeMutableBufferPointer { targetBP in
+                var targetBuffer = vImage_Buffer(data: targetBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
+                vImageConvert_Planar16FtoPlanarF(&sourceBuffer, &targetBuffer, 0)
+            }
+        }
         let float = target[0]
         return float
     }

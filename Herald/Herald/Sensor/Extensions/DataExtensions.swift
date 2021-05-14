@@ -98,9 +98,13 @@ public extension Data {
     mutating func append(_ value: Float16) {
         var input: [Float16] = [value]
         var output: [UInt8] = [0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
+        input.withUnsafeMutableBufferPointer { inputBP in
+            var sourceBuffer = vImage_Buffer(data: inputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
+            output.withUnsafeMutableBufferPointer { outputBP in
+                var destinationBuffer = vImage_Buffer(data: outputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
+                vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
+            }
+        }
         append(output[0])
         append(output[1])
     }
@@ -108,9 +112,13 @@ public extension Data {
     mutating func append(_ value: Float32) {
         var input: [Float] = [value]
         var output: [UInt8] = [0,0,0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
-        vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
+        input.withUnsafeMutableBufferPointer { inputBP in
+            var sourceBuffer = vImage_Buffer(data: inputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
+            output.withUnsafeMutableBufferPointer { outputBP in
+                var destinationBuffer = vImage_Buffer(data: outputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
+                vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
+            }
+        }
         append(output[0])
         append(output[1])
         append(output[2])

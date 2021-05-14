@@ -346,23 +346,32 @@ public class UIntBig: Equatable, Hashable, Comparable {
         if multiplier.isOne {
             return
         }
-        let a = magnitude
-        let b = multiplier.magnitude
-        var product: [UInt16] = Array<UInt16>(repeating: 0, count: a.count + b.count)
-        var valueA, valueB, carry, carried: UInt32
-        for i in 0...a.count-1 {
-            valueA = UInt32(a[i])
+        let a = magnitude.map({ UInt32($0) })
+        let b = multiplier.magnitude.map({ UInt32($0) })
+        var product: [UInt32] = Array<UInt32>(repeating: 0, count: a.count + b.count)
+        UIntBig.times(a, b, &product)
+        magnitude = UIntBig.trimZeroMSBs(product.map({ UInt16(truncatingIfNeeded: $0) }))
+    }
+    
+    /// Optimised times function "product = a * b", this is the fastest implementation in Swift
+    /// Further optimisation will need to move to Karatsuba algorithm
+    static func times(_ a: [UInt32], _ b: [UInt32], _ product: inout [UInt32]) {
+        var carry: UInt32
+        var i = 0, j = 0, k = 0
+        for valueA in a {
             carry = 0
-            for j in 0...b.count-1 {
-                valueB = UInt32(b[j])
-                carried = UInt32(product[i+j])
-                carry += valueA * valueB + carried
-                product[i+j] = UInt16(truncatingIfNeeded: carry)
+            j = 0
+            k = i
+            for valueB in b {
+                carry += valueA * valueB + product[k]
+                product[k] = carry & 0xFFFF
                 carry >>= 16
+                j += 1
+                k += 1
             }
-            product[i+b.count] = UInt16(truncatingIfNeeded: carry)
+            product[k] = carry
+            i += 1
         }
-        magnitude = UIntBig.trimZeroMSBs(product)
     }
 
     /// Right shift all bits by one bit and insert leading 0 bit

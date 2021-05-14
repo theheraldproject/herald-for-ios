@@ -57,6 +57,22 @@ class UIntBigTests: XCTestCase {
             i *= 3
         }
     }
+    
+    // Baseline implementation : 17,933,717ns
+    public func testRightShiftByOnePerformance() {
+        let samples = UInt64(100)
+        let hex = String(repeating: "FF", count: 256)
+        var elapsed = UInt64(0)
+        for _ in 1...samples {
+            let n = UIntBig(hex)!
+            let t0 = DispatchTime.now()
+            n.rightShiftByOne()
+            let t1 = DispatchTime.now()
+            elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+        }
+        let speed = elapsed / samples
+        print("UIntBig.rightShiftByOne() = \(speed)ns/call")
+    }
 
     // MARK: - Times
 
@@ -95,6 +111,32 @@ class UIntBigTests: XCTestCase {
             }
             i *= 3
         }
+    }
+    
+    // Baseline implementation : 17,933,717ns
+    // Pre-cast UInt16 to UInt32 for A and B  : 14,292,294ns
+    // Post-cast UInt32 to UInt12 for Product : 13,209,268ns
+    // Dedicated static function for times : 12,940,940ns
+    // Pre-allocating a, b, and product : 12,939,280ns
+    // for (i, valueA) in a.enumerated(), for (j, valueB) in b.enumerated : 9,822,250ns
+    // for valueA in a, for valueB in b, and dedicated i,j,k counting : 8,346,576ns
+    // Wrapped static function as self.times call : 8,438,665ns
+    //
+    // Next change to improve performance will require switching to Karatsuba algorithm
+    // to reduce O(n^2) to O(n^1.58). It may be more productive to just switch to C.
+    public func testTimesPerformance() {
+        let samples = UInt64(100)
+        let hex = String(repeating: "FF", count: 256)
+        var elapsed = UInt64(0)
+        for _ in 1...samples {
+            let n = UIntBig(hex)!
+            let t0 = DispatchTime.now()
+            n.times(n)
+            let t1 = DispatchTime.now()
+            elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+        }
+        let speed = elapsed / samples
+        print("UIntBig.times() = \(speed)ns/call")
     }
 
     // MARK: - Minus
@@ -191,26 +233,6 @@ class UIntBigTests: XCTestCase {
         }
     }
     
-    public func testModPerformance() {
-        let modpGroup14Key: String = (
-            "FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1" +
-            "29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD" +
-            "EF9519B3 CD3A431B 302B0A6D F25F1437 4FE1356D 6D51C245" +
-            "E485B576 625E7EC6 F44C42E9 A637ED6B 0BFF5CB6 F406B7ED" +
-            "EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D" +
-            "C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F" +
-            "83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D" +
-            "670C354E 4ABC9804 F1746C08 CA18217C 32905E46 2E36CE3B" +
-            "E39E772C 180E8603 9B2783A2 EC07A28F B5C55DF0 6F4C52C9" +
-            "DE2BCBF6 95581718 3995497C EA956AE5 15D22618 98FA0510" +
-            "15728E5A 8AACAA68 FFFFFFFF FFFFFFFF")
-            .replacingOccurrences(of: " ", with: "")
-        let p = UIntBig(modpGroup14Key)!
-        let alicePublicKeyString = "E03560806F04BBD8D910D283581FCA1F47858CA4A4CEE93C410E55C13E25275239626D20BED40EFFF839B9FA8A3D7B6BD034229AD1096CFB45D2761F771AD68AA14424C0CB7E67BE87D94C0AE2C70C3F6A53B56F9711DDEAAC0B6B8B0F117105EDD56E77DAA6328B8B49E20DB80DE87691CDB555A6B0536CAD6B4A4D6588EFB0619DFB0D6EE2AED2F604F9FEBAF976BEEFC327FC567C1ACFBC66503F02DA13BEA9AA81B8E5C726D2070DC4A25423BDDD75DB5A086ED39C9EF694C8E4BCCD906D005C69245D3E3C9F201604276E6687BD8096D97B2E0C2FE57328846B13D464D8624D33503D12E3A92E0802FFF29DFBBB1AA69DB29D21E25F1FBE6AFBA6F9F17E"
-        let alicePublicKey = UIntBig(alicePublicKeyString)!
-        alicePublicKey.mod(p)
-    }
-
     // MARK: - ModPow
 
     public func testModPow() {
