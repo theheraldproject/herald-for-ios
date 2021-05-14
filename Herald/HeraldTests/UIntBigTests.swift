@@ -136,8 +136,8 @@ class UIntBigTests: XCTestCase {
                 }
                 let a = UIntBig(i)
                 let b = UIntBig(j)
-                a.times(b)
                 print("\(i),\(j)")
+                a.times(b)
                 XCTAssertEqual(i*j, a.uint64())
                 j *= 3
             }
@@ -155,6 +155,8 @@ class UIntBigTests: XCTestCase {
     // Wrapped static function as self.times call : 8,438,665ns
     // withUnsafePointer as inner loop : 4,931,951ns
     // withUnsafePointer as outer loop : 4,922,198ns
+    // Passing unsafePointers as parameters : 4,769,243ns
+    // Passing unsafeMutablePointer as parameter : 4,633,002ns
     //
     // Next change to improve performance will require switching to Karatsuba algorithm
     // to reduce O(n^2) to O(n^1.58). It may be more productive to just switch to C.
@@ -162,12 +164,21 @@ class UIntBigTests: XCTestCase {
         let samples = UInt64(100)
         let hex = String(repeating: "FF", count: 256)
         var elapsed = UInt64(0)
-        for _ in 1...samples {
-            let n = UIntBig(hex)!
-            let t0 = DispatchTime.now()
-            n.times(n)
-            let t1 = DispatchTime.now()
-            elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+        let n = UIntBig(hex)!
+        let a = n.magnitude.map({ UInt32($0) })
+        let b = n.magnitude.map({ UInt32($0) })
+        var product = Array<UInt32>(repeating: 0, count: a.count + b.count)
+        withUnsafePointer(to: a) { pA in
+            withUnsafePointer(to: b) { pB in
+                withUnsafeMutablePointer(to: &product) { pProduct in
+                    for _ in 1...samples {
+                        let t0 = DispatchTime.now()
+                        UIntBig.times(pA, pB, pProduct)
+                        let t1 = DispatchTime.now()
+                        elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+                    }
+                }
+            }
         }
         let speed = elapsed / samples
         print("UIntBig.times() = \(speed)ns/call")
@@ -198,7 +209,7 @@ class UIntBigTests: XCTestCase {
             i *= 3
         }
     }
-  
+    
     public func testMinusOffset() {
         var i = UInt64(1)
         while i < (Int64.max / 3) {
@@ -222,6 +233,29 @@ class UIntBigTests: XCTestCase {
                 j *= 7
             }
             i *= 3
+        }
+    }
+    
+    // Baseline : 142,096ns
+    // Eliminate casting and replaced first for loop with withUnsafePointer loop : 80,801ns
+    // Eliminate casting and replaced second while loop with withUnsafePointer loop : 73,378ns
+    // Replace inner while loops for negative results with calculation : 67,717ns
+    public func testSubtractPerformance() {
+        let samples = UInt64(1000)
+        let a = UIntBig(String(repeating: "FF", count: 255))!.magnitude.map({ UInt32($0) })
+        var elapsed = UInt64(0)
+        withUnsafePointer(to: a) { pA in
+            for _ in 1...samples {
+                var b = UIntBig(String(repeating: "FF", count: 256))!.magnitude.map({ UInt32($0) })
+                withUnsafeMutablePointer(to: &b) { pB in
+                    let t0 = DispatchTime.now()
+                    let _ = UIntBig.subtract(pA, 2, pB, 0)
+                    let t1 = DispatchTime.now()
+                    elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+                }
+            }
+            let speed = elapsed / samples
+            print("UIntBig.subtract() = \(speed)ns/call")
         }
     }
 
@@ -265,6 +299,29 @@ class UIntBigTests: XCTestCase {
             }
             i *= 3
         }
+    }
+    
+    // Baseline after subtract optimisation : 237,725ns
+    // UnsafePointer as parameter : 232,203ns
+    // Reduce function as inner loop : 201,585ns
+    // Minimise var allocations : 197,770ns
+    public func testModPerformance() {
+        let samples = UInt64(1000)
+        let a = UIntBig(String(repeating: "FF", count: 1))!.magnitude.map({ UInt32($0) })
+        var elapsed = UInt64(0)
+        withUnsafePointer(to: a) { pA in
+            for _ in 1...samples {
+                var b = UIntBig(String(repeating: "FF", count: 256))!.magnitude.map({ UInt32($0) })
+                let t0 = DispatchTime.now()
+                withUnsafeMutablePointer(to: &b) { pB in
+                    UIntBig.mod(pA, pB)
+                }
+                let t1 = DispatchTime.now()
+                elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
+            }
+        }
+        let speed = elapsed / samples
+        print("UIntBig.mod() = \(speed)ns/call")
     }
     
     // MARK: - ModPow

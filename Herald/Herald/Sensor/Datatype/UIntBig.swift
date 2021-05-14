@@ -171,64 +171,61 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let base = UIntBig(self)
         base.mod(modulus)
         let exp = UIntBig(exponent)
-        var i = UInt64(0), t = UInt64(0);
-        var tTimes = UInt64(0), tTimesCount = UInt64(0)
-        var tMod = UInt64(0), tModCount = UInt64(0)
-        while !exp.isZero {
-            let t0 = DispatchTime.now()
-            if exp.isOdd {
-                let tTimesStart = DispatchTime.now()
-                result.times(base)
-                let tTimesEnd = DispatchTime.now()
-                tTimes += (tTimesEnd.uptimeNanoseconds - tTimesStart.uptimeNanoseconds)
-                tTimesCount += 1
-                let tModStart = DispatchTime.now()
-                result.mod(modulus)
-                let tModEnd = DispatchTime.now()
-                tMod += (tModEnd.uptimeNanoseconds - tModStart.uptimeNanoseconds)
-                tModCount += 1
+        withUnsafePointer(to: modulus.magnitude.map({ UInt32($0) })) { pM in
+            while !exp.isZero {
+                if exp.isOdd {
+                    UIntBig.timesMod(result, base, pM)
+                }
+                exp.rightShiftByOne()
+                UIntBig.timesMod(base, base, pM)
             }
-            exp.rightShiftByOne()
-            let tTimesStart = DispatchTime.now()
-            base.times(base)
-            let tTimesEnd = DispatchTime.now()
-            tTimes += (tTimesEnd.uptimeNanoseconds - tTimesStart.uptimeNanoseconds)
-            tTimesCount += 1
-            let tModStart = DispatchTime.now()
-            base.mod(modulus)
-            let tModEnd = DispatchTime.now()
-            tMod += (tModEnd.uptimeNanoseconds - tModStart.uptimeNanoseconds)
-            tModCount += 1
-            let t1 = DispatchTime.now()
-            i += 1
-            t += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
-            //logger.debug("modPow(i=\(i),t=\(t),avg=\(t/i)ns,times=\(tTimes / tTimesCount)ns,mod=\(tMod / tModCount)ns)")
         }
         return result
+    }
+    
+    /// a = (a * b) % m
+    static func timesMod(_ a: UIntBig, _ b: UIntBig, _ pM: UnsafePointer<[UInt32]>) {
+        var ab: [UInt32] = Array<UInt32>(repeating: 0, count: a.magnitude.count + b.magnitude.count)
+        withUnsafePointer(to: a.magnitude.map({ UInt32($0) })) { pA in
+            withUnsafePointer(to: b.magnitude.map({ UInt32($0) })) { pB in
+                withUnsafeMutablePointer(to: &ab) { pAB in
+                    UIntBig.times(pA, pB, pAB)
+                    UIntBig.mod(pM, pAB)
+                }
+            }
+        }
+        a.magnitude = ab.map({ UInt16(truncatingIfNeeded: $0) })
+        UIntBig.trimZeroMSBs(&a.magnitude)
     }
 
     /// Replace self with self % modulus
     func mod(_ modulus: UIntBig) {
-        let a = modulus.magnitude
-        var b = magnitude
-        UIntBig.mod(a, &b)
-        UIntBig.trimZeroMSBs(&b)
-        magnitude = b
+        let a = modulus.magnitude.map({ UInt32($0) })
+        var b = magnitude.map({ UInt32($0) })
+        withUnsafePointer(to: a) { pA in
+            withUnsafeMutablePointer(to: &b) { pB in
+                UIntBig.mod(pA, pB)
+            }
+        }
+        magnitude = b.map({ UInt16(truncatingIfNeeded: $0) })
+        UIntBig.trimZeroMSBs(&magnitude)
     }
 
     /// Reduce b until b < a at offset by repeatedly deducting a from b at offset
     /// Assumes b.length >= a.length + offset
-    static func reduce(_ a: [UInt16], _ b: inout [UInt16], _ offset: Int) {
-        let valueA = UInt32(a[a.count - 1]) + (a.count > 1 ? 1 : 0)
-        var valueB, carry, quotient: UInt32
+    static func reduce(_ pA: UnsafePointer<[UInt32]>, _ pB: UnsafeMutablePointer<[UInt32]>, _ offset: Int) {
+        let countA = pA.pointee.count
+        let countB = pB.pointee.count
+        let valueA = UInt32(pA.pointee[countA - 1]) + (countA > 1 ? 1 : 0)
+        var valueB = UInt32(pB.pointee[countA + offset - 1]);
+        var carry: UInt32 = (countA + offset < countB ? UInt32(pB.pointee[countA + offset]) : 0)
+        var quotient: UInt32
         var multiplier: UInt16
-        carry = (a.count + offset < b.count ? UInt32(b[a.count + offset]) : 0)
-        valueB = UInt32(b[a.count + offset - 1])
-        while carry != 0 || valueB >= valueA || (offset == 0 && compare(a, b) <= 0) {
+        while carry != 0 || valueB >= valueA || (offset == 0 && lessThanOrEquals(pA, pB)) {
             if carry > UInt16.max {
                 quotient = UInt32(UInt16.max)
             } else if carry > 0 {
-                valueB = carry << 16 | valueB
+                valueB = (carry << 16) | valueB
                 quotient = valueB / valueA
             } else {
                 quotient = valueB / valueA
@@ -237,17 +234,41 @@ public class UIntBig: Equatable, Hashable, Comparable {
                 }
             }
             multiplier = (quotient > UInt16.max ? UInt16.max : UInt16(truncatingIfNeeded: quotient))
-            let _ = subtract(a, multiplier, &b, offset)
-            carry = (a.count + offset < b.count ? UInt32(b[a.count + offset]) : 0)
-            valueB = UInt32(b[a.count + offset - 1])
+            let _ = subtract(pA, multiplier, pB, offset)
+            carry = (countA + offset < countB ? UInt32(pB.pointee[countA + offset]) : 0)
+            valueB = UInt32(pB.pointee[countA + offset - 1])
         }
     }
-    
+
     /// Modular function : b % a
-    static func mod(_ a: [UInt16], _ b: inout [UInt16]) {
-        var offset = b.count - a.count
+    static func mod(_ pA: UnsafePointer<[UInt32]>, _ pB: UnsafeMutablePointer<[UInt32]>) {
+        let countA = pA.pointee.count
+        let countB = pB.pointee.count
+        let offsetAB = countB - countA
+        var offset = offsetAB
+        let valueA = UInt32(pA.pointee[countA - 1]) + (countA > 1 ? 1 : 0)
+        var quotient: UInt32
+        var multiplier: UInt16
         while offset >= 0 {
-            reduce(a, &b, offset)
+            var valueB = UInt32(pB.pointee[countA + offset - 1]);
+            var carry = (countA + offset < countB ? UInt32(pB.pointee[countA + offset]) : 0)
+            while carry != 0 || valueB >= valueA || (offset == 0 && lessThanOrEquals(pA, pB)) {
+                if carry > UInt16.max {
+                    quotient = UInt32(UInt16.max)
+                } else if carry > 0 {
+                    valueB = (carry << 16) | valueB
+                    quotient = valueB / valueA
+                } else {
+                    quotient = valueB / valueA
+                    if quotient == 0 {
+                        quotient = 1
+                    }
+                }
+                multiplier = (quotient > UInt16.max ? UInt16.max : UInt16(truncatingIfNeeded: quotient))
+                _ = subtract(pA, multiplier, pB, offset)
+                carry = (countA + offset < countB ? UInt32(pB.pointee[countA + offset]) : 0)
+                valueB = UInt32(pB.pointee[countA + offset - 1])
+            }
             offset -= 1
         }
     }
@@ -295,36 +316,71 @@ public class UIntBig: Equatable, Hashable, Comparable {
         return 0
     }
 
-    /// Subtraction function : b - a * multiplier (at offset of b)
-    /// Note, multiplier range is [0,32767]
-    static func subtract(_ a: [UInt16], _ multiplier: UInt16, _ b: inout [UInt16], _ offset: Int) -> UInt32 {
-        let times = UInt32(multiplier)
-        var carry = UInt32(0)
-        for i in 0...a.count-1 {
-            var valueA = UInt32(a[i])
-            let valueB = Int32(b[i+offset])
-            valueA *= times
-            let valueAL = valueA & 0xFFFF
-            let valueAH = valueA >> 16
-            var result = valueB - Int32(valueAL + carry)
-            carry = valueAH
-            while result < 0 {
-                result += 0x00010000
-                carry += 1
-            }
-            b[i+offset] = UInt16(truncatingIfNeeded: result)
+    static func lessThanOrEquals(_ pA: UnsafePointer<[UInt32]>, _ pB: UnsafeMutablePointer<[UInt32]>) -> Bool {
+        // Skip zero MSBs
+        var j = pB.pointee.count - 1
+        while j >= 0, pB.pointee[j] == 0 {
+            j -= 1
         }
-        var i = a.count + offset
-        while i < b.count, carry > 0 {
-            let valueB = Int32(b[i])
-            var result = valueB - Int32(carry)
-            carry = 0
-            while result < 0 {
-                result += 0x00010000
-                carry += 1
+        var i = pA.pointee.count - 1
+        while i >= 0, pA.pointee[i] == 0 {
+            i -= 1
+            if i < j {
+                return true
             }
-            b[i] = UInt16(truncatingIfNeeded: result)
-            i += 1
+        }
+        if i < j {
+            return true
+        } else if i > j {
+            return false
+        }
+        // i == j, switching to i as index
+        while i >= 0 {
+            if pA.pointee[i] < pB.pointee[i] {
+                return true
+            } else if pA.pointee[i] > pB.pointee[i] {
+                return false
+            }
+            i -= 1
+        }
+        return true
+    }
+
+    /// Subtraction function : b - a * times (at offset of b)
+    /// Note: multiplier range is [0,UInt16.max]
+    static func subtract(_ pA: UnsafePointer<[UInt32]>, _ multiplier: UInt16, _ pB: UnsafeMutablePointer<[UInt32]>, _ offset: Int) -> Int32 {
+        let countA = pA.pointee.count
+        let countB = pB.pointee.count
+        let times = UInt32(multiplier)
+        var carry = Int32(0)
+        var i = 0
+        pB.withMemoryRebound(to: [Int32].self, capacity: countB) { pBI in
+            while i < countA {
+                let aHL = pA.pointee[i] * times
+                let aL = Int32(aHL & 0xFFFF)
+                let aH = Int32(aHL >> 16)
+                var result = pBI.pointee[i+offset] - aL - carry
+                carry = aH
+                while result < 0 {
+                    result += 0x00010000
+                    carry += 1
+                }
+                pBI.pointee[i+offset] = result
+                i += 1
+            }
+            if carry > 0 {
+                i = countA + offset
+                while i < countB, carry > 0 {
+                    var result = pBI.pointee[i] - carry
+                    carry = 0
+                    while result < 0 {
+                        result += 0x00010000
+                        carry += 1
+                    }
+                    pBI.pointee[i] = result
+                    i += 1
+                }
+            }
         }
         return carry
     }
@@ -332,12 +388,17 @@ public class UIntBig: Equatable, Hashable, Comparable {
     /// Replace self with self - value * multiplier (at offset of self)
     /// Note, multiplier range is [0,32767]
     func minus(_ value: UIntBig, _ multiplier: UInt16, _ offset: Int) -> UInt32 {
-        let a = value.magnitude
-        var b = magnitude
-        let underflow = UIntBig.subtract(a, multiplier, &b, offset)
-        UIntBig.trimZeroMSBs(&b)
-        magnitude = b
-        return underflow
+        let a = value.magnitude.map({ UInt32($0) })
+        var b = magnitude.map({ UInt32($0) })
+        var underflow = Int32(0)
+        withUnsafePointer(to: a) { pA in
+            withUnsafeMutablePointer(to: &b) { pB in
+                underflow = UIntBig.subtract(pA, multiplier, pB, offset)
+            }
+        }
+        magnitude = b.map({ UInt16(truncatingIfNeeded: $0) })
+        UIntBig.trimZeroMSBs(&magnitude)
+        return UInt32(underflow)
     }
 
     /// Replace self with self * multiplier
@@ -352,34 +413,79 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let a = magnitude.map({ UInt32($0) })
         let b = multiplier.magnitude.map({ UInt32($0) })
         var product: [UInt32] = Array<UInt32>(repeating: 0, count: a.count + b.count)
-        UIntBig.times(a, b, &product)
+        withUnsafePointer(to: a) { pA in
+            withUnsafePointer(to: b) { pB in
+                withUnsafeMutablePointer(to: &product) { pProduct in
+                    UIntBig.times(pA, pB, pProduct)
+                }
+            }
+        }
         magnitude = product.map({ UInt16(truncatingIfNeeded: $0) })
         UIntBig.trimZeroMSBs(&magnitude)
     }
     
     /// Optimised times function "product = a * b", this is the fastest implementation in Swift
     /// Further optimisation will need to move to Karatsuba algorithm
-    static func times(_ a: [UInt32], _ b: [UInt32], _ product: inout [UInt32]) {
-        withUnsafePointer(to: a) { pA in
-            var carry: UInt32
-            var i = 0, j = 0, k = 0
-            while i < a.count {
-                carry = 0
-                j = 0
-                k = i
-                let valueA = pA.pointee[i]
-                withUnsafePointer(to: b) { pB in
-                    while j < b.count {
-                        carry += valueA * pB.pointee[j] + product[k]
-                        product[k] = carry & 0xFFFF
-                        carry >>= 16
-                        j += 1
-                        k += 1
-                    }
-                }
-                product[k] = carry
-                i += 1
+    static func times(_ pA: UnsafePointer<[UInt32]>, _ pB: UnsafePointer<[UInt32]>, _ pProduct: UnsafeMutablePointer<[UInt32]>) {
+        let countA = pA.pointee.count
+        let countB = pB.pointee.count
+        let countP = pProduct.pointee.count
+        // Indices for a, b, and product
+        var i = 0, j = 0, k = 0
+        // Shortcut : Test if either A or B is zero, set P to zero
+        if countA == 0 || countB == 0 {
+            while k < countP {
+                pProduct.pointee[k] = 0
+                k += 1
             }
+            return
+        }
+        // Shortcut : Test if A is one, copy B into P and zero the remainder
+        if countA == 1, pA.pointee[0] == 1 {
+            while k < countB {
+                pProduct.pointee[k] = pB.pointee[k]
+                k += 1
+            }
+            while k < countP {
+                pProduct.pointee[k] = 0
+                k += 1
+            }
+            return
+        }
+        // Shortcut : Test if B is one, copy A into P and zero the remainder
+        if countB == 1, pB.pointee[0] == 1 {
+            while k < countA {
+                pProduct.pointee[k] = pA.pointee[k]
+                k += 1
+            }
+            while k < countP {
+                pProduct.pointee[k] = 0
+                k += 1
+            }
+            return
+        }
+        // Multiplication
+        var carry: UInt32
+        while i < countA {
+            carry = 0
+            j = 0
+            k = i
+            let valueA = pA.pointee[i]
+            while j < countB {
+                carry += valueA * pB.pointee[j] + pProduct.pointee[k]
+                pProduct.pointee[k] = carry & 0xFFFF
+                carry >>= 16
+                j += 1
+                k += 1
+            }
+            pProduct.pointee[k] = carry
+            i += 1
+        }
+        k += 1
+        // Set remaining values in P to zero
+        while k < countP {
+            pProduct.pointee[k] = 0
+            k += 1
         }
     }
 
