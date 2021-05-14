@@ -360,21 +360,26 @@ public class UIntBig: Equatable, Hashable, Comparable {
     /// Optimised times function "product = a * b", this is the fastest implementation in Swift
     /// Further optimisation will need to move to Karatsuba algorithm
     static func times(_ a: [UInt32], _ b: [UInt32], _ product: inout [UInt32]) {
-        var carry: UInt32
-        var i = 0, j = 0, k = 0
-        for valueA in a {
-            carry = 0
-            j = 0
-            k = i
-            for valueB in b {
-                carry += valueA * valueB + product[k]
-                product[k] = carry & 0xFFFF
-                carry >>= 16
-                j += 1
-                k += 1
+        withUnsafePointer(to: a) { pA in
+            var carry: UInt32
+            var i = 0, j = 0, k = 0
+            while i < a.count {
+                carry = 0
+                j = 0
+                k = i
+                let valueA = pA.pointee[i]
+                withUnsafePointer(to: b) { pB in
+                    while j < b.count {
+                        carry += valueA * pB.pointee[j] + product[k]
+                        product[k] = carry & 0xFFFF
+                        carry >>= 16
+                        j += 1
+                        k += 1
+                    }
+                }
+                product[k] = carry
+                i += 1
             }
-            product[k] = carry
-            i += 1
         }
     }
 

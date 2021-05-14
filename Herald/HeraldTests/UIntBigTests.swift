@@ -137,6 +137,7 @@ class UIntBigTests: XCTestCase {
                 let a = UIntBig(i)
                 let b = UIntBig(j)
                 a.times(b)
+                print("\(i),\(j)")
                 XCTAssertEqual(i*j, a.uint64())
                 j *= 3
             }
@@ -152,6 +153,8 @@ class UIntBigTests: XCTestCase {
     // for (i, valueA) in a.enumerated(), for (j, valueB) in b.enumerated : 9,822,250ns
     // for valueA in a, for valueB in b, and dedicated i,j,k counting : 8,346,576ns
     // Wrapped static function as self.times call : 8,438,665ns
+    // withUnsafePointer as inner loop : 4,931,951ns
+    // withUnsafePointer as outer loop : 4,922,198ns
     //
     // Next change to improve performance will require switching to Karatsuba algorithm
     // to reduce O(n^2) to O(n^1.58). It may be more productive to just switch to C.
