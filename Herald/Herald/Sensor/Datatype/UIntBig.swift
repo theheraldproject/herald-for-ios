@@ -171,6 +171,8 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let base = UIntBig(self)
         base.mod(modulus)
         let exp = UIntBig(exponent)
+        var n = UInt64(0)
+        let t0 = DispatchTime.now()
         withUnsafePointer(to: modulus.magnitude.map({ UInt32($0) })) { pM in
             while !exp.isZero {
                 if exp.isOdd {
@@ -178,8 +180,13 @@ public class UIntBig: Equatable, Hashable, Comparable {
                 }
                 exp.rightShiftByOne()
                 UIntBig.timesMod(base, base, pM)
+                let t1 = DispatchTime.now()
+                n += 1
+                logger.debug("modPow progress (bitLength=\(n),elapsed=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds)/1000000)ms,average=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds))ns/cycle)")
             }
         }
+        let t1 = DispatchTime.now()
+        logger.debug("modPow total (bitLength=\(n),elapsed=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds)/1000000)ms,average=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds))ns/cycle)")
         return result
     }
     
@@ -432,34 +439,22 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let countP = pProduct.pointee.count
         // Indices for a, b, and product
         var i = 0, j = 0, k = 0
-        // Shortcut : Test if either A or B is zero, set P to zero
+        // Shortcut : Test if either A or B is zero
         if countA == 0 || countB == 0 {
-            while k < countP {
-                pProduct.pointee[k] = 0
-                k += 1
-            }
             return
         }
-        // Shortcut : Test if A is one, copy B into P and zero the remainder
+        // Shortcut : Test if A is one, copy B into P
         if countA == 1, pA.pointee[0] == 1 {
             while k < countB {
                 pProduct.pointee[k] = pB.pointee[k]
                 k += 1
             }
-            while k < countP {
-                pProduct.pointee[k] = 0
-                k += 1
-            }
             return
         }
-        // Shortcut : Test if B is one, copy A into P and zero the remainder
+        // Shortcut : Test if B is one, copy A into P
         if countB == 1, pB.pointee[0] == 1 {
             while k < countA {
                 pProduct.pointee[k] = pA.pointee[k]
-                k += 1
-            }
-            while k < countP {
-                pProduct.pointee[k] = 0
                 k += 1
             }
             return
@@ -482,11 +477,6 @@ public class UIntBig: Equatable, Hashable, Comparable {
             i += 1
         }
         k += 1
-        // Set remaining values in P to zero
-        while k < countP {
-            pProduct.pointee[k] = 0
-            k += 1
-        }
     }
 
     /// Right shift all bits by one bit and insert leading 0 bit

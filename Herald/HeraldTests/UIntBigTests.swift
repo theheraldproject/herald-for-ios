@@ -167,11 +167,11 @@ class UIntBigTests: XCTestCase {
         let n = UIntBig(hex)!
         let a = n.magnitude.map({ UInt32($0) })
         let b = n.magnitude.map({ UInt32($0) })
-        var product = Array<UInt32>(repeating: 0, count: a.count + b.count)
         withUnsafePointer(to: a) { pA in
             withUnsafePointer(to: b) { pB in
-                withUnsafeMutablePointer(to: &product) { pProduct in
-                    for _ in 1...samples {
+                for _ in 1...samples {
+                    var product = Array<UInt32>(repeating: 0, count: a.count + b.count)
+                    withUnsafeMutablePointer(to: &product) { pProduct in
                         let t0 = DispatchTime.now()
                         UIntBig.times(pA, pB, pProduct)
                         let t1 = DispatchTime.now()
