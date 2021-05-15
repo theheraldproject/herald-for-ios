@@ -15,12 +15,11 @@ public protocol BeaconPayloadDataSupplier : PayloadDataSupplier {
 
 /// Beacon payload data supplier.
 public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteBeaconPayloadDataSupplierV1")
     private static let protocolAndVersion : UInt8 = 0x30 // V1 of Beacon protocol
+
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteBeaconPayloadDataSupplierV1")
     private let payloadLength: Int = 9 // default, may be more with extended data area
-    private var commonHeader: Data // 5 bytes
-    private var extendedData: ExtendedData? // 0+ bytes
-    private var fullPayload: Data // 9+ bytes
+    private let fullPayload: Data // 9+ bytes
     
     public init(countryCode: UInt16, stateCode: UInt16, code: UInt32, extendedData: ExtendedData? = nil) {
         // Generate common header
@@ -29,14 +28,12 @@ public class ConcreteBeaconPayloadDataSupplierV1 : BeaconPayloadDataSupplier {
         commonHeader.append(ConcreteBeaconPayloadDataSupplierV1.protocolAndVersion)
         commonHeader.append(countryCode)
         commonHeader.append(stateCode)
-        self.commonHeader = commonHeader
 
         // Generate beacon payload
         // Beacon payload = commonHeader + Beacon Registration Code + Extended Data
         var fullPayload = Data()
         fullPayload.append(commonHeader)
         fullPayload.append(code)
-        self.extendedData = extendedData
         if let extended = extendedData {
             // append to payload
             if extended.hasData() {
