@@ -171,8 +171,6 @@ public class UIntBig: Equatable, Hashable, Comparable {
         let base = UIntBig(self)
         base.mod(modulus)
         let exp = UIntBig(exponent)
-        var n = UInt64(0)
-        let t0 = DispatchTime.now()
         withUnsafePointer(to: modulus.magnitude.map({ UInt32($0) })) { pM in
             while !exp.isZero {
                 if exp.isOdd {
@@ -180,13 +178,8 @@ public class UIntBig: Equatable, Hashable, Comparable {
                 }
                 exp.rightShiftByOne()
                 UIntBig.timesMod(base, base, pM)
-                let t1 = DispatchTime.now()
-                n += 1
-                logger.debug("modPow progress (bitLength=\(n),elapsed=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds)/1000000)ms,average=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds))ns/cycle)")
             }
         }
-        let t1 = DispatchTime.now()
-        logger.debug("modPow total (bitLength=\(n),elapsed=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds)/1000000)ms,average=\((t1.uptimeNanoseconds-t0.uptimeNanoseconds))ns/cycle)")
         return result
     }
     
@@ -436,7 +429,6 @@ public class UIntBig: Equatable, Hashable, Comparable {
     static func times(_ pA: UnsafePointer<[UInt32]>, _ pB: UnsafePointer<[UInt32]>, _ pProduct: UnsafeMutablePointer<[UInt32]>) {
         let countA = pA.pointee.count
         let countB = pB.pointee.count
-        let countP = pProduct.pointee.count
         // Indices for a, b, and product
         var i = 0, j = 0, k = 0
         // Shortcut : Test if either A or B is zero

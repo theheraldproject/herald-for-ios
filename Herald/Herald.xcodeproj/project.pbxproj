@@ -47,6 +47,7 @@
 		B69F189925B84B32001CC891 /* BLEAdvertParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189825B84B32001CC891 /* BLEAdvertParser.swift */; };
 		B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */; };
 		B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */; };
+		B69FC6F626510BE800CE5D4B /* Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69FC6F526510BE800CE5D4B /* Security.swift */; };
 		B6BDCFA1264D2AE5005C42C5 /* UIntBig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */; };
 		B6BDCFA5264D2AF2005C42C5 /* UIntBigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */; };
 		B6BDCFA9264D7252005C42C5 /* RandomSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA8264D7252005C42C5 /* RandomSource.swift */; };
@@ -139,6 +140,7 @@
 		B69F189825B84B32001CC891 /* BLEAdvertParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BLEAdvertParser.swift; path = herald/Sensor/BLE/BLEAdvertParser.swift; sourceTree = SOURCE_ROOT; };
 		B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertParserTests.swift; sourceTree = "<group>"; };
 		B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PseudoDeviceAddressTests.swift; sourceTree = "<group>"; };
+		B69FC6F526510BE800CE5D4B /* Security.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security.swift; sourceTree = "<group>"; };
 		B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIntBig.swift; sourceTree = "<group>"; };
 		B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIntBigTests.swift; sourceTree = "<group>"; };
 		B6BDCFA8264D7252005C42C5 /* RandomSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomSource.swift; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 				B68DAB892580040400F396D7 /* EventTimeIntervalLog.swift */,
 				B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */,
 				D32988E325C34AE20066D9D4 /* PayloadDataFormatter.swift */,
+				B69FC6F526510BE800CE5D4B /* Security.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -571,6 +574,7 @@
 				6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */,
 				B6C483D22630B6680007BFD1 /* SampleList.swift in Sources */,
 				B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */,
+				B69FC6F626510BE800CE5D4B /* Security.swift in Sources */,
 				B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */,
 				6F273A4425862B1A0090B3B5 /* VenueDiary.swift in Sources */,
 				B6C4841F2633444B0007BFD1 /* SmoothedLinearModel.swift in Sources */,

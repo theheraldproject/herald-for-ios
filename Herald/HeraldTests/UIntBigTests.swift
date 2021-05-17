@@ -136,7 +136,6 @@ class UIntBigTests: XCTestCase {
                 }
                 let a = UIntBig(i)
                 let b = UIntBig(j)
-                print("\(i),\(j)")
                 a.times(b)
                 XCTAssertEqual(i*j, a.uint64())
                 j *= 3
@@ -293,7 +292,6 @@ class UIntBigTests: XCTestCase {
                 let a = UIntBig(i)
                 let b = UIntBig(j)
                 a.mod(b)
-                print("\(i),\(j),\(i%j),\(a.uint64())")
                 XCTAssertEqual(i % j, a.uint64())
                 j *= 7
             }
@@ -344,7 +342,6 @@ class UIntBigTests: XCTestCase {
                     let m = b.modPow(UIntBig(j), UIntBig(k))
                     let ex = UInt64(pow(Double(i), Double(j))) % k
                     let ac = m.uint64()
-                    print("\(i),\(j),\(k),\(ex),\(ac)")
                     XCTAssertEqual(ex, ac)
                     k *= 3
                 }
@@ -357,23 +354,18 @@ class UIntBigTests: XCTestCase {
     public func testModPowPerformance() {
         // Cannot use same test range as Android as Swift is much slower
         let samples = UInt64(100)
-        var t1 = UInt64(0)
-        for x in 0...samples {
-            let i = UInt64.random(in: 0...UInt64.max)
-            let j = UInt64.random(in: 0...UInt64.max)
-            let k = UInt64.random(in: 0...UInt64.max)
-            let a1 = UIntBig(i)
-            let b1 = UIntBig(j)
-            let c1 = UIntBig(k)
-            let tS1 = DispatchTime.now()
-            let _ = a1.modPow(b1, c1)
-            let tE1 = DispatchTime.now()
-            t1 += (tE1.uptimeNanoseconds - tS1.uptimeNanoseconds)
-            if x % 10 == 0, x > 0, x < samples {
-                print("sample=\(x),UIntBig=\(t1 / x)ns/call");
-            }
+        var elapsed = UInt64(0)
+        for _ in 0...samples {
+            let a = UIntBig(bitLength: 64)!
+            let b = UIntBig(bitLength: 64)!
+            let c = UIntBig(bitLength: 64)!
+            let t0 = DispatchTime.now()
+            let _ = a.modPow(b, c)
+            let t1 = DispatchTime.now()
+            elapsed += (t1.uptimeNanoseconds - t0.uptimeNanoseconds)
         }
-        print("sample=\(samples),UIntBig=\(t1 / samples)ns/call");
+        let speed = elapsed / samples
+        print("UIntBig.modPow() = \(speed)ns/call")
     }
 
     // MARK: - Hex
@@ -448,7 +440,6 @@ class UIntBigTests: XCTestCase {
                     let d = a.modPow(b, c)
                     var data = Data()
                     data.append(d)
-                    print("\(i),\(j),\(k),\(data.base64EncodedString())")
                     csv.append("\(i),\(j),\(k),\(data.base64EncodedString())\n")
                     k *= 3
                 }
