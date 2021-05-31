@@ -32,4 +32,4 @@ Signed-off-by: Firstname Surname <your@emailaddress.com>
 
 Please do not edit the below. It will notify the maintainers once you submit your PR.
 
-@vmware/herald-maintainers
+@theheraldproject/committers
