@@ -22,11 +22,11 @@ jobs:
     strategy:
       matrix:
         destination: [
-          'platform=iOS Simulator,OS=12.2,name=iPhone X'
-          ,
-          'platform=iOS Simulator,OS=14.6,name=iPhone X'
-          ,
-          'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
+          #'platform=iOS Simulator,OS=12.2,name=iPhone X'
+          #,
+          'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro'
+          #,
+          #'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
         ]
 
     steps:
@@ -34,7 +34,6 @@ jobs:
 
       - name: Build
         run: |
-          cd Herald
-          xcodebuild clean test -project Herald.xcodeproj -scheme Herald -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+          xcodebuild clean test -project Herald-for-iOS.xcodeproj -scheme Herald -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
         env: 
           destination: ${{ matrix.destination }}

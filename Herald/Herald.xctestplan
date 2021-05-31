@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "1279809A-A20D-4E98-A218-7028A578CD01",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Herald.xcodeproj",
+        "identifier" : "B650151A25229D480070F774",
+        "name" : "HeraldTests"
+      }
+    }
+  ],
+  "version" : 1
+}
