@@ -34,7 +34,6 @@ jobs:
 
       - name: Build
         run: |
-          cd Herald
           xcodebuild clean test -project Herald-for-iOS.xcodeproj -scheme Herald -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
         env: 
           destination: ${{ matrix.destination }}
