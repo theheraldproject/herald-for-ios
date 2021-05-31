@@ -97,6 +97,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         } else {
             logger.fault("start, transmitter already enabled to follow bluetooth state")
         }
+        self.peripheral.delegate = self
         startAdvertising()
     }
     
@@ -108,6 +109,10 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             logger.fault("stop, transmitter already disabled")
         }
         stopAdvertising()
+        queue.async {
+            self.peripheral.removeAllServices()
+            self.peripheral.delegate = nil
+        }
     }
     
     private func startAdvertising() {
@@ -167,14 +172,14 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     
     private func stopAdvertising() {
         logger.debug("stopAdvertising()")
+        notifyTimer?.cancel()
+        notifyTimer = nil
         guard peripheral != nil, peripheral.isAdvertising else {
             return
         }
         queue.async {
             self.peripheral.stopAdvertising()
         }
-        notifyTimer?.cancel()
-        notifyTimer = nil
     }
     
     /// All work starts from notify subscribers loop.

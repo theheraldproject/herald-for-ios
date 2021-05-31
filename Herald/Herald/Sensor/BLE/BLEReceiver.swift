@@ -91,6 +91,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         } else {
             logger.fault("start, receiver already enabled to follow bluetooth state")
         }
+        self.central.delegate = self
         scan("start")
     }
     
@@ -110,6 +111,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         scanTimer = nil
         queue.async {
             self.central.stopScan()
+            self.central.delegate = nil
         }
         // Cancel all connections, the resulting didDisconnect and didFailToConnect
         database.devices().forEach() { device in
