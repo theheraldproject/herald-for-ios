@@ -102,6 +102,7 @@
 		6F52D509257C4F750097DD92 /* ExtendedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedData.swift; path = herald/Sensor/Payload/Extended/ExtendedData.swift; sourceTree = SOURCE_ROOT; };
 		6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensionTests.swift; sourceTree = "<group>"; };
 		6FE142FA2565C39A0084A59C /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Device.swift; path = herald/Sensor/Device.swift; sourceTree = SOURCE_ROOT; };
+		6FE32EDC266542A900F22740 /* Herald.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = Herald.xctestplan; path = ../Herald/Herald.xctestplan; sourceTree = "<group>"; };
 		B61B1C97263AE69300FA20B0 /* TextFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileTests.swift; sourceTree = "<group>"; };
 		B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RssiHistogramTests.swift; sourceTree = "<group>"; };
 		B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SelfCalibratedModel.swift; path = herald/Sensor/Analysis/Algorithms/Distance/SelfCalibratedModel.swift; sourceTree = SOURCE_ROOT; };
@@ -209,6 +210,7 @@
 		B637EF46251E55E60072D238 = {
 			isa = PBXGroup;
 			children = (
+				6FE32EDC266542A900F22740 /* Herald.xctestplan */,
 				B637EF52251E55E60072D238 /* Herald */,
 				B650151C25229D480070F774 /* HeraldTests */,
 				B637EF51251E55E60072D238 /* Products */,
