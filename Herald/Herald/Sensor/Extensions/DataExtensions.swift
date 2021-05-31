@@ -242,7 +242,7 @@ public extension Data {
     }
     
     /// Get UIntBig from byte array
-    func uintBig(_ index: Int) -> UIntBig? {
+    func uintBig(_ index: Int) -> (value: UIntBig, start:Int, end:Int)? {
         guard index >= 0 else {
             return nil
         }
@@ -260,7 +260,7 @@ public extension Data {
             i += 1
             j += 2
         }
-        return UIntBig(magnitude)
+        return (UIntBig(magnitude), index, index + 4 + magnitude.count * 2)
     }
     
     func string(_ index: Int, _ encoding: StringLengthEncodingOption = .UINT8) -> (value:String, start:Int, end:Int)? {

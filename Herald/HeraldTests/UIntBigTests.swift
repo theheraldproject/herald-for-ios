@@ -398,12 +398,12 @@ class UIntBigTests: XCTestCase {
     }
 
     public func testRandom() {
-        let random = RandomSource(method: .Test, testValue: 0xFF)
+        let random = TestRandomFunction(0xFF)
         var i = Int(1)
         while i < (Int16.max / 3) {
-            let a = UIntBig(bitLength: i, random: random)
+            let a = UIntBig(bitLength: i, random: random)!
             XCTAssertNotNil(a)
-            XCTAssertEqual(i, a!.bitLength())
+            XCTAssertEqual(i, a.bitLength())
             i *= 3
         }
     }
@@ -416,7 +416,10 @@ class UIntBigTests: XCTestCase {
         while i <= (Int64.max / 7) {
             var data = Data()
             data.append(UIntBig(i))
-            XCTAssertEqual(UIntBig(i), data.uintBig(0))
+            let (value, start, end) = data.uintBig(0)!
+            XCTAssertEqual(UIntBig(i), value)
+            XCTAssertEqual(start, 0)
+            XCTAssertEqual(end, 4 + UIntBig(i).magnitude.count * 2)
             csv.append("\(i),\(data.base64EncodedString())\n")
             i *= 7
         }

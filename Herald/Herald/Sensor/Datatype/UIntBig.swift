@@ -71,17 +71,18 @@ public class UIntBig: Equatable, Hashable, Comparable {
         }
     }
     
-    public convenience init?(bitLength: Int, random: RandomSource = RandomSource()) {
+    public convenience init?(bitLength: Int, random: PseudoRandomFunction = SecureRandomFunction()) {
         self.init(Array<UInt16>(repeating: 0, count: (bitLength + 15) / 16))
-        var bytes: [UInt8] = Array<UInt8>(repeating: 0, count: 2)
-        var value: UInt16
+        var data = Data(repeating: 0, count: magnitude.count * 2)
+        guard random.nextBytes(&data) else {
+            return nil
+        }
         var remaining = bitLength
         var i = 0
         while i < magnitude.count, remaining > 0 {
-            if !random.nextBytes(&bytes) {
+            guard var value = data.uint16(i) else {
                 return nil
             }
-            value = UInt16(bytes[0]) << 8 | UInt16(bytes[1])
             if remaining < 16 {
                 value = value >> (16 - remaining)
             } else {
@@ -91,6 +92,19 @@ public class UIntBig: Equatable, Hashable, Comparable {
             i += 1
         }
     }
+    
+    public convenience init?(_ data: Data, index: Int = 0) {
+        guard let uintBig = data.uintBig(index) else {
+            return nil
+        }
+        self.init(uintBig.value.magnitude)
+    }
+    
+    public var data: Data { get {
+        var data = Data()
+        data.append(self)
+        return data
+    }}
     
     public var hexEncodedString: String { get {
         var data = Data()

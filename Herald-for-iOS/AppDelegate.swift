@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         logger.debug("application:didFinishLaunchingWithOptions")
-        
+        Security.diffieHellmanTest(.modpGroup14)
         return true
     }
     

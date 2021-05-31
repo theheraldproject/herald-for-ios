@@ -387,7 +387,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
@@ -408,7 +408,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5NRR4P5W72;
 				EXCLUDED_SOURCE_FILE_NAMES = "/Resources/*";
 				INFOPLIST_FILE = "$(SRCROOT)/Herald-for-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;

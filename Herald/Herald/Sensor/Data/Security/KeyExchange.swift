@@ -1,5 +1,5 @@
 //
-//  Security.swift
+//  KeyExchange.swift
 //
 //  Copyright 2021 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
@@ -7,28 +7,96 @@
 
 import Foundation
 
-/// Cross-platform security primitives
-public class Security {
-    /// Secure random source for security functions
-    public static var secureRandom = RandomSource(method: .SecureRandom)
+/// Cryptographically secure key exchange
+public protocol KeyExchange {
+
+    /// Generate a random key pair for key exchange with peer
+    func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)?
     
-    // MARK: - Diffie-Hellman Key Agreement
+    /// Generate shared key by combining own private key and peer public key
+    func sharedKey(own: KeyExchangePrivateKey, peer: KeyExchangePublicKey) -> KeyExchangeSharedKey?
+}
+
+public typealias KeyExchangePrivateKey = Data
+public typealias KeyExchangePublicKey = Data
+public typealias KeyExchangeSharedKey = Data
+
+
+/// Diffie-Hellman-Merkle key exchange using NCSC Foundation Profile MODP group 14 (2048-bit) by default
+public class DiffieHellmanMerkle: KeyExchange {
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.Security.DiffieHellmanMerkle")
+    private let random = SecureRandomFunction()
+
+    /// Parameters for Diffie-Hellman key agreement
+    /// NCSC Foundation Profile for TLS requires key exchange using
+    /// DH Group 14 (2048-bit MODP Group) - which is RFC3526 MODP Group 14
+    private let parameters: DiffieHellmanParameters
     
-    /// Generate a random private key
-    public static func diffieHellmanPrivateKey(_ parameters: DiffieHellmanParameters = .modpGroup1) -> UIntBig? {
-        return UIntBig(bitLength: parameters.p.bitLength() - 2, random: Security.secureRandom)
+    public init(_ parameters: DiffieHellmanParameters = .modpGroup14) {
+        self.parameters = parameters
     }
     
-    /// Derive a public key from the given private key
-    public static func diffieHellmanPublicKey(_ privateKey: UIntBig, _ parameters: DiffieHellmanParameters = .modpGroup1) -> UIntBig {
-        return parameters.g.modPow(privateKey, parameters.p)
+    // MARK: - KeyExchange
+    
+    public func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)? {
+        guard let privateKey = UIntBig(bitLength: parameters.p.bitLength() - 2, random: random) else {
+            return nil
+        }
+        let privateKeyData = KeyExchangePrivateKey(privateKey.data)
+        // publicKey = (base ^ exponent) % modulus = (g ^ privateKey) % p
+        let base = parameters.g
+        let exponent = privateKey
+        let modulus = parameters.p
+        let publicKey = base.modPow(exponent, modulus)
+        let publicKeyData = KeyExchangePublicKey(publicKey.data)
+        return (privateKeyData, publicKeyData)
+    }
+    
+    public func sharedKey(own: KeyExchangePrivateKey, peer: KeyExchangePublicKey) -> KeyExchangeSharedKey? {
+        // sharedKey = (base ^ exponent) % modulus = (peerPublicKey ^ ownPrivateKey) % p
+        guard let base = UIntBig(peer),
+              let exponent = UIntBig(own) else {
+            return nil
+        }
+        let modulus = parameters.p
+        let sharedKey = base.modPow(exponent, modulus)
+        let sharedKeyData = KeyExchangeSharedKey(sharedKey.data)
+        return sharedKeyData
+    }
+        
+    // MARK: - Optional in-situ test functions
+    
+    /// Run performance test on phone hardware
+    /// Note : Use release build for performance tests as it is over 40x faster than debug build
+    public func performanceTest(_ samples: UInt64 = 100) {
+        var timeKeyPair = UInt64(0)
+        var timeSharedKey = UInt64(0)
+        var timeRoundtrip = UInt64(0)
+        for _ in 0...samples {
+            // Roundtrip key generation and exchange
+            let t0 = DispatchTime.now().uptimeNanoseconds
+            let (alicePrivateKey, alicePublicKey) = keyPair()!
+            let t1 = DispatchTime.now().uptimeNanoseconds
+            let (bobPrivateKey, bobPublicKey) = keyPair()!
+            let t2 = DispatchTime.now().uptimeNanoseconds
+            let aliceSharedKey = sharedKey(own: alicePrivateKey, peer: bobPublicKey)
+            let t3 = DispatchTime.now().uptimeNanoseconds
+            let bobSharedKey = sharedKey(own: bobPrivateKey, peer: alicePublicKey)
+            let t4 = DispatchTime.now().uptimeNanoseconds
+            guard aliceSharedKey == bobSharedKey else {
+                logger.fault("performanceTest, shared key mismatch")
+                continue
+            }
+            // Update time counters
+            timeKeyPair += (t1-t0)
+            timeKeyPair += (t2-t1)
+            timeSharedKey += (t3-t2)
+            timeSharedKey += (t4-t3)
+            timeRoundtrip += (t4-t0)
+        }
+        logger.debug("performanceTest (samples=\(samples),roundTrip=\(timeRoundtrip / samples)ns,keyPair=\(timeKeyPair / (samples * 2))ns,sharedKey=\(timeSharedKey / (samples * 2))ns)")
     }
 
-    /// Derive a shared key from own private key and peer public key
-    public static func diffieHellmanSharedKey(_ privateKey: UIntBig, _ publicKey: UIntBig, _ parameters: DiffieHellmanParameters = .modpGroup1) -> UIntBig {
-        return publicKey.modPow(privateKey, parameters.p)
-    }
-    
 }
 
 /// Common Diffie-Hellman parameters
@@ -89,6 +157,7 @@ public class DiffieHellmanParameters {
                                         "670C354E 4ABC9804 F1746C08 CA237327 FFFFFFFF FFFFFFFF",
                                     g:  "2")!
     /// RFC3526 MODP Group 14 : 2048-bits : Generator = 2
+    /// Satisfies NCSC Foundation Profile for TLS standard
     public static let modpGroup14 = DiffieHellmanParameters(p:
                                         "FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1" +
                                         "29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD" +
