@@ -166,7 +166,7 @@
 		B692CA8824CADA7500F45AEE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = com.vmware.herald;
+				CLASSPREFIX = io.heraldprox.herald;
 				LastSwiftUpdateCheck = 1160;
 				LastUpgradeCheck = 1160;
 				ORGANIZATIONNAME = "Herald Project Contributors";

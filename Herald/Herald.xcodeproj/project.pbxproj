@@ -490,7 +490,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1200;
-				ORGANIZATIONNAME = com.vmware;
+				ORGANIZATIONNAME = io.heraldprox;
 				TargetAttributes = {
 					B637EF4F251E55E60072D238 = {
 						CreatedOnToolsVersion = 12.0.1;
@@ -824,7 +824,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.HeraldTests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.heraldprox.HeraldTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -843,7 +843,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.vmware.HeraldTests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.heraldprox.HeraldTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
