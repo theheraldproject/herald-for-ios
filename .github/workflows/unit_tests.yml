@@ -22,11 +22,11 @@ jobs:
     strategy:
       matrix:
         destination: [
-          'platform=iOS Simulator,OS=12.2,name=iPhone X'
-          ,
-          'platform=iOS Simulator,OS=14.6,name=iPhone X'
-          ,
-          'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
+          #'platform=iOS Simulator,OS=12.2,name=iPhone X'
+          #,
+          'platform=iOS Simulator,OS=14.6,name=iPhone 11 Pro'
+          #,
+          #'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
         ]
 
     steps:
