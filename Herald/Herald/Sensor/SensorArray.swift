@@ -10,12 +10,14 @@ import UIKit
 
 /// Sensor array for combining multiple detection and tracking methods.
 public class SensorArray : NSObject, Sensor {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
-    private var sensorArray: [Sensor] = []
-    public let payloadData: PayloadData?
     public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
-    private var concreteBle: ConcreteBLESensor?;
-    
+
+    public let payloadData: PayloadData?
+
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
+    private let concreteBle: ConcreteBLESensor
+    private var sensorArray: [Sensor] = []
+
     public init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
         // Mobility sensor enables background BLE advert detection
@@ -27,7 +29,7 @@ public class SensorArray : NSObject, Sensor {
         }
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)
-        sensorArray.append(concreteBle!)
+        sensorArray.append(concreteBle)
         
         // Payload data at initiation time for identifying this device in the logs
         payloadData = payloadDataSupplier.payload(PayloadTimestamp(), device: nil)
@@ -61,11 +63,11 @@ public class SensorArray : NSObject, Sensor {
     }
     
     public func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {
-        return concreteBle!.immediateSend(data: data,targetIdentifier);
+        return concreteBle.immediateSend(data: data,targetIdentifier);
     }
     
     public func immediateSendAll(data: Data) -> Bool {
-        return concreteBle!.immediateSendAll(data: data);
+        return concreteBle.immediateSendAll(data: data);
     }
     
     public func add(delegate: SensorDelegate) {

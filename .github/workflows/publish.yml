@@ -1,0 +1,25 @@
+name: Publish to CocoaPods
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: [macos-latest] 
+    permissions: 
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install cocoapods
+        run: gem install cocoapods
+          
+      - name: Publish to CocoaPods
+        run: |
+          set -eo pipefail
+          pod lib lint --allow-warnings
+          pod trunk push Herald.podspec --allow-warnings
+        env: 
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}

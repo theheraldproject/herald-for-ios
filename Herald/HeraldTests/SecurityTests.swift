@@ -47,25 +47,4 @@ class SecurityTests: XCTestCase {
         
         XCTAssertEqual(message, decryptedMessage)
     }
-//    
-//    public func test_tls() {
-//        Security.diffieHellmanParameters = .random128
-//        let alicePrivateKey = Security.diffieHellmanPrivateKey()!
-//        print("alice private key bits: \(alicePrivateKey.bitLength())")
-//        print("alice private key = \(alicePrivateKey.hexEncodedString)")
-//
-//        let bobPrivateKey = Security.diffieHellmanPrivateKey()!
-//        print("bob private key bits: \(bobPrivateKey.bitLength())")
-//        print("bob private key = \(bobPrivateKey.hexEncodedString)")
-//        let bobPublicKey = Security.diffieHellmanPublicKey(bobPrivateKey)
-//        print("bob public key bits: \(bobPublicKey.bitLength())")
-//        print("bob public key = \(bobPublicKey.hexEncodedString)")
-//        
-//        let data: String = "hello"
-//        let dataPackage = Security.send(privateKey: alicePrivateKey, peerPublicKey: bobPublicKey, message: data.data(using: .utf8)!)!
-//        let message = Security.receive(privateKey: bobPrivateKey, dataPackage: dataPackage)!
-//        let dataOut = String(bytes: message, encoding: .utf8)
-//        XCTAssertEqual(data, dataOut)
-//
-//    }
 }

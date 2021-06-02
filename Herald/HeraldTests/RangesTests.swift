@@ -204,8 +204,8 @@ class RangesTests: XCTestCase {
         let sd = sqrt(variance.reduce()!)
         
 
-        // See second diagram at https://vmware.github.io/herald/bluetooth/distance
-        // i.e. https://vmware.github.io/herald/images/distance-rssi-regression.png
+        // See second diagram at https://heraldprox.io/bluetooth/distance
+        // i.e. https://heraldprox.io/images/distance-rssi-regression.png
         let toDistance = FowlerBasic(intercept: -50, coefficient: -24)
         let distance = sl.filter(afterPoint).filter(valid).filter(strong).filter(InRange(modeValue - 2 * sd, modeValue + 2 * sd)).aggregate([toDistance])
         XCTAssertEqual(distance.get(FowlerBasic.self)!, 5.6235, accuracy: 0.0005)
