@@ -19,9 +19,10 @@ protocol MobilitySensor : Sensor {
  Requires : Info.plist : Privacy - Location Always and When In Use Usage Description
  */
 class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelegate {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteMobilitySensor")
     /// Minimum mobility sensing resolution is 3km as defined by CoreLocation.
     public static let minimumResolution: Distance = Distance(kCLLocationAccuracyThreeKilometers)
+
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "ConcreteMobilitySensor")
     private var delegates: [SensorDelegate] = []
     private let locationManager = CLLocationManager()
     private let rangeForBeacon: UUID?

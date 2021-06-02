@@ -15,8 +15,9 @@ public protocol SimplePayloadDataSupplier : PayloadDataSupplier {
 
 /// Simple payload data supplier.
 public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteSimplePayloadDataSupplier")
     public static let payloadLength: Int = 21
+
+    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Payload.ConcreteSimplePayloadDataSupplier")
     private let commonHeader: Data
     private let matchingKeys: [MatchingKey]
     // Cache contact identifiers for the day
