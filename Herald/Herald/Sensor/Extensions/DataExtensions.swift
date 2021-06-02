@@ -81,13 +81,30 @@ public extension Data {
         append(Data(bytes: &int64, count: MemoryLayout<Int64>.size))
     }
     
+    mutating func append(_ value: UIntBig) {
+        let magnitude = value.magnitude
+        // Magnitude length
+        append(UInt32(magnitude.count))
+        // Magnitude values
+        guard magnitude.count > 0 else {
+            return
+        }
+        for i in 0...magnitude.count - 1 {
+            append(UInt16(magnitude[i]))
+        }
+    }
+    
     @available(iOS 14.0, *)
     mutating func append(_ value: Float16) {
         var input: [Float16] = [value]
         var output: [UInt8] = [0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
-        vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
+        input.withUnsafeMutableBufferPointer { inputBP in
+            var sourceBuffer = vImage_Buffer(data: inputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<Float16>.size)
+            output.withUnsafeMutableBufferPointer { outputBP in
+                var destinationBuffer = vImage_Buffer(data: outputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
+                vImageConvert_Planar16FtoPlanar8(&sourceBuffer, &destinationBuffer, 0)
+            }
+        }
         append(output[0])
         append(output[1])
     }
@@ -95,9 +112,13 @@ public extension Data {
     mutating func append(_ value: Float32) {
         var input: [Float] = [value]
         var output: [UInt8] = [0,0,0,0]
-        var sourceBuffer = vImage_Buffer(data: &input, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
-        var destinationBuffer = vImage_Buffer(data: &output, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
-        vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
+        input.withUnsafeMutableBufferPointer { inputBP in
+            var sourceBuffer = vImage_Buffer(data: inputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
+            output.withUnsafeMutableBufferPointer { outputBP in
+                var destinationBuffer = vImage_Buffer(data: outputBP.baseAddress!, height: 1, width: 1, rowBytes: MemoryLayout<UInt32>.size)
+                vImageConvert_PlanarFtoPlanar8(&sourceBuffer, &destinationBuffer, Float.greatestFiniteMagnitude, Float.leastNonzeroMagnitude, 0)
+            }
+        }
         append(output[0])
         append(output[1])
         append(output[2])
@@ -218,6 +239,28 @@ public extension Data {
             UInt64(bytes[index + 5]) << 40 |
             UInt64(bytes[index + 6]) << 48 |
             UInt64(bytes[index + 7]) << 56
+    }
+    
+    /// Get UIntBig from byte array
+    func uintBig(_ index: Int) -> (value: UIntBig, start:Int, end:Int)? {
+        guard index >= 0 else {
+            return nil
+        }
+        guard let length = uint32(index), length <= Int32.max else {
+            return nil
+        }
+        var magnitude: [UInt16] = Array<UInt16>(repeating: 0, count: Int(truncatingIfNeeded: length))
+        var i = 0
+        var j = index + 4
+        while i < magnitude.count {
+            guard let value = uint16(j) else {
+                return nil
+            }
+            magnitude[i] = value
+            i += 1
+            j += 2
+        }
+        return (UIntBig(magnitude), index, index + 4 + magnitude.count * 2)
     }
     
     func string(_ index: Int, _ encoding: StringLengthEncodingOption = .UINT8) -> (value:String, start:Int, end:Int)? {

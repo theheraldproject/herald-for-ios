@@ -47,6 +47,9 @@
 		B69F189925B84B32001CC891 /* BLEAdvertParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189825B84B32001CC891 /* BLEAdvertParser.swift */; };
 		B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */; };
 		B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */; };
+		B6BDCFA1264D2AE5005C42C5 /* UIntBig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */; };
+		B6BDCFA5264D2AF2005C42C5 /* UIntBigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */; };
+		B6BDCFAD264DDE63005C42C5 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFAC264DDE63005C42C5 /* SecurityTests.swift */; };
 		B6C483C72630B1CD0007BFD1 /* SampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C483C62630B1CD0007BFD1 /* SampleTests.swift */; };
 		B6C483D22630B6680007BFD1 /* SampleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C483D12630B6680007BFD1 /* SampleList.swift */; };
 		B6C483DA26317E600007BFD1 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C483D926317E600007BFD1 /* Filter.swift */; };
@@ -67,6 +70,11 @@
 		B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */; };
 		B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */; };
 		B6EEC24625B5BC4400D1CDF9 /* DataExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEC24525B5BC4400D1CDF9 /* DataExtensions.swift */; };
+		B6F40DBA265814B00088B098 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F40DB9265814B00088B098 /* RingBuffer.swift */; };
+		B6F40DBF26582F8D0088B098 /* KeyExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F40DBE26582F8D0088B098 /* KeyExchange.swift */; };
+		B6F40DC52658FAD40088B098 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F40DC42658FAD40088B098 /* Encryption.swift */; };
+		B6F40DC92658FB090088B098 /* Integrity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F40DC82658FB090088B098 /* Integrity.swift */; };
+		B6F40DCD2658FC5B0088B098 /* PseudoRandomFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F40DCC2658FC5B0088B098 /* PseudoRandomFunction.swift */; };
 		B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745EF255713C2003567B7 /* SocialDistance.swift */; };
 		B6F745F3255713C2003567B7 /* SampleStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* SampleStatistics.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
@@ -136,6 +144,9 @@
 		B69F189825B84B32001CC891 /* BLEAdvertParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BLEAdvertParser.swift; path = herald/Sensor/BLE/BLEAdvertParser.swift; sourceTree = SOURCE_ROOT; };
 		B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertParserTests.swift; sourceTree = "<group>"; };
 		B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PseudoDeviceAddressTests.swift; sourceTree = "<group>"; };
+		B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIntBig.swift; sourceTree = "<group>"; };
+		B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIntBigTests.swift; sourceTree = "<group>"; };
+		B6BDCFAC264DDE63005C42C5 /* SecurityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityTests.swift; sourceTree = "<group>"; };
 		B6C483C62630B1CD0007BFD1 /* SampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleTests.swift; sourceTree = "<group>"; };
 		B6C483D12630B6680007BFD1 /* SampleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SampleList.swift; path = herald/Sensor/Analysis/Sampling/SampleList.swift; sourceTree = SOURCE_ROOT; };
 		B6C483D926317E600007BFD1 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Filter.swift; path = herald/Sensor/Analysis/Sampling/Filter.swift; sourceTree = SOURCE_ROOT; };
@@ -157,6 +168,11 @@
 		B6EEC22C25B44A8800D1CDF9 /* Mobility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Mobility.swift; path = herald/Sensor/Analysis/Mobility.swift; sourceTree = SOURCE_ROOT; };
 		B6EEC23A25B58E0D00D1CDF9 /* EventLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EventLog.swift; path = herald/Sensor/Data/EventLog.swift; sourceTree = SOURCE_ROOT; };
 		B6EEC24525B5BC4400D1CDF9 /* DataExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DataExtensions.swift; path = herald/Sensor/Extensions/DataExtensions.swift; sourceTree = SOURCE_ROOT; };
+		B6F40DB9265814B00088B098 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
+		B6F40DBE26582F8D0088B098 /* KeyExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchange.swift; sourceTree = "<group>"; };
+		B6F40DC42658FAD40088B098 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
+		B6F40DC82658FB090088B098 /* Integrity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrity.swift; sourceTree = "<group>"; };
+		B6F40DCC2658FC5B0088B098 /* PseudoRandomFunction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PseudoRandomFunction.swift; sourceTree = "<group>"; };
 		B6F745EF255713C2003567B7 /* SocialDistance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistance.swift; sourceTree = "<group>"; };
 		B6F745F0255713C2003567B7 /* SampleStatistics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleStatistics.swift; sourceTree = "<group>"; };
 		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
@@ -300,6 +316,7 @@
 		B637EF71251E56320072D238 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				B6F40DBD26582F500088B098 /* Security */,
 				B637EF72251E56320072D238 /* TextFile.swift */,
 				B637EF73251E56320072D238 /* BatteryLog.swift */,
 				B637EF74251E56320072D238 /* DetectionLog.swift */,
@@ -348,6 +365,8 @@
 				B61B1C97263AE69300FA20B0 /* TextFileTests.swift */,
 				B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */,
 				B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */,
+				B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */,
+				B6BDCFAC264DDE63005C42C5 /* SecurityTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -407,6 +426,8 @@
 			isa = PBXGroup;
 			children = (
 				B6C4841A2632D3710007BFD1 /* DoubleValue.swift */,
+				B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */,
+				B6F40DB9265814B00088B098 /* RingBuffer.swift */,
 			);
 			path = Datatype;
 			sourceTree = "<group>";
@@ -418,6 +439,17 @@
 				B6EEC24525B5BC4400D1CDF9 /* DataExtensions.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		B6F40DBD26582F500088B098 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				B6F40DBE26582F8D0088B098 /* KeyExchange.swift */,
+				B6F40DC42658FAD40088B098 /* Encryption.swift */,
+				B6F40DC82658FB090088B098 /* Integrity.swift */,
+				B6F40DCC2658FC5B0088B098 /* PseudoRandomFunction.swift */,
+			);
+			path = Security;
 			sourceTree = "<group>";
 		};
 		B6F745EE255713C2003567B7 /* Analysis */ = {
@@ -548,13 +580,17 @@
 				B6C483EE2631B8D40007BFD1 /* Aggregate.swift in Sources */,
 				B69F189925B84B32001CC891 /* BLEAdvertParser.swift in Sources */,
 				B637EF7D251E56320072D238 /* BLEReceiver.swift in Sources */,
+				B6F40DBA265814B00088B098 /* RingBuffer.swift in Sources */,
+				B6F40DC92658FB090088B098 /* Integrity.swift in Sources */,
 				B637EF7B251E56320072D238 /* BLEUtilities.swift in Sources */,
+				B6F40DCD2658FC5B0088B098 /* PseudoRandomFunction.swift in Sources */,
 				B6C4840B2631F15D0007BFD1 /* VariantSet.swift in Sources */,
 				B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */,
 				B6C483F42631D4520007BFD1 /* FowlerBasic.swift in Sources */,
 				B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */,
 				B61B1CA2263B12FE00FA20B0 /* SelfCalibratedModel.swift in Sources */,
 				B6EEC22D25B44A8800D1CDF9 /* Mobility.swift in Sources */,
+				B6BDCFA1264D2AE5005C42C5 /* UIntBig.swift in Sources */,
 				B6C4840F2632C7660007BFD1 /* AnalysisDelegate.swift in Sources */,
 				B637EF79251E56320072D238 /* BLESensor.swift in Sources */,
 				6F52D4FF257C470B0097DD92 /* BeaconPayloadDataSupplier.swift in Sources */,
@@ -574,6 +610,7 @@
 				B6599D0325A4EB0C00AC306D /* InertiaSensor.swift in Sources */,
 				B6EEC23B25B58E0D00D1CDF9 /* EventLog.swift in Sources */,
 				B637EF8C251E56320072D238 /* ContactLog.swift in Sources */,
+				B6F40DC52658FAD40088B098 /* Encryption.swift in Sources */,
 				B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */,
 				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
@@ -584,6 +621,7 @@
 				B6C483FB2631D7890007BFD1 /* RiskAggregationBasic.swift in Sources */,
 				6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
+				B6F40DBF26582F8D0088B098 /* KeyExchange.swift in Sources */,
 				B637EF80251E56320072D238 /* TestPayloadDataSupplier.swift in Sources */,
 				B6F745F3255713C2003567B7 /* SampleStatistics.swift in Sources */,
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
@@ -604,6 +642,7 @@
 			files = (
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
 				B6C483E626318AED0007BFD1 /* SampleListTests.swift in Sources */,
+				B6BDCFA5264D2AF2005C42C5 /* UIntBigTests.swift in Sources */,
 				B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */,
 				D301023D25B8DD8300598DF4 /* ExtendedDataTests.swift in Sources */,
 				6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */,
@@ -618,6 +657,7 @@
 				B61B1C98263AE69300FA20B0 /* TextFileTests.swift in Sources */,
 				B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */,
 				B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */,
+				B6BDCFAD264DDE63005C42C5 /* SecurityTests.swift in Sources */,
 				B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */,
 				6F273A50258641CA0090B3B5 /* VenueDiaryTests.swift in Sources */,
 				B6C483EA2631A87C0007BFD1 /* RangesTests.swift in Sources */,
