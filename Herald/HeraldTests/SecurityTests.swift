@@ -14,13 +14,13 @@ class SecurityTests: XCTestCase {
     public func testKeyExchange() {
         let keyExchange = DiffieHellmanMerkle(DiffieHellmanParameters.modpGroup1)
 
-        let (alicePrivateKey, alicePublicKey) = keyExchange.keyPair()!
+        let (alicePrivateKey, alicePublicKey) = keyExchange.keyPair()
         print("alice private key bytes: \(alicePrivateKey.count)")
         print("alice private key = \(alicePrivateKey.hexEncodedString)")
         print("alice public key bytes: \(alicePublicKey.count)")
         print("alice public key = \(alicePublicKey.hexEncodedString)")
 
-        let (bobPrivateKey, bobPublicKey) = keyExchange.keyPair()!
+        let (bobPrivateKey, bobPublicKey) = keyExchange.keyPair()
         print("bob private key bytes: \(bobPrivateKey.count)")
         print("bob private key = \(bobPrivateKey.hexEncodedString)")
         print("bob public key bytes: \(bobPublicKey.count)")
@@ -46,5 +46,15 @@ class SecurityTests: XCTestCase {
         let decryptedMessage = String(bytes: decrypted, encoding: .utf8)!
         
         XCTAssertEqual(message, decryptedMessage)
+    }
+    
+    public func testTransportLayerSecurityMessage() throws {
+        let a = TransportLayerSecurityMessage(type: .idPublicKey, id: Int32(Int32.max))
+        let b = TransportLayerSecurityMessage(data: a.data)
+        let c = TransportLayerSecurityMessage(data: Data())
+        XCTAssertEqual(a.type, .idMessage)
+        XCTAssertEqual(a.id, Int32.max)
+        XCTAssertEqual(a.data.count, 5)
+        XCTAssertNil(c)
     }
 }

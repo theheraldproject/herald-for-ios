@@ -20,6 +20,7 @@
 		B61B1C9E263AFACC00FA20B0 /* RssiHistogramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */; };
 		B61B1CA2263B12FE00FA20B0 /* SelfCalibratedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */; };
 		B61B1CA6263B165F00FA20B0 /* SelfCalibratedModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */; };
+		B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */; };
 		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B637EF79251E56320072D238 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5E251E56320072D238 /* BLESensor.swift */; };
 		B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5F251E56320072D238 /* BLEDatabase.swift */; };
@@ -115,6 +116,7 @@
 		B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RssiHistogramTests.swift; sourceTree = "<group>"; };
 		B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SelfCalibratedModel.swift; path = herald/Sensor/Analysis/Algorithms/Distance/SelfCalibratedModel.swift; sourceTree = SOURCE_ROOT; };
 		B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCalibratedModelTests.swift; sourceTree = "<group>"; };
+		B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportLayerSecurity.swift; path = ../../../../../Herald/Herald/Sensor/Data/Security/TransportLayerSecurity.swift; sourceTree = "<group>"; };
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B637EF53251E55E60072D238 /* Herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Herald.h; sourceTree = "<group>"; };
 		B637EF54251E55E60072D238 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -448,6 +450,7 @@
 				B6F40DC42658FAD40088B098 /* Encryption.swift */,
 				B6F40DC82658FB090088B098 /* Integrity.swift */,
 				B6F40DCC2658FC5B0088B098 /* PseudoRandomFunction.swift */,
+				B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */,
 			);
 			path = Security;
 			sourceTree = "<group>";
@@ -600,6 +603,7 @@
 				6F273A4425862B1A0090B3B5 /* VenueDiary.swift in Sources */,
 				B6C4841F2633444B0007BFD1 /* SmoothedLinearModel.swift in Sources */,
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
+				B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */,
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,

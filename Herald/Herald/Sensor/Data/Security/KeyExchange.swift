@@ -11,7 +11,7 @@ import Foundation
 public protocol KeyExchange {
 
     /// Generate a random key pair for key exchange with peer
-    func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)?
+    func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)
     
     /// Generate shared key by combining own private key and peer public key
     func sharedKey(own: KeyExchangePrivateKey, peer: KeyExchangePublicKey) -> KeyExchangeSharedKey?
@@ -38,10 +38,8 @@ public class DiffieHellmanMerkle: KeyExchange {
     
     // MARK: - KeyExchange
     
-    public func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)? {
-        guard let privateKey = UIntBig(bitLength: parameters.p.bitLength() - 2, random: random) else {
-            return nil
-        }
+    public func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey) {
+        let privateKey = UIntBig(bitLength: parameters.p.bitLength() - 2, random: random)
         let privateKeyData = KeyExchangePrivateKey(privateKey.data)
         // publicKey = (base ^ exponent) % modulus = (g ^ privateKey) % p
         let base = parameters.g
@@ -75,9 +73,9 @@ public class DiffieHellmanMerkle: KeyExchange {
         for _ in 0...samples {
             // Roundtrip key generation and exchange
             let t0 = DispatchTime.now().uptimeNanoseconds
-            let (alicePrivateKey, alicePublicKey) = keyPair()!
+            let (alicePrivateKey, alicePublicKey) = keyPair()
             let t1 = DispatchTime.now().uptimeNanoseconds
-            let (bobPrivateKey, bobPublicKey) = keyPair()!
+            let (bobPrivateKey, bobPublicKey) = keyPair()
             let t2 = DispatchTime.now().uptimeNanoseconds
             let aliceSharedKey = sharedKey(own: alicePrivateKey, peer: bobPublicKey)
             let t3 = DispatchTime.now().uptimeNanoseconds
