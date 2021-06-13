@@ -47,14 +47,23 @@ class SecurityTests: XCTestCase {
         
         XCTAssertEqual(message, decryptedMessage)
     }
-    
-    public func testTransportLayerSecurityMessage() throws {
-        let a = TransportLayerSecurityMessage(type: .idPublicKey, id: Int32(Int32.max))
-        let b = TransportLayerSecurityMessage(data: a.data)
-        let c = TransportLayerSecurityMessage(data: Data())
-        XCTAssertEqual(a.type, .idMessage)
-        XCTAssertEqual(a.id, Int32.max)
-        XCTAssertEqual(a.data.count, 5)
-        XCTAssertNil(c)
+
+    public func testTransportLayerSecurity() throws {
+        let keyExchangeParameters: DiffieHellmanParameters = .random128
+        let alice: TransportLayerSecurity = ConcreteTransportLayerSecurity(keyExchangeParameters: keyExchangeParameters)
+        let bob: TransportLayerSecurity = ConcreteTransportLayerSecurity(keyExchangeParameters: keyExchangeParameters)
+        for i in 0...10 {
+            print("testTransportLayerSecurity (count=\(i))")
+            let data = Data(repeating: UInt8(i), count: i)
+            // Alice reads public key from Bob
+            let bobPublicKey = bob.readPublicKey()
+            print("testTransportLayerSecurity (count=\(i),bobPublicKeyCount=\(bobPublicKey.count))")
+            // Alice encrypted data for Bob
+            let aliceEncryptedData = alice.writeEncryptedData(peerPublicKey: bobPublicKey, data: data)!
+            print("testTransportLayerSecurity (count=\(i),aliceEncryptedDataCount=\(aliceEncryptedData.count))")
+            // Bob decrypts data from Alice
+            let bobDecryptedData = bob.receiveEncryptedData(aliceEncryptedData)
+            XCTAssertEqual(data, bobDecryptedData)
+        }
     }
 }
