@@ -62,8 +62,14 @@ class SecurityTests: XCTestCase {
             let aliceEncryptedData = alice.writeEncryptedData(peerPublicKey: bobPublicKey, data: data)!
             print("testTransportLayerSecurity (count=\(i),aliceEncryptedDataCount=\(aliceEncryptedData.count))")
             // Bob decrypts data from Alice
-            let bobDecryptedData = bob.receiveEncryptedData(aliceEncryptedData)
+            let (bobSessionId, bobDecryptedData) = bob.receiveEncryptedData(aliceEncryptedData)!
             XCTAssertEqual(data, bobDecryptedData)
+            // Alice reads encrypted data from Bob
+            let bobEncryptedData = bob.readEncryptedData(sessionId: bobSessionId, data: data)!
+            print("testTransportLayerSecurity (count=\(i),bobEncryptedDataCount=\(bobEncryptedData.count))")
+            // Alice decrypts data from Bob
+            let (_, aliceDecryptedData) = alice.receiveEncryptedData(bobEncryptedData)!
+            XCTAssertEqual(data, aliceDecryptedData)
         }
     }
 }
