@@ -22,7 +22,11 @@ public typealias EncryptionKey = Data
 
 /// AES128 encryption algorithm
 public class AES128: Encryption {
-    private let random = SecureRandomFunction()
+    private let random: PseudoRandomFunction
+    
+    public init(_ random: PseudoRandomFunction = SecureRandomFunction()) {
+        self.random = random
+    }
     
     // MARK: - Encryption
     

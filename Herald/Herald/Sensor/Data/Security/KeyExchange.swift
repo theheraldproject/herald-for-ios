@@ -25,15 +25,16 @@ public typealias KeyExchangeSharedKey = Data
 /// Diffie-Hellman-Merkle key exchange using NCSC Foundation Profile MODP group 14 (2048-bit) by default
 public class DiffieHellmanMerkle: KeyExchange {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.Security.DiffieHellmanMerkle")
-    private let random = SecureRandomFunction()
+    private let random: PseudoRandomFunction
 
     /// Parameters for Diffie-Hellman key agreement
     /// NCSC Foundation Profile for TLS requires key exchange using
     /// DH Group 14 (2048-bit MODP Group) - which is RFC3526 MODP Group 14
     private let parameters: DiffieHellmanParameters
     
-    public init(_ parameters: DiffieHellmanParameters = .modpGroup14) {
+    public init(_ parameters: DiffieHellmanParameters = .modpGroup14, random: PseudoRandomFunction = SecureRandomFunction()) {
         self.parameters = parameters
+        self.random = random
     }
     
     // MARK: - KeyExchange

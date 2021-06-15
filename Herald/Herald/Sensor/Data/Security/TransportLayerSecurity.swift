@@ -59,7 +59,7 @@ public class TransportLayerSecuritySession {
     private let timestamp = Date()
     private var encryptCounter: UInt8 = 0
     public var expired: Bool { get {
-        return encryptCounter > 0 || timestamp.timeIntervalSinceNow < TimeInterval.minute * 5
+        return encryptCounter > 0 || TimeInterval(Date().secondsSinceUnixEpoch - timestamp.secondsSinceUnixEpoch) > (TimeInterval.minute * 5)
     }}
     
     public init(keyExchange: KeyExchange, integrity: Integrity, encryption: Encryption) {
@@ -124,11 +124,12 @@ public class ConcreteTransportLayerSecurity: TransportLayerSecurity {
     private let encodingForEncryptedDataCount: DataLengthEncodingOption = .UINT16
     private let keyExchange: KeyExchange
     private let integrity: Integrity = SHA256()
-    private let encryption: Encryption = AES128()
+    private let encryption: Encryption
     private var sessions: [TransportLayerSecuritySessionID:TransportLayerSecuritySession] = [:]
 
-    init(keyExchangeParameters: DiffieHellmanParameters = .modpGroup14) {
-        self.keyExchange = DiffieHellmanMerkle(keyExchangeParameters)
+    init(keyExchangeParameters: DiffieHellmanParameters = .modpGroup14, random: PseudoRandomFunction = SecureRandomFunction()) {
+        self.keyExchange = DiffieHellmanMerkle(keyExchangeParameters, random: random)
+        self.encryption = AES128(random)
     }
     
     /// Alice reads public key from Bob. This function is called by Bob to create a new session for Alice and provide the public key.
