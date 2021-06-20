@@ -70,13 +70,15 @@ class BloomFilter {
     }
     
     func add(_ data: Data) {
-        let bytes = [UInt8](data)
-        setBit(XXH3.digest64(bytes), true)
-        setBit(XXH3.digest64(bytes.reversed()), true)
+        setBit(digest64(data), true)
+        setBit(digest64(Data(data.reversed())), true)
     }
     
     func contains(_ data: Data) -> Bool {
-        let bytes = [UInt8](data)
-        return getBit(XXH3.digest64(bytes)) && getBit(XXH3.digest64(bytes.reversed()))
+        return getBit(digest64(data)) && getBit(digest64(Data(data.reversed())))
+    }
+    
+    func digest64(_ data: Data) -> UInt64 {
+        return F.h(data).uint64(0)!
     }
 }
