@@ -8,20 +8,15 @@
 import Foundation
 
 /// CSV contact log for post event analysis and visualisation
-public class StatisticsLog: NSObject, SensorDelegate {
-    private let textFile: TextFile
+public class StatisticsLog: SensorDelegateLogger {
     private let payloadData: PayloadData
     private var identifierToPayload: [TargetIdentifier:String] = [:]
     private var payloadToTime: [String:Date] = [:]
     private var payloadToSample: [String:SampleStatistics] = [:]
     
     public init(filename: String, payloadData: PayloadData) {
-        textFile = TextFile(filename: filename)
         self.payloadData = payloadData
-    }
-    
-    private func csv(_ value: String) -> String {
-        return TextFile.csv(value)
+        super.init(filename: filename)
     }
     
     private func add(identifier: TargetIdentifier) {
@@ -62,22 +57,22 @@ public class StatisticsLog: NSObject, SensorDelegate {
             }
             content.append("\(csv(payload)),\(sample.count),\(mean),\(sd),\(min),\(max)\n")
         }
-        textFile.overwrite(content)
+        overwrite(content)
     }
 
 
     // MARK:- SensorDelegate
     
-    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
+    public override func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         identifierToPayload[fromTarget] = didRead.shortName
         add(identifier: fromTarget)
     }
     
-    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
+    public override func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {
         add(identifier: fromTarget)
     }
     
-    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
+    public override func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         didShare.forEach() { payloadData in
             add(payload: payloadData.shortName)
         }

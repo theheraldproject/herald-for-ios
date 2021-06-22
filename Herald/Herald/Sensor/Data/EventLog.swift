@@ -8,42 +8,37 @@
 import Foundation
 
 /// Generic event log with optional data retention enforcement functions
-public class EventLog<T:Event>: NSObject, SensorDelegate {
+public class EventLog<T:Event>: SensorDelegateLogger {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.EventLog")
-    private let textFile: TextFile?
     private let queue: DispatchQueue
     public var events: [T] = []
 
     public override init() {
         queue = DispatchQueue(label: "Sensor.Data.EventLog")
-        textFile = nil
         super.init()
     }
     
-    public init(filename: String) {
-        textFile = TextFile(filename: filename)
+    public override init(filename: String) {
         queue = DispatchQueue(label: "Sensor.Data.EventLog(\(filename))")
-        super.init()
-        if textFile!.empty() {
-            textFile!.write(T.csvHeader)
-        } else if let file = textFile!.url {
-            do {
-                try String(contentsOf: file).split(separator: "\n").forEach { line in
-                    if let event = T(String(line)) {
-                        events.append(event)
-                    }
-                }
-                logger.debug("Loaded historic events (count=\(events.count))")
-            } catch {
-                logger.fault("Failed to read event log")
+        super.init(filename: filename)
+        contentsOf().split(separator: "\n").forEach { line in
+            if let event = T(String(line)) {
+                events.append(event)
             }
+        }
+        logger.debug("Loaded historic events (count=\(events.count))")
+    }
+    
+    private func writerHeader() {
+        if empty() {
+            write(T.csvHeader)
         }
     }
     
     public func append(_ event: T) {
         logger.debug("append(\(event.csvString))")
         queue.sync {
-            textFile?.write(event.csvString)
+            write(event.csvString)
             events.append(event)
         }
     }
@@ -73,7 +68,7 @@ public class EventLog<T:Event>: NSObject, SensorDelegate {
                 content.append(event.csvString)
                 content.append("\n")
             }
-            textFile?.overwrite(content)
+            overwrite(content)
             events = subdata
         }
     }
@@ -107,17 +102,6 @@ public class EventLog<T:Event>: NSObject, SensorDelegate {
         }
         return result
     }
-    
-    // MARK:- SensorDelegate
-    
-    public func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {}
-    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {}
-    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
-    public func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {}
-    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier) {}
-    public func sensor(_ sensor: SensorType, didVisit: Location?) {}
-    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {}
-    public func sensor(_ sensor: SensorType, didUpdateState: SensorState) {}
 }
 
 /// Event for logging

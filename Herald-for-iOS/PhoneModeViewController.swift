@@ -8,7 +8,7 @@
 import UIKit
 import Herald
 
-class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, VenueDiaryDelegate {
+class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, VenueDiaryDelegate, Resettable {
     
     private let logger = Log(subsystem: "Herald", category: "ViewController")
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -20,6 +20,7 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     // UI header
     @IBOutlet weak var labelDevice: UILabel!
     @IBOutlet weak var labelPayload: UILabel!
+    @IBOutlet weak var switchSensorOnOff: UISwitch!
     
     // MARK:- Events
     private var didDetect = 0
@@ -90,7 +91,28 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
     
     @IBOutlet weak var buttonCrash: UIButton!
     
+    // MARK:- Resettable
     
+    func reset() {
+        didDetect = 0
+        didRead = 0
+        didMeasure = 0
+        didShare = 0
+        didReceive = 0
+        
+        targetIdentifiers.removeAll()
+        payloads.removeAll()
+        targets.removeAll()
+        
+        socialMixingScore.reset()
+        smoothedLinearModel.reset()
+        
+        DispatchQueue.main.async {
+            self.updateCounts()
+            self.updateTargets()
+            self.updateSocialDistance(self.socialMixingScoreUnit)
+        }
+    }
     
     // MARK:- UIViewController
     
@@ -104,7 +126,6 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         sensor.add(delegate: self)
         sensor.add(delegate: socialMixingScore)
         sensor.add(delegate: mobility)
-        
         
         // Added diary logger
         if nil == venueDiary {
@@ -136,6 +157,9 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         analysisProviderManager.add(SmoothedLinearModelAnalyser(interval: 1, smoothingWindow: 60, model: smoothedLinearModel))
         analysisDelegateManager.add(analysisDelegate)
         analysisRunner = AnalysisRunner(analysisProviderManager, analysisDelegateManager, defaultListSize: 1200)
+        
+        // Enable remote reset of user interface component in automated tests
+        appDelegate.automatedTestClient?.add(self)
     }
 
     @objc func willEnterForeground() {
@@ -427,6 +451,15 @@ class PhoneModeViewController: UIViewController, SensorDelegate, UITableViewData
         DispatchQueue.main.async {
             self.labelDidReceiveCount.text = "\(self.didReceive)"
             self.updateTargets()
+        }
+    }
+    
+    func sensor(_ sensor: SensorType, didUpdateState: SensorState) {
+        guard sensor == .ARRAY else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.switchSensorOnOff.isOn = didUpdateState == .on
         }
     }
     

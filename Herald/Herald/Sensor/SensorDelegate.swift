@@ -66,6 +66,8 @@ public enum SensorType : String {
     case ACCELEROMETER
     /// Other - Incase of an extension between minor versions of Herald
     case OTHER
+    /// Sensor array consisting of multiple sensors
+    case ARRAY
 }
 
 /// Sensor state

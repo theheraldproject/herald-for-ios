@@ -25,7 +25,7 @@ public enum SensorLoggerLevel: String {
     case off, debug, info, fault
 }
 
-public class ConcreteSensorLogger: NSObject, SensorLogger {
+public class ConcreteSensorLogger: NSObject, SensorLogger, Resettable {
     private let subsystem: String
     private let category: String
     private let dateFormatter = DateFormatter()
@@ -98,4 +98,9 @@ public class ConcreteSensorLogger: NSObject, SensorLogger {
         log(.fault, message)
     }
     
+    // MARK: - Resettable
+    
+    public func reset() {
+        ConcreteSensorLogger.logFile.reset()
+    }
 }
