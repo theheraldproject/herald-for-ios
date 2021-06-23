@@ -79,7 +79,6 @@
 		B6F745F3255713C2003567B7 /* SampleStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* SampleStatistics.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
 		B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */; };
-		B6F745FE25571475003567B7 /* XXH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FB25571475003567B7 /* XXH3.swift */; };
 		B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FC25571475003567B7 /* BloomFilter.swift */; };
 		B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */; };
 		B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74605255714C2003567B7 /* SocialDistanceTests.swift */; };
@@ -177,7 +176,6 @@
 		B6F745F0255713C2003567B7 /* SampleStatistics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleStatistics.swift; sourceTree = "<group>"; };
 		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
 		B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataMatcher.swift; sourceTree = "<group>"; };
-		B6F745FB25571475003567B7 /* XXH3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XXH3.swift; sourceTree = "<group>"; };
 		B6F745FC25571475003567B7 /* BloomFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilter.swift; sourceTree = "<group>"; };
 		B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcher.swift; sourceTree = "<group>"; };
 		B6F74605255714C2003567B7 /* SocialDistanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistanceTests.swift; sourceTree = "<group>"; };
@@ -337,7 +335,6 @@
 				B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */,
 				B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */,
 				B6F745FC25571475003567B7 /* BloomFilter.swift */,
-				B6F745FB25571475003567B7 /* XXH3.swift */,
 			);
 			path = Simple;
 			sourceTree = "<group>";
@@ -617,7 +614,6 @@
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				6FE142FB2565C39A0084A59C /* Device.swift in Sources */,
 				B6C484012631DC570007BFD1 /* ListManager.swift in Sources */,
-				B6F745FE25571475003567B7 /* XXH3.swift in Sources */,
 				B6C483FB2631D7890007BFD1 /* RiskAggregationBasic.swift in Sources */,
 				6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
