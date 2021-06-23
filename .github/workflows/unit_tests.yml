@@ -1,0 +1,39 @@
+name: Unit Tests
+
+# READ THIS BEFORE MODIFYING: https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+# And this: https://nathandavison.com/blog/github-actions-and-the-threat-of-malicious-pull-requests
+
+# WARNING ONLY EVER USE A GITHUB_TOKEN THAT HAS **ONLY** READ_REPO ACCESS
+# (Because we invoke the local gradlew command for reproducibility)
+
+# read-only repo token
+# no access to secrets
+on:
+  pull_request:
+    branches:
+      - develop # PRs from external developers or project team
+      - master  # PRs for triggering a release. Both old (master) and new (main) branch names
+      - main
+
+jobs:
+  unit_tests:
+    name: Swift Build and Test for ${{ matrix.destination }}
+    runs-on: [macos-latest]
+    strategy:
+      matrix:
+        destination: [
+          #'platform=iOS Simulator,OS=12.2,name=iPhone X'
+          #,
+          'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro'
+          #,
+          #'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
+        ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          xcodebuild clean test -project Herald-for-iOS.xcodeproj -scheme Herald -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+        env: 
+          destination: ${{ matrix.destination }}
