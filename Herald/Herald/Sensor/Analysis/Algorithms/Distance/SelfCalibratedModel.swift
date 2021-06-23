@@ -27,6 +27,7 @@ public class SelfCalibratedModel: SmoothedLinearModel {
     private let maxRssiPercentile: Double
     private let anchorRssiPercentile: Double
     public let histogram: RssiHistogram
+    private let textFile: TextFile?
     private var maxRssi: Double = -10
     private var lastSampleTime: Date = Date(timeIntervalSince1970: 0)
 
@@ -36,7 +37,13 @@ public class SelfCalibratedModel: SmoothedLinearModel {
         self.maxRssiPercentile = (TimeInterval.day - withinMin) / TimeInterval.day
         self.anchorRssiPercentile = (TimeInterval.day - withinMean) / TimeInterval.day
         self.histogram = RssiHistogram(min: -99, max: -10, updatePeriod: TimeInterval.minute * 10, textFile: textFile)
+        self.textFile = textFile
         super.init()
+    }
+    
+    public override func reset() {
+        super.reset()
+        textFile?.reset()
     }
 
     public func update() {

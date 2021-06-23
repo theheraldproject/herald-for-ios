@@ -237,10 +237,10 @@ class K {
 }
 
 /// Elementary functions
-private class F {
+internal class F {
     
     /// Cryptographic hash function : SHA256
-    fileprivate static func h(_ data: Data) -> Data {
+    internal static func h(_ data: Data) -> Data {
         var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         data.withUnsafeBytes({ _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &hash) })
         return Data(hash)

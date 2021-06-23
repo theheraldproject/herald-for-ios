@@ -9,9 +9,8 @@ import Foundation
 import UIKit
 
 /// CSV contact log for post event analysis and visualisation
-public class DetectionLog: NSObject, SensorDelegate {
+public class DetectionLog: SensorDelegateLogger {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.DetectionLog")
-    private let textFile: TextFile
     private let payloadData: PayloadData
     private let deviceName = UIDevice.current.name
     private let deviceOS = UIDevice.current.systemVersion
@@ -20,17 +19,12 @@ public class DetectionLog: NSObject, SensorDelegate {
     private let payloadDataFormatter: PayloadDataFormatter
 
     public init(filename: String, payloadData: PayloadData, payloadDataFormatter: PayloadDataFormatter = ConcretePayloadDataFormatter()) {
-        textFile = TextFile(filename: filename)
         self.payloadData = payloadData
         self.payloadDataFormatter = payloadDataFormatter
-        super.init()
+        super.init(filename: filename)
         write()
     }
     
-    private func csv(_ value: String) -> String {
-        return TextFile.csv(value)
-    }
-
     private func write() {
         var content = "\(csv(deviceName)),iOS,\(csv(deviceOS)),\(csv(payloadDataFormatter.shortFormat(payloadData)))"
         var payloadList: [String] = []
@@ -47,12 +41,19 @@ public class DetectionLog: NSObject, SensorDelegate {
         }
         logger.debug("write (content=\(content))")
         content.append("\n")
-        textFile.overwrite(content)
+        overwrite(content)
     }
     
     // MARK:- SensorDelegate
     
-    public func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
+    public override func sensor(_ sensor: SensorType, didUpdateState: SensorState) {
+        queue.async {
+            self.logger.debug("didUpdateState (state=\(didUpdateState)")
+            self.write()
+        }
+    }
+    
+    public override func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {
         queue.async {
             if self.payloads.insert(self.payloadDataFormatter.shortFormat(didRead)).inserted {
                 self.logger.debug("didRead (payload=\(self.payloadDataFormatter.shortFormat(didRead)))")
@@ -61,7 +62,7 @@ public class DetectionLog: NSObject, SensorDelegate {
         }
     }
     
-    public func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
+    public override func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {
         didShare.forEach() { payloadData in
             queue.async {
                 if self.payloads.insert(self.payloadDataFormatter.shortFormat(payloadData)).inserted {

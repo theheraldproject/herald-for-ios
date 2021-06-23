@@ -21,6 +21,8 @@
 		B61B1CA2263B12FE00FA20B0 /* SelfCalibratedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */; };
 		B61B1CA6263B165F00FA20B0 /* SelfCalibratedModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */; };
 		B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */; };
+		B62983CF2682296E00C88B9D /* Resettable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62983CE2682296E00C88B9D /* Resettable.swift */; };
+		B62983D3268229FE00C88B9D /* SensorDelegateLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */; };
 		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B637EF79251E56320072D238 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5E251E56320072D238 /* BLESensor.swift */; };
 		B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5F251E56320072D238 /* BLEDatabase.swift */; };
@@ -83,7 +85,6 @@
 		B6F745F3255713C2003567B7 /* SampleStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F0255713C2003567B7 /* SampleStatistics.swift */; };
 		B6F745F4255713C2003567B7 /* Interactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F1255713C2003567B7 /* Interactions.swift */; };
 		B6F745F82557145E003567B7 /* PayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */; };
-		B6F745FE25571475003567B7 /* XXH3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FB25571475003567B7 /* XXH3.swift */; };
 		B6F745FF25571475003567B7 /* BloomFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FC25571475003567B7 /* BloomFilter.swift */; };
 		B6F7460025571475003567B7 /* SimplePayloadDataMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */; };
 		B6F74609255714C2003567B7 /* SocialDistanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74605255714C2003567B7 /* SocialDistanceTests.swift */; };
@@ -120,6 +121,8 @@
 		B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SelfCalibratedModel.swift; path = herald/Sensor/Analysis/Algorithms/Distance/SelfCalibratedModel.swift; sourceTree = SOURCE_ROOT; };
 		B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCalibratedModelTests.swift; sourceTree = "<group>"; };
 		B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportLayerSecurity.swift; path = ../../../../../Herald/Herald/Sensor/Data/Security/TransportLayerSecurity.swift; sourceTree = "<group>"; };
+		B62983CE2682296E00C88B9D /* Resettable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Resettable.swift; path = ../../../../Herald/Herald/Sensor/Data/Resettable.swift; sourceTree = "<group>"; };
+		B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SensorDelegateLogger.swift; path = ../../../../Herald/Herald/Sensor/Data/SensorDelegateLogger.swift; sourceTree = "<group>"; };
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B637EF53251E55E60072D238 /* Herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Herald.h; sourceTree = "<group>"; };
 		B637EF54251E55E60072D238 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -185,7 +188,6 @@
 		B6F745F0255713C2003567B7 /* SampleStatistics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleStatistics.swift; sourceTree = "<group>"; };
 		B6F745F1255713C2003567B7 /* Interactions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactions.swift; sourceTree = "<group>"; };
 		B6F745F72557145E003567B7 /* PayloadDataMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PayloadDataMatcher.swift; sourceTree = "<group>"; };
-		B6F745FB25571475003567B7 /* XXH3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XXH3.swift; sourceTree = "<group>"; };
 		B6F745FC25571475003567B7 /* BloomFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilter.swift; sourceTree = "<group>"; };
 		B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcher.swift; sourceTree = "<group>"; };
 		B6F74605255714C2003567B7 /* SocialDistanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialDistanceTests.swift; sourceTree = "<group>"; };
@@ -326,6 +328,8 @@
 			children = (
 				B6F40DBD26582F500088B098 /* Security */,
 				B637EF72251E56320072D238 /* TextFile.swift */,
+				B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */,
+				B62983CE2682296E00C88B9D /* Resettable.swift */,
 				B637EF73251E56320072D238 /* BatteryLog.swift */,
 				B637EF74251E56320072D238 /* DetectionLog.swift */,
 				B637EF75251E56320072D238 /* SensorLogger.swift */,
@@ -345,7 +349,6 @@
 				B650151325229D060070F774 /* SimplePayloadDataSupplier.swift */,
 				B6F745FD25571475003567B7 /* SimplePayloadDataMatcher.swift */,
 				B6F745FC25571475003567B7 /* BloomFilter.swift */,
-				B6F745FB25571475003567B7 /* XXH3.swift */,
 			);
 			path = Simple;
 			sourceTree = "<group>";
@@ -614,6 +617,7 @@
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
 				B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */,
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
+				B62983D3268229FE00C88B9D /* SensorDelegateLogger.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
 				B650151425229D060070F774 /* SimplePayloadDataSupplier.swift in Sources */,
 				D32988E425C34AE20066D9D4 /* PayloadDataFormatter.swift in Sources */,
@@ -630,7 +634,6 @@
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				6FE142FB2565C39A0084A59C /* Device.swift in Sources */,
 				B6C484012631DC570007BFD1 /* ListManager.swift in Sources */,
-				B6F745FE25571475003567B7 /* XXH3.swift in Sources */,
 				B6C483FB2631D7890007BFD1 /* RiskAggregationBasic.swift in Sources */,
 				6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */,
 				B637EF8B251E56320072D238 /* SensorLogger.swift in Sources */,
@@ -640,6 +643,7 @@
 				B637EF7F251E56320072D238 /* Sensor.swift in Sources */,
 				B6F745F2255713C2003567B7 /* SocialDistance.swift in Sources */,
 				B6C483DA26317E600007BFD1 /* Filter.swift in Sources */,
+				B62983CF2682296E00C88B9D /* Resettable.swift in Sources */,
 				B637EF88251E56320072D238 /* TextFile.swift in Sources */,
 				B68DAB8A2580040400F396D7 /* EventTimeIntervalLog.swift in Sources */,
 				B6C4841B2632D3710007BFD1 /* DoubleValue.swift in Sources */,
