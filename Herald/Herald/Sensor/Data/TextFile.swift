@@ -7,9 +7,9 @@
 
 import Foundation
 
-public class TextFile {
+public class TextFile: Resettable {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.TextFile")
-    let url: URL?
+    public let url: URL?
     private let queue: DispatchQueue
     
     public init(filename: String) {
@@ -17,6 +17,32 @@ public class TextFile {
         .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         .appendingPathComponent(filename)
         queue = DispatchQueue(label: "Sensor.Data.TextFile(\(filename))")
+    }
+    
+    public func reset() {
+        overwrite("")
+    }
+    
+    public static func removeAll() -> Bool {
+        let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.TextFile")
+        guard let url = try? FileManager.default
+                .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
+            return true
+        }
+        guard let files = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
+            return true
+        }
+        var success = true
+        for file in files {
+            do {
+                try FileManager.default.removeItem(at: file)
+                logger.debug("Remove file successful (folder=\(url),file=\(file.lastPathComponent))");
+            } catch {
+                logger.fault("Remove file failed (folder=\(url),file=\(file.lastPathComponent))");
+                success = false
+            }
+        }
+        return success
     }
     
     /// Get contents of file

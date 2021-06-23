@@ -451,7 +451,7 @@
                                     <action selector="showVenueDiary:" destination="BYZ-38-t0r" eventType="touchUpInside" id="6Lm-aM-QBe"/>
                                 </connections>
                             </button>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NDT-aw-Yt1" userLabel="sensorOnOffSwitch">
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="NDT-aw-Yt1" userLabel="sensorOnOffSwitch">
                                 <rect key="frame" x="345" y="64" width="51" height="31"/>
                                 <connections>
                                     <action selector="sensorOnOffSwitchAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="U0A-rs-B0f"/>
@@ -530,6 +530,7 @@
                         <outlet property="labelSocialMixingScore09" destination="3s5-0h-FGs" id="irB-i6-07a"/>
                         <outlet property="labelSocialMixingScore10" destination="Pbe-8M-Mb4" id="QvJ-KF-eqo"/>
                         <outlet property="labelSocialMixingScore11" destination="he4-5I-bHb" id="ldI-PR-HVX"/>
+                        <outlet property="switchSensorOnOff" destination="NDT-aw-Yt1" id="9lA-3S-EpU"/>
                         <outlet property="tableViewTargets" destination="mT0-iS-Edp" id="Vdj-oY-qC3"/>
                         <outlet property="textMessageToSend" destination="sap-g3-GwH" id="CZo-kQ-6Uy"/>
                     </connections>

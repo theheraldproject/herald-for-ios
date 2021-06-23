@@ -11,12 +11,12 @@ import UIKit
 /// Sensor array for combining multiple detection and tracking methods.
 public class SensorArray : NSObject, Sensor {
     public static let deviceDescription = "\(UIDevice.current.name) (iOS \(UIDevice.current.systemVersion))"
-
     public let payloadData: PayloadData?
-
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "SensorArray")
     private let concreteBle: ConcreteBLESensor
     private var sensorArray: [Sensor] = []
+    private let delegateQueue = DispatchQueue(label: "Sensor.SensorArray.DelegateQueue")
+    private var delegates: [SensorDelegate] = []
 
     public init(_ payloadDataSupplier: PayloadDataSupplier) {
         logger.debug("init")
@@ -71,16 +71,19 @@ public class SensorArray : NSObject, Sensor {
     }
     
     public func add(delegate: SensorDelegate) {
+        delegates.append(delegate)
         sensorArray.forEach { $0.add(delegate: delegate) }
     }
     
     public func start() {
         logger.debug("start")
         sensorArray.forEach { $0.start() }
+        delegates.forEach { $0.sensor(.ARRAY, didUpdateState: .on)}
     }
     
     public func stop() {
         logger.debug("stop")
         sensorArray.forEach { $0.stop() }
+        delegates.forEach { $0.sensor(.ARRAY, didUpdateState: .off)}
     }
 }
