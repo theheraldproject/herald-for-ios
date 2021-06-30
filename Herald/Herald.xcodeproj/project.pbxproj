@@ -20,6 +20,7 @@
 		B61B1C9E263AFACC00FA20B0 /* RssiHistogramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */; };
 		B61B1CA2263B12FE00FA20B0 /* SelfCalibratedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */; };
 		B61B1CA6263B165F00FA20B0 /* SelfCalibratedModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */; };
+		B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */; };
 		B62983CF2682296E00C88B9D /* Resettable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62983CE2682296E00C88B9D /* Resettable.swift */; };
 		B62983D3268229FE00C88B9D /* SensorDelegateLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */; };
 		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -49,9 +50,12 @@
 		B69F189925B84B32001CC891 /* BLEAdvertParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189825B84B32001CC891 /* BLEAdvertParser.swift */; };
 		B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */; };
 		B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */; };
+		B6B62B092677B4BD009B97BC /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B62B082677B4BD009B97BC /* KeyExchangeTests.swift */; };
+		B6B62B0D2677BA32009B97BC /* EncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B62B0C2677BA32009B97BC /* EncryptionTests.swift */; };
+		B6B62B112677BDBF009B97BC /* IntegrityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B62B102677BDBF009B97BC /* IntegrityTests.swift */; };
+		B6B62B152678B7C3009B97BC /* TransportLayerSecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B62B142678B7C3009B97BC /* TransportLayerSecurityTests.swift */; };
 		B6BDCFA1264D2AE5005C42C5 /* UIntBig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */; };
 		B6BDCFA5264D2AF2005C42C5 /* UIntBigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */; };
-		B6BDCFAD264DDE63005C42C5 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDCFAC264DDE63005C42C5 /* SecurityTests.swift */; };
 		B6C483C72630B1CD0007BFD1 /* SampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C483C62630B1CD0007BFD1 /* SampleTests.swift */; };
 		B6C483D22630B6680007BFD1 /* SampleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C483D12630B6680007BFD1 /* SampleList.swift */; };
 		B6C483DA26317E600007BFD1 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C483D926317E600007BFD1 /* Filter.swift */; };
@@ -116,6 +120,7 @@
 		B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RssiHistogramTests.swift; sourceTree = "<group>"; };
 		B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SelfCalibratedModel.swift; path = herald/Sensor/Analysis/Algorithms/Distance/SelfCalibratedModel.swift; sourceTree = SOURCE_ROOT; };
 		B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCalibratedModelTests.swift; sourceTree = "<group>"; };
+		B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportLayerSecurity.swift; path = ../../../../../Herald/Herald/Sensor/Data/Security/TransportLayerSecurity.swift; sourceTree = "<group>"; };
 		B62983CE2682296E00C88B9D /* Resettable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Resettable.swift; path = ../../../../Herald/Herald/Sensor/Data/Resettable.swift; sourceTree = "<group>"; };
 		B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SensorDelegateLogger.swift; path = ../../../../Herald/Herald/Sensor/Data/SensorDelegateLogger.swift; sourceTree = "<group>"; };
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,9 +152,12 @@
 		B69F189825B84B32001CC891 /* BLEAdvertParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BLEAdvertParser.swift; path = herald/Sensor/BLE/BLEAdvertParser.swift; sourceTree = SOURCE_ROOT; };
 		B69F189C25B8A6AB001CC891 /* BLEAdvertParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertParserTests.swift; sourceTree = "<group>"; };
 		B69FA4C225C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PseudoDeviceAddressTests.swift; sourceTree = "<group>"; };
+		B6B62B082677B4BD009B97BC /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KeyExchangeTests.swift; path = ../../Herald/HeraldTests/KeyExchangeTests.swift; sourceTree = "<group>"; };
+		B6B62B0C2677BA32009B97BC /* EncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EncryptionTests.swift; path = ../../Herald/HeraldTests/EncryptionTests.swift; sourceTree = "<group>"; };
+		B6B62B102677BDBF009B97BC /* IntegrityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IntegrityTests.swift; path = ../../Herald/HeraldTests/IntegrityTests.swift; sourceTree = "<group>"; };
+		B6B62B142678B7C3009B97BC /* TransportLayerSecurityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportLayerSecurityTests.swift; path = ../../Herald/HeraldTests/TransportLayerSecurityTests.swift; sourceTree = "<group>"; };
 		B6BDCFA0264D2AE5005C42C5 /* UIntBig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIntBig.swift; sourceTree = "<group>"; };
 		B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIntBigTests.swift; sourceTree = "<group>"; };
-		B6BDCFAC264DDE63005C42C5 /* SecurityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityTests.swift; sourceTree = "<group>"; };
 		B6C483C62630B1CD0007BFD1 /* SampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleTests.swift; sourceTree = "<group>"; };
 		B6C483D12630B6680007BFD1 /* SampleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SampleList.swift; path = herald/Sensor/Analysis/Sampling/SampleList.swift; sourceTree = SOURCE_ROOT; };
 		B6C483D926317E600007BFD1 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Filter.swift; path = herald/Sensor/Analysis/Sampling/Filter.swift; sourceTree = SOURCE_ROOT; };
@@ -369,7 +377,10 @@
 				B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */,
 				B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */,
 				B6BDCFA4264D2AF2005C42C5 /* UIntBigTests.swift */,
-				B6BDCFAC264DDE63005C42C5 /* SecurityTests.swift */,
+				B6B62B082677B4BD009B97BC /* KeyExchangeTests.swift */,
+				B6B62B0C2677BA32009B97BC /* EncryptionTests.swift */,
+				B6B62B102677BDBF009B97BC /* IntegrityTests.swift */,
+				B6B62B142678B7C3009B97BC /* TransportLayerSecurityTests.swift */,
 			);
 			path = HeraldTests;
 			sourceTree = "<group>";
@@ -451,6 +462,7 @@
 				B6F40DC42658FAD40088B098 /* Encryption.swift */,
 				B6F40DC82658FB090088B098 /* Integrity.swift */,
 				B6F40DCC2658FC5B0088B098 /* PseudoRandomFunction.swift */,
+				B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */,
 			);
 			path = Security;
 			sourceTree = "<group>";
@@ -603,6 +615,7 @@
 				6F273A4425862B1A0090B3B5 /* VenueDiary.swift in Sources */,
 				B6C4841F2633444B0007BFD1 /* SmoothedLinearModel.swift in Sources */,
 				B637EF8A251E56320072D238 /* DetectionLog.swift in Sources */,
+				B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */,
 				B6F745F4255713C2003567B7 /* Interactions.swift in Sources */,
 				B62983D3268229FE00C88B9D /* SensorDelegateLogger.swift in Sources */,
 				B637EF89251E56320072D238 /* BatteryLog.swift in Sources */,
@@ -644,6 +657,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6B62B0D2677BA32009B97BC /* EncryptionTests.swift in Sources */,
+				B6B62B112677BDBF009B97BC /* IntegrityTests.swift in Sources */,
+				B6B62B092677B4BD009B97BC /* KeyExchangeTests.swift in Sources */,
 				B650152925229D760070F774 /* SimplePayloadDataSupplierTests.swift in Sources */,
 				B6C483E626318AED0007BFD1 /* SampleListTests.swift in Sources */,
 				B6BDCFA5264D2AF2005C42C5 /* UIntBigTests.swift in Sources */,
@@ -653,6 +669,7 @@
 				B61B1CA6263B165F00FA20B0 /* SelfCalibratedModelTests.swift in Sources */,
 				B6C484072631EFA90007BFD1 /* AnalysisRunnerTests.swift in Sources */,
 				B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */,
+				B6B62B152678B7C3009B97BC /* TransportLayerSecurityTests.swift in Sources */,
 				6FBC6F2025867508001A86CE /* DataExtensionTests.swift in Sources */,
 				B6C483C72630B1CD0007BFD1 /* SampleTests.swift in Sources */,
 				6F273A4C258631AF0090B3B5 /* VenueDiaryEventTests.swift in Sources */,
@@ -661,7 +678,6 @@
 				B61B1C98263AE69300FA20B0 /* TextFileTests.swift in Sources */,
 				B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */,
 				B69F189D25B8A6AB001CC891 /* BLEAdvertParserTests.swift in Sources */,
-				B6BDCFAD264DDE63005C42C5 /* SecurityTests.swift in Sources */,
 				B69FA4C325C2FD3B005E1E00 /* PseudoDeviceAddressTests.swift in Sources */,
 				6F273A50258641CA0090B3B5 /* VenueDiaryTests.swift in Sources */,
 				B6C483EA2631A87C0007BFD1 /* RangesTests.swift in Sources */,

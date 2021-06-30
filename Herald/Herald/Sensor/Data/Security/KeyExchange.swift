@@ -11,7 +11,7 @@ import Foundation
 public protocol KeyExchange {
 
     /// Generate a random key pair for key exchange with peer
-    func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)?
+    func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)
     
     /// Generate shared key by combining own private key and peer public key
     func sharedKey(own: KeyExchangePrivateKey, peer: KeyExchangePublicKey) -> KeyExchangeSharedKey?
@@ -25,23 +25,22 @@ public typealias KeyExchangeSharedKey = Data
 /// Diffie-Hellman-Merkle key exchange using NCSC Foundation Profile MODP group 14 (2048-bit) by default
 public class DiffieHellmanMerkle: KeyExchange {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.Security.DiffieHellmanMerkle")
-    private let random = SecureRandomFunction()
+    private let random: PseudoRandomFunction
 
     /// Parameters for Diffie-Hellman key agreement
     /// NCSC Foundation Profile for TLS requires key exchange using
     /// DH Group 14 (2048-bit MODP Group) - which is RFC3526 MODP Group 14
     private let parameters: DiffieHellmanParameters
     
-    public init(_ parameters: DiffieHellmanParameters = .modpGroup14) {
+    public init(_ parameters: DiffieHellmanParameters = .modpGroup14, random: PseudoRandomFunction = SecureRandomFunction()) {
         self.parameters = parameters
+        self.random = random
     }
     
     // MARK: - KeyExchange
     
-    public func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey)? {
-        guard let privateKey = UIntBig(bitLength: parameters.p.bitLength() - 2, random: random) else {
-            return nil
-        }
+    public func keyPair() -> (KeyExchangePrivateKey, KeyExchangePublicKey) {
+        let privateKey = UIntBig(bitLength: parameters.p.bitLength() - 2, random: random)
         let privateKeyData = KeyExchangePrivateKey(privateKey.data)
         // publicKey = (base ^ exponent) % modulus = (g ^ privateKey) % p
         let base = parameters.g
@@ -75,9 +74,9 @@ public class DiffieHellmanMerkle: KeyExchange {
         for _ in 0...samples {
             // Roundtrip key generation and exchange
             let t0 = DispatchTime.now().uptimeNanoseconds
-            let (alicePrivateKey, alicePublicKey) = keyPair()!
+            let (alicePrivateKey, alicePublicKey) = keyPair()
             let t1 = DispatchTime.now().uptimeNanoseconds
-            let (bobPrivateKey, bobPublicKey) = keyPair()!
+            let (bobPrivateKey, bobPublicKey) = keyPair()
             let t2 = DispatchTime.now().uptimeNanoseconds
             let aliceSharedKey = sharedKey(own: alicePrivateKey, peer: bobPublicKey)
             let t3 = DispatchTime.now().uptimeNanoseconds

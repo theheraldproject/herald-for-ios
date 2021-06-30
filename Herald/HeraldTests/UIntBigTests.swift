@@ -356,9 +356,9 @@ class UIntBigTests: XCTestCase {
         let samples = UInt64(100)
         var elapsed = UInt64(0)
         for _ in 0...samples {
-            let a = UIntBig(bitLength: 64)!
-            let b = UIntBig(bitLength: 64)!
-            let c = UIntBig(bitLength: 64)!
+            let a = UIntBig(bitLength: 64)
+            let b = UIntBig(bitLength: 64)
+            let c = UIntBig(bitLength: 64)
             let t0 = DispatchTime.now()
             let _ = a.modPow(b, c)
             let t1 = DispatchTime.now()
@@ -401,7 +401,7 @@ class UIntBigTests: XCTestCase {
         let random = TestRandomFunction(0xFF)
         var i = Int(1)
         while i < (Int16.max / 3) {
-            let a = UIntBig(bitLength: i, random: random)!
+            let a = UIntBig(bitLength: i, random: random)
             XCTAssertNotNil(a)
             XCTAssertEqual(i, a.bitLength())
             i *= 3

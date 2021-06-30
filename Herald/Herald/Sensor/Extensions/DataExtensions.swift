@@ -124,40 +124,45 @@ public extension Data {
         append(output[2])
         append(output[3])
     }
-
+    
+    /// Encode data block, inserting length as prefix using UInt8,...,64. Returns true if successful, false otherwise.
+    mutating func append(_ value: Data, _ encoding: DataLengthEncodingOption) -> Bool {
+        switch (encoding) {
+        case .UINT8:
+            guard value.count <= UInt8.max else {
+                return false
+            }
+            append(UInt8(value.count))
+            break
+        case .UINT16:
+            guard value.count <= UInt16.max else {
+                return false
+            }
+            append(UInt16(value.count))
+            break
+        case .UINT32:
+            guard value.count <= UInt32.max else {
+                return false
+            }
+            append(UInt32(value.count))
+            break
+        case .UINT64:
+            guard value.count <= UInt64.max else {
+                return false
+            }
+            append(UInt64(value.count))
+            break
+        }
+        append(value)
+        return true
+    }
+    
     /// Encode string as data, inserting length as prefix using UInt8,...,64. Returns true if successful, false otherwise.
-    mutating func append(_ value: String, _ encoding: StringLengthEncodingOption = .UINT8) -> Bool {
+    mutating func append(_ value: String, _ encoding: DataLengthEncodingOption = .UINT8) -> Bool {
         guard let data = value.data(using: .utf8) else {
             return false
         }
-        switch (encoding) {
-        case .UINT8:
-            guard data.count <= UInt8.max else {
-                return false
-            }
-            append(UInt8(data.count))
-            break
-        case .UINT16:
-            guard data.count <= UInt16.max else {
-                return false
-            }
-            append(UInt16(data.count))
-            break
-        case .UINT32:
-            guard data.count <= UInt32.max else {
-                return false
-            }
-            append(UInt32(data.count))
-            break
-        case .UINT64:
-            guard data.count <= UInt64.max else {
-                return false
-            }
-            append(UInt64(data.count))
-            break
-        }
-        append(data)
-        return true
+        return append(data, encoding)
     }
 
     /// MARK:- Conversion from data to intrinsic types
@@ -263,7 +268,8 @@ public extension Data {
         return (UIntBig(magnitude), index, index + 4 + magnitude.count * 2)
     }
     
-    func string(_ index: Int, _ encoding: StringLengthEncodingOption = .UINT8) -> (value:String, start:Int, end:Int)? {
+    /// Get Data from byte array
+    func data(_ index: Int, _ encoding: DataLengthEncodingOption = .UINT8) -> (value:Data, start:Int, end:Int)? {
         var start = index
         var end = index
         switch (encoding) {
@@ -299,15 +305,27 @@ public extension Data {
         guard start != index, self.count >= start, self.count >= end else {
             return nil
         }
-        guard let string = String(bytes: subdata(in: start..<end), encoding: .utf8) else {
+        let data = subdata(in: start..<end)
+        guard data.count == (end - start) else {
+            return nil
+        }
+        return (data, start, end)
+    }
+    
+    /// Get String from byte array
+    func string(_ index: Int, _ encoding: DataLengthEncodingOption = .UINT8) -> (value:String, start:Int, end:Int)? {
+        guard let (value, start, end) = data(index, encoding) else {
+            return nil
+        }
+        guard let string = String(bytes: value, encoding: .utf8) else {
             return nil
         }
         return (string, start, end)
     }
 }
 
-/// Encoding option for string length data as prefix
-public enum StringLengthEncodingOption {
+/// Encoding option for length data as prefix
+public enum DataLengthEncodingOption {
     case UINT8, UINT16, UINT32, UINT64
 }
 
