@@ -68,17 +68,11 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
             
     /// Generate contact identifier for time
     private func contactIdentifier(_ time: Date) -> ContactIdentifier? {
-        // Generate matching key for the day
-        let day = K.day(time)
-        guard let matchingKey = matchingKey(time) else {
-            logger.fault("Contact identifier out of range, failed to generate matching key (time=\(time),day=\(day)))")
-            return nil
-        }
-        
         // Generate contact key and contact identifier
+        let day = K.day(time)
         let period = K.period(time)
         if self.period != period {
-            guard let matchingKey = self.matchingKey, let contactKeySeed = K.contactKeySeed(matchingKey, forPeriod: period) else {
+            guard let matchingKey = matchingKey(time), let contactKeySeed = K.contactKeySeed(matchingKey, forPeriod: period) else {
                 logger.fault("Contact identifier out of range, failed to generate contact key seed (time=\(time),day=\(day)))")
                 return nil
             }
