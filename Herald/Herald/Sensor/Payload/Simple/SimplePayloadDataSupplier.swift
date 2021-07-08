@@ -51,28 +51,28 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     /// Generate matching key for day
     public func matchingKey(_ time: Date) -> MatchingKey? {
         let day = K.day(time)
-        if self.day != day || self.matchingKey == nil {
-            // Generate matching key
-            guard let matchingKeySeed = K.matchingKeySeed(secretKey, onDay: day) else {
-                logger.fault("Failed to generate matching key seed (time=\(time),day=\(day)))")
-                return nil
-            }
-            self.matchingKey = K.matchingKey(matchingKeySeed)
-            self.day = day
-            // Reset contact key on matching key change
-            self.contactKey = nil
-            self.period = nil
+        guard let matchingKeySeed = K.matchingKeySeed(secretKey, onDay: day) else {
+            logger.fault("Failed to generate matching key seed (time=\(time),day=\(day)))")
+            return nil
         }
-        return self.matchingKey
+        return K.matchingKey(matchingKeySeed)
     }
             
     /// Generate contact identifier for time
     private func contactIdentifier(_ time: Date) -> ContactIdentifier? {
         // Generate contact key and contact identifier
         let day = K.day(time)
+        if self.day != day || self.matchingKey == nil {
+            self.matchingKey = matchingKey(time)
+            self.day = day
+            // Reset contact key on matching key change
+            self.contactKey = nil
+            self.period = nil
+        }
+        
         let period = K.period(time)
         if self.period != period {
-            guard let matchingKey = matchingKey(time), let contactKeySeed = K.contactKeySeed(matchingKey, forPeriod: period) else {
+            guard let matchingKey = self.matchingKey, let contactKeySeed = K.contactKeySeed(matchingKey, forPeriod: period) else {
                 logger.fault("Contact identifier out of range, failed to generate contact key seed (time=\(time),day=\(day)))")
                 return nil
             }
