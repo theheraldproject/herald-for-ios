@@ -22,7 +22,10 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
     private let secretKey: SecretKey
     // Cache contact identifiers for the day
     private var day: Int?
-    private var contactIdentifiers: [ContactIdentifier]?
+    private var matchingKey: MatchingKey?
+    private var period: Int?
+    private var contactKey: ContactKey?
+    private var contactIdentifier: ContactIdentifier?
     
     public init(protocolAndVersion: UInt8, countryCode: UInt16, stateCode: UInt16, secretKey: SecretKey) {
         // Generate common header
@@ -45,49 +48,52 @@ public class ConcreteSimplePayloadDataSupplier : SimplePayloadDataSupplier {
         return SecretKey(secretKey)
     }
     
-    /// Get matching key for a day
+    /// Generate matching key for day
     public func matchingKey(_ time: Date) -> MatchingKey? {
         let day = K.day(time)
-        guard let matchingKeySeed = K.matchingKeySeed(secretKey, onDay: day) else {
-            logger.fault("Matching key seed out of day range (time=\(time),day=\(day)))")
-            return nil
+        if self.day != day || self.matchingKey == nil {
+            // Generate matching key
+            guard let matchingKeySeed = K.matchingKeySeed(secretKey, onDay: day) else {
+                logger.fault("Failed to generate matching key seed (time=\(time),day=\(day)))")
+                return nil
+            }
+            self.matchingKey = K.matchingKey(matchingKeySeed)
+            self.day = day
+            // Reset contact key on matching key change
+            self.contactKey = nil
+            self.period = nil
         }
-        return K.matchingKey(matchingKeySeed)
+        return self.matchingKey
     }
-        
+            
     /// Generate contact identifier for time
     private func contactIdentifier(_ time: Date) -> ContactIdentifier? {
+        // Generate matching key for the day
         let day = K.day(time)
+        guard let matchingKey = matchingKey(time) else {
+            logger.fault("Contact identifier out of range, failed to generate matching key (time=\(time),day=\(day)))")
+            return nil
+        }
+        
+        // Generate contact key and contact identifier
         let period = K.period(time)
-        
-        guard let matchingKeyOnDay = matchingKey(time) else {
-            logger.fault("Contact identifier out of day range (time=\(time),day=\(day)))")
-            return nil
-        }
-        
-        // Generate and cache contact keys for specific day on-demand
-        if self.day != day {
-            contactIdentifiers = K.contactKeys(matchingKeyOnDay).map({ K.contactIdentifier($0) })
-            self.day = day
-        }
-        
-        guard let contactIdentifiers = contactIdentifiers else {
-            logger.fault("Contact identifiers unavailable (time=\(time),day=\(day)))")
-            return nil
-        }
-        
-        guard period >= 0, period < contactIdentifiers.count else {
-            logger.fault("Contact identifier out of period range (time=\(time),period=\(period)))")
-            return nil
+        if self.period != period {
+            guard let matchingKey = self.matchingKey, let contactKeySeed = K.contactKeySeed(matchingKey, forPeriod: period) else {
+                logger.fault("Contact identifier out of range, failed to generate contact key seed (time=\(time),day=\(day)))")
+                return nil
+            }
+            self.contactKey = K.contactKey(contactKeySeed)
+            self.period = period
+            self.contactIdentifier = K.contactIdentifier(self.contactKey!)
         }
         
         // Defensive check
-        guard contactIdentifiers[period].count == 16 else {
-            logger.fault("Contact identifier not 16 bytes (time=\(time),count=\(contactIdentifiers[period].count))")
+        guard let contactIdentifier = self.contactIdentifier, contactIdentifier.count == 16 else {
+            logger.fault("Contact identifier out of range (time=\(time),day=\(day)))")
             return nil
         }
         
-        return contactIdentifiers[period]
+        return contactIdentifier
     }
     
     // MARK:- SimplePayloadDataSupplier
@@ -222,41 +228,23 @@ class K {
         return contactKeySeed
     }
     
+    static func forEachContactIdentifier(_ deriveFrom: MatchingKey, _ action: (ContactIdentifier, _ period: Int) -> Void) {
+        var contactKeySeed = F.h(deriveFrom)
+        var contactKeySeedPeriod = K.periods
+        action(contactIdentifier(contactKey(contactKeySeed)), contactKeySeedPeriod)
+        // Work backwards from period 240 to derive seeds for period 239, 238, until
+        // reaching the required period
+        while contactKeySeedPeriod >= 0 {
+            contactKeySeed = ContactKeySeed(F.h(F.t(contactKeySeed)))
+            contactKeySeedPeriod -= 1
+            action(contactIdentifier(contactKey(contactKeySeed)), contactKeySeedPeriod)
+        }
+    }
+    
     static func contactKey(_ deriveFrom: ContactKeySeed) -> ContactKey {
         // Contact key at period N is derived from contact key seed at period N and period N-1
         let contactKeySeedMinusOne = ContactKeySeed(F.h(F.t(deriveFrom)))
         let contactKey = ContactKey(F.h(F.xor(deriveFrom, contactKeySeedMinusOne)))
-        return contactKey
-
-    }
-
-    /// Generate contact keys K_{c}^{0...periods}
-    static func contactKeys(_ matchingKey: MatchingKey) -> [ContactKey] {
-        let n = K.periods
-
-        /**
-         Forward secured contact key seeds are generated by a reversed hash chain with truncation, to ensure future keys cannot be derived from historic keys. This is identical to the procedure for generating the matching key seeds. The seeds are never transmitted from the phone. They are cryptographically challenging to reveal from the broadcasted contact keys, while easy to generate given the matching key, or secret key.
-         */
-        var contactKeySeed: [ContactKeySeed] = Array(repeating: ContactKeySeed(), count: n + 1)
-        /**
-         The last contact key seed on day i at period 240 (last 6 minutes of the day) is the hash of the matching key for day i.
-         */
-        contactKeySeed[n] = F.h(matchingKey)
-        for j in (0...n - 1).reversed() {
-            contactKeySeed[j] = ContactKeySeed(F.h(F.t(contactKeySeed[j + 1])))
-        }
-        /**
-         Contact key for day i at period j is the hash of the contact key seed for day i at period j xor j - 1. A separation of contact key from its seed is necessary because the contact key is distributed to other phones as evidence for encounters on day i within period j. Given a seed is used to derive the seeds for other periods on the same day, transmitting the hash prevents an attacker from establishing the other seeds on day i.
-         */
-        var contactKey: [ContactKey] = Array(repeating: ContactKey(), count: n + 1)
-        for j in 1...n {
-            contactKey[j] = ContactKey(F.h(F.xor(contactKeySeed[j], contactKeySeed[j - 1])))
-        }
-        /**
-         Contact key on day 0 is derived from contact key seed at period 0 and period -1. Implemented as special case for clarity in above code.
-         */
-        let contactKeySeedMinusOne = ContactKeySeed(F.h(F.t(contactKeySeed[0])))
-        contactKey[0] = ContactKey(F.h(F.xor(contactKeySeed[0], contactKeySeedMinusOne)))
         return contactKey
     }
 
