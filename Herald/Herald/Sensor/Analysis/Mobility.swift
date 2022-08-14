@@ -48,7 +48,7 @@ public class MobilityEvent: Event {
     }}
     
     /// Create encounter instance from source data
-    init(_ distance: Distance, timestamp: Date = Date()) {
+    public init(_ distance: Distance, timestamp: Date = Date()) {
         self.timestamp = timestamp
         self.distance = distance
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 public class FowlerBasic: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     private let mode: Mode = Mode()
     private let intercept: Double

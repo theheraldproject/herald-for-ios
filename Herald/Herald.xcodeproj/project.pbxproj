@@ -15,14 +15,15 @@
 		6F52D505257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */; };
 		6F52D50A257C4F750097DD92 /* ExtendedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F52D509257C4F750097DD92 /* ExtendedData.swift */; };
 		6FBC6F2025867508001A86CE /* DataExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */; };
+		6FE013D028A91C9F00D9545F /* PublicAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE013CF28A91C9F00D9545F /* PublicAPITests.swift */; };
 		6FE142FB2565C39A0084A59C /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE142FA2565C39A0084A59C /* Device.swift */; };
 		B61B1C98263AE69300FA20B0 /* TextFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1C97263AE69300FA20B0 /* TextFileTests.swift */; };
 		B61B1C9E263AFACC00FA20B0 /* RssiHistogramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */; };
 		B61B1CA2263B12FE00FA20B0 /* SelfCalibratedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */; };
 		B61B1CA6263B165F00FA20B0 /* SelfCalibratedModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */; };
-		B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */; };
 		B62983CF2682296E00C88B9D /* Resettable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62983CE2682296E00C88B9D /* Resettable.swift */; };
 		B62983D3268229FE00C88B9D /* SensorDelegateLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */; };
+		B630C45E266FFADE002C316B /* TransportLayerSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */; };
 		B637EF55251E55E60072D238 /* Herald.h in Headers */ = {isa = PBXBuildFile; fileRef = B637EF53251E55E60072D238 /* Herald.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B637EF79251E56320072D238 /* BLESensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5E251E56320072D238 /* BLESensor.swift */; };
 		B637EF7A251E56320072D238 /* BLEDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637EF5F251E56320072D238 /* BLEDatabase.swift */; };
@@ -114,15 +115,16 @@
 		6F52D504257C47820097DD92 /* BeaconPayloadDataSupplierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconPayloadDataSupplierTests.swift; sourceTree = "<group>"; };
 		6F52D509257C4F750097DD92 /* ExtendedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedData.swift; path = herald/Sensor/Payload/Extended/ExtendedData.swift; sourceTree = SOURCE_ROOT; };
 		6FBC6F1F25867508001A86CE /* DataExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensionTests.swift; sourceTree = "<group>"; };
+		6FE013CF28A91C9F00D9545F /* PublicAPITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PublicAPITests.swift; path = ../../Herald/HeraldTests/PublicAPITests.swift; sourceTree = "<group>"; };
 		6FE142FA2565C39A0084A59C /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Device.swift; path = herald/Sensor/Device.swift; sourceTree = SOURCE_ROOT; };
 		6FE32EDC266542A900F22740 /* Herald.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = Herald.xctestplan; path = ../Herald/Herald.xctestplan; sourceTree = "<group>"; };
 		B61B1C97263AE69300FA20B0 /* TextFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileTests.swift; sourceTree = "<group>"; };
 		B61B1C9D263AFACC00FA20B0 /* RssiHistogramTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RssiHistogramTests.swift; sourceTree = "<group>"; };
 		B61B1CA1263B12FE00FA20B0 /* SelfCalibratedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SelfCalibratedModel.swift; path = herald/Sensor/Analysis/Algorithms/Distance/SelfCalibratedModel.swift; sourceTree = SOURCE_ROOT; };
 		B61B1CA5263B165F00FA20B0 /* SelfCalibratedModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCalibratedModelTests.swift; sourceTree = "<group>"; };
-		B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportLayerSecurity.swift; path = ../../../../../Herald/Herald/Sensor/Data/Security/TransportLayerSecurity.swift; sourceTree = "<group>"; };
 		B62983CE2682296E00C88B9D /* Resettable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Resettable.swift; path = ../../../../Herald/Herald/Sensor/Data/Resettable.swift; sourceTree = "<group>"; };
 		B62983D2268229FE00C88B9D /* SensorDelegateLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SensorDelegateLogger.swift; path = ../../../../Herald/Herald/Sensor/Data/SensorDelegateLogger.swift; sourceTree = "<group>"; };
+		B630C45D266FFADE002C316B /* TransportLayerSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TransportLayerSecurity.swift; path = ../../../../../Herald/Herald/Sensor/Data/Security/TransportLayerSecurity.swift; sourceTree = "<group>"; };
 		B637EF50251E55E60072D238 /* Herald.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Herald.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B637EF53251E55E60072D238 /* Herald.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Herald.h; sourceTree = "<group>"; };
 		B637EF54251E55E60072D238 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -356,6 +358,7 @@
 		B650151C25229D480070F774 /* HeraldTests */ = {
 			isa = PBXGroup;
 			children = (
+				6FE013CF28A91C9F00D9545F /* PublicAPITests.swift */,
 				B6D8A56E25229F33000E6CC2 /* Info.plist */,
 				B650152825229D760070F774 /* SimplePayloadDataSupplierTests.swift */,
 				B6F74607255714C2003567B7 /* BloomFilterTests.swift */,
@@ -674,6 +677,7 @@
 				B6C483C72630B1CD0007BFD1 /* SampleTests.swift in Sources */,
 				6F273A4C258631AF0090B3B5 /* VenueDiaryEventTests.swift in Sources */,
 				B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */,
+				6FE013D028A91C9F00D9545F /* PublicAPITests.swift in Sources */,
 				B61B1C9E263AFACC00FA20B0 /* RssiHistogramTests.swift in Sources */,
 				B61B1C98263AE69300FA20B0 /* TextFileTests.swift in Sources */,
 				B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */,

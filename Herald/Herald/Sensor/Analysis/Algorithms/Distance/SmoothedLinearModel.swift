@@ -42,7 +42,7 @@ import Foundation
 ///   avoids being skewed by the 0 - 20cm range, and offer simplicity for fitting the data
 ///   range of interest (1 - 8m).
 public class SmoothedLinearModel: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     private let median: Median = Median()
     public var intercept: Double
