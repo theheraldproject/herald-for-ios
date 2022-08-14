@@ -178,10 +178,10 @@ public class Interactions: SensorDelegateLogger {
 
 /// Encounter record describing proximity with target at a moment in time
 public class Encounter {
-    let timestamp: Date
-    let proximity: Proximity
-    let payload: PayloadData
-    var csvString: String { get {
+    public let timestamp: Date
+    public let proximity: Proximity
+    public let payload: PayloadData
+    public var csvString: String { get {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let f0 = dateFormatter.string(from: timestamp)
@@ -194,14 +194,14 @@ public class Encounter {
     }}
     
     /// Create encounter instance from source data
-    init?(_ didMeasure: Proximity, _ withPayload: PayloadData, timestamp: Date = Date()) {
+    public init?(_ didMeasure: Proximity, _ withPayload: PayloadData, timestamp: Date = Date()) {
         self.timestamp = timestamp
         self.proximity = didMeasure
         self.payload = withPayload
     }
 
     /// Create encounter instance from log entry
-    init?(_ row: String) {
+    public init?(_ row: String) {
         let fields = row.split(separator: ",")
         guard fields.count >= 6 else {
             return nil

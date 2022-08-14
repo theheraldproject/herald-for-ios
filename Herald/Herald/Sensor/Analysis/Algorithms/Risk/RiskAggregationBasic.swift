@@ -11,7 +11,7 @@ import Foundation
 /// Similar in function to the Oxford Risk Model, but without its calibration values and scaling.
 /// NOT FOR PRODUCTION EPIDEMIOLOGICAL USE - SAMPLE ONLY!!!
 public class RiskAggregationBasic: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var timeScale: Double
     private var distanceScale: Double
