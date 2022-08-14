@@ -12,8 +12,7 @@ on:
   pull_request:
     branches:
       - develop # PRs from external developers or project team
-      - master  # PRs for triggering a release. Both old (master) and new (main) branch names
-      - main
+      - main    # PRs for triggering a release
 
 jobs:
   unit_tests:
@@ -24,7 +23,7 @@ jobs:
         destination: [
           #'platform=iOS Simulator,OS=12.2,name=iPhone X'
           #,
-          'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro'
+          'platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro'
           #,
           #'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
         ]
