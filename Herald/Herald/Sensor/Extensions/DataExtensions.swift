@@ -236,14 +236,15 @@ public extension Data {
         guard index < (bytes.count - 7) else {
             return nil
         }
-        return UInt64(bytes[index]) |
-            UInt64(bytes[index + 1]) << 8 |
-            UInt64(bytes[index + 2]) << 16 |
-            UInt64(bytes[index + 3]) << 24 |
-            UInt64(bytes[index + 4]) << 32 |
-            UInt64(bytes[index + 5]) << 40 |
-            UInt64(bytes[index + 6]) << 48 |
-            UInt64(bytes[index + 7]) << 56
+        let b1 = UInt64(bytes[index]) |
+                    UInt64(bytes[index + 1]) << 8 |
+                    UInt64(bytes[index + 2]) << 16 |
+                    UInt64(bytes[index + 3]) << 24 |
+                    UInt64(bytes[index + 4]) << 32
+        let b2 = UInt64(bytes[index + 5]) << 40 |
+                    UInt64(bytes[index + 6]) << 48 |
+                    UInt64(bytes[index + 7]) << 56
+        return b1 | b2
     }
     
     /// Get UIntBig from byte array
