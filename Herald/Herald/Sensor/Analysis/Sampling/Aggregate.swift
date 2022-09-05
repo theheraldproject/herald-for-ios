@@ -7,20 +7,23 @@
 
 import Foundation
 
-public class Aggregate {
-    public var runs: Int { get { 0 }}
+open class Aggregate {
+    public init() {
+    }
     
-    public func beginRun(thisRun: Int) {
+    open var runs: Int { get { 0 }}
+    
+    open func beginRun(thisRun: Int) {
     }
 
-    public func map(value : Sample) {
+    open func map(value : Sample) {
     }
 
-    public func reduce() -> Double? {
+    open func reduce() -> Double? {
         return nil
     }
 
-    public func reset() {
+    open func reset() {
     }
 }
 
