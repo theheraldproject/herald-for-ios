@@ -12,6 +12,9 @@ public protocol SensorDelegate {
     /// Detection of a target with an ephemeral identifier, e.g. BLE central detecting a BLE peripheral.
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier)
     
+    /// Indicates whether a device has dropped out of being accessible (E.g. removed from BLEDatabase)
+    func sensor(_ sensor: SensorType, available: Bool, didDeleteOrDetect: TargetIdentifier)
+    
     /// Read payload data from target, e.g. encrypted device identifier from BLE peripheral after successful connection.
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier)
     
@@ -37,6 +40,7 @@ public protocol SensorDelegate {
 /// Sensor delegate functions are all optional.
 public extension SensorDelegate {
     func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {}
+    func sensor(_ sensor: SensorType, available: Bool, didDeleteOrDetect: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didRead: PayloadData, fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didShare: [PayloadData], fromTarget: TargetIdentifier) {}
     func sensor(_ sensor: SensorType, didReceive: Data, fromTarget: TargetIdentifier) {}

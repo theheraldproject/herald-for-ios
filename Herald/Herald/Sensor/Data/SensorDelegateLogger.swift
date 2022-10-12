@@ -80,6 +80,9 @@ public class SensorDelegateLogger: SensorDelegate, Resettable {
     public func sensor(_ sensor: SensorType, didDetect: TargetIdentifier) {
     }
     
+    public func sensor(_ sensor: SensorType, available: Bool, didDeleteOrDetect: TargetIdentifier) {
+    }
+    
     public func sensor(_ sensor: SensorType, didUpdateState: SensorState) {
     }
     
