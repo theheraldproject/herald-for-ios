@@ -100,7 +100,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
             #if DEBUG
             var sensorDelegateLoggers: [SensorDelegateLogger] = []
             sensorDelegateLoggers.append(ContactLog(filename: "contacts.csv"))
-            sensorDelegateLoggers.append(StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
+            // Removed to align with removal in Android for bug https://github.com/theheraldproject/herald-for-android/issues/239
+            // sensorDelegateLoggers.append(StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
             sensorDelegateLoggers.append(DetectionLog(filename: "detection.csv", payloadData: payloadData))
             sensorDelegateLoggers.append(BatteryLog(filename: "battery.csv"))
             if (BLESensorConfiguration.payloadDataUpdateTimeInterval != .never ||
@@ -109,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
             }
             for sensorDelegateLogger in sensorDelegateLoggers {
                 sensor?.add(delegate: sensorDelegateLogger)
-                automatedTestClient?.add(sensorDelegateLogger)
+                automatedTestClient?.add(sensorDelegateLogger)r
             }
             #endif
         }

@@ -263,6 +263,10 @@ public class BLEDevice : Device {
     var lastDiscoveredAt: Date = Date.distantPast
     /// Track Herald initiated connection attempts - workaround for iOS peripheral caching incorrect state bug
     var lastConnectionInitiationAttempt: Date?
+    /// Count the number of failed connection attempts since forced disconnect
+    var failedConnectionAttempts: Int = 0
+    /// Progressive backoff and jitter requires a don't connect until time
+    var onlyConnectAfter: Date = Date()
     /// Track connect request at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity
     var lastConnectRequestedAt: Date = Date.distantPast
     /// Track connected at timestamp, used by taskConnect to prioritise connection when device runs out of concurrent connection capacity

@@ -542,6 +542,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             device.lastConnectRequestedAt = Date()
             self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
                 if $0.state != .connected {
+                    var performConnection = false
                     // Check to see if Herald has initiated a connection attempt before
                     if let lastAttempt = device.lastConnectionInitiationAttempt {
                         // Has Herald already initiated a connect attempt?
@@ -549,19 +550,49 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                             // If timeout reached, force disconnect
                             self.logger.fault("connect, timeout forcing disconnect (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             device.lastConnectionInitiationAttempt = nil
+                            device.failedConnectionAttempts += 1
+                            // determine next connection time now
+                            device.onlyConnectAfter = Date() + TimeInterval(1 + 2^device.failedConnectionAttempts + Int.random(in: 0...5)) // 1 second, 3, 7, 15, 31, 63 and so on, with mean 2.5 seconds jitter added
                             self.queue.async { self.central.cancelPeripheralConnection(peripheral) }
                         } else {
                             // If not timed out yet, keep trying
+//                            self.logger.debug("connect, waiting for connection or timeout... (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             self.logger.debug("connect, retrying (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
-                            self.central.connect($0)
+//                            device.lastConnectionInitiationAttempt = Date() // Set on each distinct attempt
+//                            device.onlyConnectAfter = Date() + TimeInterval(1 + Int.random(in: 0...5)) // 1 second + mean 2.5 seconds jitter added
+                            performConnection = true
                         }
                     } else {
                         // If not, connect now
                         self.logger.debug("connect, initiation (source=\(source),device=\(device))")
-                        device.lastConnectionInitiationAttempt = Date()
-                        self.central.connect($0)
+//                        device.lastConnectionInitiationAttempt = Date() // Set on each distinct attempt
+//                        device.onlyConnectAfter = Date() + TimeInterval(1 + Int.random(in: 0...5)) // 1 second + mean 2.5 seconds jitter added
+                        performConnection = true
+                    }
+                    // Try to connect, but don't attempt if currently attempting a connection (I.e. from a recent previous call that reaches this point)
+                    // Note: iOS devices incorrectly report .connecting, so we're relying on the timeout, above, here
+                    if (performConnection && $0.state != .connecting) {
+                        // Allow progressive backoff
+                        if (device.onlyConnectAfter < Date()) {
+                            self.logger.debug("connect, now requesting a central connection (source=\(source),device=\(device))")
+                            // Add in a delay immediately to prevent thrashing, but don't increase failure count unless THIS connection times out explicitly
+                            device.lastConnectionInitiationAttempt = Date() // Set on each distinct attempt
+                            device.onlyConnectAfter = Date() + TimeInterval(1 + 2^device.failedConnectionAttempts + Int.random(in: 0...5)) // 1 second, 3, 7, 15, 31, 63 and so on, with mean 2.5 seconds jitter added
+                            self.central.connect($0)
+                        } else {
+                            self.logger.debug("connect, waiting for discovery or backoff delay (source=\(source),device=\(device),connectAfter=\(device.onlyConnectAfter))")
+                        }
+                    } else {
+                        self.logger.debug("connect, waiting for state to leave .connecting state (source=\(source),device=\(device),connectAfter=\(device.onlyConnectAfter),state=\($0.state.description)")
                     }
                 } else {
+                    // clear failure and progressive backoff counts for this now-connected device
+                    device.failedConnectionAttempts = 0
+                    device.lastConnectionInitiationAttempt = nil
+                    // Minimum 10 second delay (plus mean 2.5 second jitter) between SUCCESSFUL attempts
+                    // Note: In reality this will only affect us if reading a payload fails due to the connection failing
+                    device.onlyConnectAfter = Date() + TimeInterval(10 + Int.random(in: 0...5))
+                    // This ensures post-connection actions take place
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
             }
