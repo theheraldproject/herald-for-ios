@@ -248,10 +248,20 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
             // Notify delegates
             logger.debug("didRead (device=\(device.identifier),payloadData=\(payloadData.shortName))")
             delegateQueue.async {
+                // Confirm it's a Herald Payload device (didDeleteOrDetect)
+                self.delegates.forEach { $0.sensor(.BLE, available: true, didDeleteOrDetect: device.identifier) }
+                // Now share that payload
                 self.delegates.forEach { $0.sensor(.BLE, didRead: payloadData, fromTarget: device.identifier) }
             }
         default:
             return
+        }
+    }
+    
+    func bleDatabase(didDelete device: BLEDevice) {
+        logger.debug("didDelete(device=\(device.identifier),payloadData=\(device.payloadData?.shortName ?? "nil"))")
+        delegateQueue.async {
+            self.delegates.forEach { $0.sensor(.BLE, available: false, didDeleteOrDetect: device.identifier) }
         }
     }
     
