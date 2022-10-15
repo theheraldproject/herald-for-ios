@@ -83,9 +83,16 @@ public class TextFile: Resettable {
             }
             if FileManager.default.fileExists(atPath: file.path) {
                 if let fileHandle = try? FileHandle(forWritingTo: file) {
-                    fileHandle.seekToEndOfFile()
-                    fileHandle.write(data)
-                    fileHandle.closeFile()
+                    
+                    if #available(iOS 13.4, *) {
+                        try? fileHandle.seekToEnd()
+                        try? fileHandle.write(contentsOf: data)
+                        try? fileHandle.close()
+                    } else {
+                        fileHandle.seekToEndOfFile()
+                        fileHandle.write(data)
+                        fileHandle.closeFile()
+                    }
                 }
             } else {
                 try? data.write(to: file, options: .atomicWrite)
