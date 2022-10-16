@@ -20,7 +20,22 @@ public struct BLESensorConfiguration {
     /// then discover services to identify actual beacons.
     /// - Service and characteristic UUIDs are V4 UUIDs that have been randomly generated and tested
     /// for uniqueness by conducting web searches to ensure it returns no results.
-    public static var serviceUUID: CBUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
+    public static var legacyHeraldServiceUUID: CBUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
+    /// The legacy unregistered manufacturer ID that was used by Herald until Oct 2022
+    public static var legacyHeraldManufacturerIdForSensor: UInt16 = UInt16(65530)
+    /// Detect the old legacy (unregistered) 128 bit Herald service ID
+    /// Since v2.1.0 (Oct 2022)
+    /// Deprecated. Support will be removed by Oct 2023. May be changed to false by default before then.
+    public static var legacyHeraldServiceDetectionEnabled: Bool = true
+    
+    /// The Service UUID (Short) used by Herald since v2.1.0 (Oct 2022)
+    /// See legacyHeraldServiceDetectionEnabled and legacyHeraldServiceUUID for the prior service support
+    public static var linuxFoundationServiceUUID: CBUUID = CBUUID(string: "0000FCF6-0000-1000-8000-00805F9B34FB")
+    /// Manufacturer data is being used on Android to store pseudo device address
+    /// - This is now the dedicated Linux Foundation manufacturer ID (decimal 1521, hex 0x05F1)
+    /// See legacyHeraldManufacturerIdForSensor for previous version
+    public static var linuxFoundationManufacturerIdForSensor: UInt16 = UInt16(1521) // aka 0x05F1
+    
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
     public static var androidSignalCharacteristicUUID: CBUUID = CBUUID(string: "f617b813-092e-437a-8324-e09a80821a11")
@@ -30,9 +45,9 @@ public struct BLESensorConfiguration {
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
     public static var payloadCharacteristicUUID: CBUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
-    /// Manufacturer data is being used on Android to store pseudo device address
-    /// - Pending update to dedicated ID
-    public static var manufacturerIdForSensor: UInt16 = UInt16(65530)
+    /// Secured Payload exchange registered UUID
+    /// Since v2.1.0 (Not used until a future version TBD)
+    public static var securedPayloadCharacteristicUUID: CBUUID = CBUUID(string: "ae9f88ca-6ea6-494d-bd3f-09ffa3380340")
 
     
     // MARK:- Interoperability with OpenTrace

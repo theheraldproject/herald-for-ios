@@ -167,8 +167,14 @@ public class LegacyPayloadData : PayloadData {
     public let service: UUID
     public var protocolName: ProtocolName { get {
         switch service.uuidString {
-        case BLESensorConfiguration.serviceUUID.uuidString:
+        case BLESensorConfiguration.linuxFoundationServiceUUID.uuidString:
             return .HERALD
+        case BLESensorConfiguration.legacyHeraldServiceUUID.uuidString:
+            if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+                return .HERALD
+            } else {
+                return .UNKNOWN
+            }
         case BLESensorConfiguration.interopOpenTraceServiceUUID.uuidString:
             return .OPENTRACE
         case BLESensorConfiguration.interopAdvertBasedProtocolServiceUUID.uuidString:

@@ -255,7 +255,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskScanForPeripherals() {
         // Scan for peripherals -> didDiscover
-        var scanForServices: [CBUUID] = [BLESensorConfiguration.serviceUUID]
+        var scanForServices: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+        // Optionally, include the old Herald service UUID (prior to v2.1.0)
+        if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+            scanForServices.append(BLESensorConfiguration.legacyHeraldServiceUUID)
+        }
         // Optionally include OpenTrace protocol as scan criteria
         if BLESensorConfiguration.interopOpenTraceEnabled {
             scanForServices.append(BLESensorConfiguration.interopOpenTraceServiceUUID)
@@ -266,14 +270,19 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         central.scanForPeripherals(
             withServices: scanForServices,
-            options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.serviceUUID]])
+            options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.linuxFoundationServiceUUID]])
     }
     
     /**
      Register all connected peripherals advertising the sensor service as a device.
      */
     private func taskRegisterConnectedPeripherals() {
-        central.retrieveConnectedPeripherals(withServices: [BLESensorConfiguration.serviceUUID]).forEach() { peripheral in
+        var services: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+        // Optionally, include the old Herald service UUID (prior to v2.1.0)
+        if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+            services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
+        }
+        central.retrieveConnectedPeripherals(withServices: services).forEach() { peripheral in
             let targetIdentifier = TargetIdentifier(peripheral: peripheral)
             let device = database.device(targetIdentifier)
             if device.peripheral == nil || device.peripheral != peripheral {
@@ -638,7 +647,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         queue.async {
-            var services: [CBUUID] = [BLESensorConfiguration.serviceUUID]
+            var services: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+            // Optionally, include the old Herald service UUID (prior to v2.1.0)
+            if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+                services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
+            }
             // Optionally include OpenTrace protocol as discovery criteria
             if BLESensorConfiguration.interopOpenTraceEnabled {
                 services.append(BLESensorConfiguration.interopOpenTraceServiceUUID)
@@ -873,7 +886,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         for service in services {
-            if service.uuid == BLESensorConfiguration.serviceUUID {
+            if (service.uuid == BLESensorConfiguration.linuxFoundationServiceUUID) ||
+                (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && service.uuid == BLESensorConfiguration.legacyHeraldServiceUUID) {
                 logger.debug("didDiscoverServices, found sensor service (device=\(device))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return

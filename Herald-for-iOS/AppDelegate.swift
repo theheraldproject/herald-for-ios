@@ -110,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
             }
             for sensorDelegateLogger in sensorDelegateLoggers {
                 sensor?.add(delegate: sensorDelegateLogger)
-                automatedTestClient?.add(sensorDelegateLogger)r
+                automatedTestClient?.add(sensorDelegateLogger)
             }
             #endif
         }
