@@ -23,7 +23,8 @@ jobs:
         destination: [
           #'platform=iOS Simulator,OS=12.2,name=iPhone X'
           #,
-          'platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro'
+          # 'platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro'
+          'platform=iOS Simulator,OS=16.0,name=iPhone 11 Pro'
           #,
           #'platform=iOS Simulator,OS=9.3,name=iPhone 5s'
         ]
