@@ -7,27 +7,30 @@
 
 import Foundation
 
-public class Aggregate {
-    var runs: Int { get { 0 }}
+open class Aggregate {
+    public init() {
+    }
     
-    func beginRun(thisRun: Int) {
+    open var runs: Int { get { 0 }}
+    
+    open func beginRun(thisRun: Int) {
     }
 
-    func map(value : Sample) {
+    open func map(value : Sample) {
     }
 
-    func reduce() -> Double? {
+    open func reduce() -> Double? {
         return nil
     }
 
-    func reset() {
+    open func reset() {
     }
 }
 
 // MARK: - Aggregates
 
 public class Mean: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var count: Int64 = 0
     private var sum: Double = 0
@@ -59,7 +62,7 @@ public class Mean: Aggregate {
 }
 
 public class Variance: Aggregate {
-    override var runs: Int { get { 2 }}
+    public override var runs: Int { get { 2 }}
     private var run: Int = 1
     private var count: Int64 = 0
     private var sum: Double = 0
@@ -108,7 +111,7 @@ public class Variance: Aggregate {
 }
 
 public class Mode: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var counts: [Double:Int64] = [:]
 
@@ -148,7 +151,7 @@ public class Mode: Aggregate {
 }
 
 public class Median: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     private var values: [Double] = []
     private var median: Double? = nil
@@ -192,7 +195,7 @@ public class Median: Aggregate {
 
 
 public class Gaussian: Aggregate {
-    override var runs: Int { get { 1 }}
+    public override var runs: Int { get { 1 }}
     private var run: Int = 1
     public var model: SampleStatistics = SampleStatistics()
 

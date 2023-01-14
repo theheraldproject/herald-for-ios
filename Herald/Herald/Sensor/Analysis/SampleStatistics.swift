@@ -43,7 +43,7 @@ public class SampleStatistics {
     /**
      String representation of mean, standard deviation, min and max
      */
-    var description: String { get {
+    public var description: String { get {
         let sCount = n.description
         let sMean = (mean == nil ? "-" : mean!.description)
         let sStandardDeviation = (standardDeviation == nil ? "-" : standardDeviation!.description)
@@ -55,7 +55,7 @@ public class SampleStatistics {
     public init() {
     }
     
-    init(_ x: Double, _ f: Int64) {
+    public init(_ x: Double, _ f: Int64) {
         n = f
         m1 = x
         min = x
@@ -84,12 +84,12 @@ public class SampleStatistics {
     }
     
     /// Add sample value x, n times.
-    func add(_ x:Double, _ n:Int) {
+    public func add(_ x:Double, _ n:Int) {
         add(SampleStatistics(x, Int64(n)))
     }
     
     /// Add samples to this sample.
-    func add(_ sample: SampleStatistics) {
+    public func add(_ sample: SampleStatistics) {
         guard sample.n > 0 else {
             return
         }
@@ -133,7 +133,7 @@ public class SampleStatistics {
     }
     
     /// Estimate distance between this sample's distribution and another sample's distribution, 1 means identical and 0 means completely different.
-    func distance(_ sample: SampleStatistics) -> Double? {
+    public func distance(_ sample: SampleStatistics) -> Double? {
         return bhattacharyyaDistance(self, sample)
     }
     

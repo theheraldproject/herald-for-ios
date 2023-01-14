@@ -21,7 +21,7 @@ class ConcreteSimplePayloadDataMatcher : SimplePayloadDataMatcher {
             let bloomFilter = BloomFilter(1024*1024*8)
             bloomFilters[day] = bloomFilter
             matchingKeysOnDate.forEach { matchingKey in
-                K.contactKeys(matchingKey).map({ K.contactIdentifier($0) }).forEach { contactIdentifier in
+                K.forEachContactIdentifier(matchingKey) { contactIdentifier, _ in
                     bloomFilter.add(contactIdentifier)
                 }
             }

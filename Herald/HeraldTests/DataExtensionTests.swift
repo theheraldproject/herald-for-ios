@@ -215,6 +215,47 @@ class DataExtensionTests: XCTestCase {
         add(attachment)
     }
     
+    func testData() throws {
+        // Zero
+        var dataRange = Data()
+        XCTAssertTrue(dataRange.append(Data(), .UINT8))
+        XCTAssertEqual(Data(), dataRange.data(0)?.value)
+        XCTAssertEqual(1, dataRange.data(0)?.start)
+        XCTAssertEqual(1, dataRange.data(0)?.end)
+        
+        // Encoding options
+        var dataEncoding = Data()
+        XCTAssertTrue(dataEncoding.append(Data(repeating: 1, count: 1), .UINT8))
+        XCTAssertTrue(dataEncoding.append(Data(repeating: 2, count: 2), .UINT16))
+        XCTAssertTrue(dataEncoding.append(Data(repeating: 3, count: 3), .UINT32))
+        XCTAssertTrue(dataEncoding.append(Data(repeating: 4, count: 4), .UINT64))
+        XCTAssertEqual(Data(repeating: 1, count: 1), dataEncoding.data(0, .UINT8)?.value)
+        XCTAssertEqual(1, dataEncoding.data(0, .UINT8)?.start)
+        XCTAssertEqual(2, dataEncoding.data(0, .UINT8)?.end)
+        XCTAssertEqual(Data(repeating: 2, count: 2), dataEncoding.data(2, .UINT16)?.value)
+        XCTAssertEqual(4, dataEncoding.data(2, .UINT16)?.start)
+        XCTAssertEqual(6, dataEncoding.data(2, .UINT16)?.end)
+        XCTAssertEqual(Data(repeating: 3, count: 3), dataEncoding.data(6, .UINT32)?.value)
+        XCTAssertEqual(10, dataEncoding.data(6, .UINT32)?.start)
+        XCTAssertEqual(13, dataEncoding.data(6, .UINT32)?.end)
+        XCTAssertEqual(Data(repeating: 4, count: 4), dataEncoding.data(13, .UINT64)?.value)
+        XCTAssertEqual(21, dataEncoding.data(13, .UINT64)?.start)
+        XCTAssertEqual(25, dataEncoding.data(13, .UINT64)?.end)
+        
+        // Values in range
+        var csv = "value,data\n"
+        for i in 0...5 {
+            var data = Data()
+            XCTAssertTrue(data.append(Data(repeating: UInt8(i), count: i), .UINT8))
+            XCTAssertEqual(Data(repeating: UInt8(i), count: i), data.data(0)?.value)
+            csv.append("\(i),\(data.base64EncodedString())\n")
+        }
+        let attachment = XCTAttachment(string: csv)
+        attachment.lifetime = .keepAlways
+        attachment.name = "data.csv"
+        add(attachment)
+    }
+    
     func testString() throws {
         // Zero
         var dataRange = Data()
@@ -254,7 +295,6 @@ class DataExtensionTests: XCTestCase {
         attachment.lifetime = .keepAlways
         attachment.name = "string.csv"
         add(attachment)
-
     }
     
     func testHexTransform() throws {

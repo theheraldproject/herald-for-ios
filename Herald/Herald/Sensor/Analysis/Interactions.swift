@@ -10,46 +10,43 @@ import Foundation
 /// Log of interactions for recording encounters (time, proximity, and identity).
 /// This is can be used as basis for maintaining a persistent log
 /// of encounters for on-device or centralised matching.
-public class Interactions: NSObject, SensorDelegate {
+public class Interactions: SensorDelegateLogger {
     private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Analysis.EncounterLog")
-    private let textFile: TextFile?
-    private let dateFormatter = DateFormatter()
     private let queue: DispatchQueue
     private var encounters: [Encounter] = []
 
     public override init() {
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         queue = DispatchQueue(label: "Sensor.Analysis.EncounterLog")
-        textFile = nil
         super.init()
     }
     
     public init(filename: String, retention: TimeInterval = TimeInterval.fortnight) {
-        textFile = TextFile(filename: filename)
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         queue = DispatchQueue(label: "Sensor.Analysis.EncounterLog(\(filename))")
-        super.init()
-        if textFile!.empty() {
-            textFile!.write("time,proximity,unit,payload")
-        } else if let file = textFile!.url {
-            do {
-                try String(contentsOf: file).split(separator: "\n").forEach { line in
-                    if let encounter = Encounter(String(line)) {
-                        encounters.append(encounter)
-                    }
-                }
-                logger.debug("Loaded historic encounters (count=\(encounters.count))")
-            } catch {
-                logger.fault("Failed to read encounter log")
+        super.init(filename: filename)
+        contentsOf().split(separator: "\n").forEach { line in
+            if let encounter = Encounter(String(line)) {
+                encounters.append(encounter)
             }
         }
+        logger.debug("Loaded historic encounters (count=\(encounters.count))")
         // Remove data beyond data retention period
         remove(before: Date().addingTimeInterval(-retention))
     }
     
+    public override func reset() {
+        super.reset()
+        encounters.removeAll()
+    }
+    
+    private func writeHeader() {
+        if empty() {
+            write("time,proximity,unit,payload")
+        }
+    }
+    
     public func append(_ encounter: Encounter) {
         queue.sync {
-            textFile?.write(encounter.csvString)
+            write(encounter.csvString)
             encounters.append(encounter)
         }
     }
@@ -79,14 +76,14 @@ public class Interactions: NSObject, SensorDelegate {
                 content.append(encounter.csvString)
                 content.append("\n")
             }
-            textFile?.overwrite(content)
+            overwrite(content)
             encounters = subdata
         }
     }
     
     // MARK:- SensorDelegate
     
-    public func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {
+    public override func sensor(_ sensor: SensorType, didMeasure: Proximity, fromTarget: TargetIdentifier, withPayload: PayloadData) {
         guard let encounter = Encounter(didMeasure, withPayload) else {
             return
         }
@@ -181,10 +178,10 @@ public class Interactions: NSObject, SensorDelegate {
 
 /// Encounter record describing proximity with target at a moment in time
 public class Encounter {
-    let timestamp: Date
-    let proximity: Proximity
-    let payload: PayloadData
-    var csvString: String { get {
+    public let timestamp: Date
+    public let proximity: Proximity
+    public let payload: PayloadData
+    public var csvString: String { get {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let f0 = dateFormatter.string(from: timestamp)
@@ -197,14 +194,14 @@ public class Encounter {
     }}
     
     /// Create encounter instance from source data
-    init?(_ didMeasure: Proximity, _ withPayload: PayloadData, timestamp: Date = Date()) {
+    public init?(_ didMeasure: Proximity, _ withPayload: PayloadData, timestamp: Date = Date()) {
         self.timestamp = timestamp
         self.proximity = didMeasure
         self.payload = withPayload
     }
 
     /// Create encounter instance from log entry
-    init?(_ row: String) {
+    public init?(_ row: String) {
         let fields = row.split(separator: ",")
         guard fields.count >= 6 else {
             return nil

@@ -17,8 +17,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
     // Payload data supplier, sensor and contact log
     var payloadDataSupplier: PayloadDataSupplier?
     var sensor: SensorArray?
-    
     var phoneMode = true
+    
+    // Test automation, set to null to disable automation.
+    // Set to "http://serverAddress:port" to enable automation.
+    let automatedTestServer: String? = nil
+    var automatedTestClient: AutomatedTestClient? = nil
 
     /// Generate unique and consistent device identifier for testing detection and tracking
     private func identifier() -> Int32 {
@@ -43,9 +47,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         payloadDataSupplier = ConcreteTestPayloadDataSupplier(identifier: identifier())
         sensor = SensorArray(payloadDataSupplier!)
         sensor?.add(delegate: self)
+        // Sensor will start and stop with UI switch (default ON) and bluetooth state
+        // Or remotely controlled by test server.
+        if let automatedTestServer = automatedTestServer, let sensorArray = sensor {
+            automatedTestClient = AutomatedTestClient(serverAddress: automatedTestServer, sensorArray: sensorArray, heartbeatInterval: TimeInterval(10))
+            if let automatedTestClient = automatedTestClient {
+                sensor?.add(delegate: automatedTestClient)
+            }
+        } else {
+            sensor?.start()
+        }
         addEfficacyLogging()
-        sensor?.start()
         
+
         // EXAMPLE immediate data send function (note: NOT wrapped with Herald header)
         //let targetIdentifier: TargetIdentifier? // ... set its value
         //let success: Bool = sensor!.immediateSend(data: Data(), targetIdentifier!)
@@ -84,13 +98,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SensorDelegate {
         if let payloadData = sensor?.payloadData {
             // Loggers
             #if DEBUG
-            sensor?.add(delegate: ContactLog(filename: "contacts.csv"))
-            sensor?.add(delegate: StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
-            sensor?.add(delegate: DetectionLog(filename: "detection.csv", payloadData: payloadData))
-            _ = BatteryLog(filename: "battery.csv")
+            var sensorDelegateLoggers: [SensorDelegateLogger] = []
+            sensorDelegateLoggers.append(ContactLog(filename: "contacts.csv"))
+            // Removed to align with removal in Android for bug https://github.com/theheraldproject/herald-for-android/issues/239
+            // sensorDelegateLoggers.append(StatisticsLog(filename: "statistics.csv", payloadData: payloadData))
+            sensorDelegateLoggers.append(DetectionLog(filename: "detection.csv", payloadData: payloadData))
+            sensorDelegateLoggers.append(BatteryLog(filename: "battery.csv"))
             if (BLESensorConfiguration.payloadDataUpdateTimeInterval != .never ||
                 (BLESensorConfiguration.interopOpenTraceEnabled && BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval != .never)) {
-                sensor?.add(delegate: EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
+                sensorDelegateLoggers.append(EventTimeIntervalLog(filename: "statistics_didRead.csv", payloadData: payloadData, eventType: .read))
+            }
+            for sensorDelegateLogger in sensorDelegateLoggers {
+                sensor?.add(delegate: sensorDelegateLogger)
+                automatedTestClient?.add(sensorDelegateLogger)
             }
             #endif
         }

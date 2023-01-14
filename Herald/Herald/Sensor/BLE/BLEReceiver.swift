@@ -113,7 +113,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         // Cancel all connections, the resulting didDisconnect and didFailToConnect
         database.devices().forEach() { device in
-            if let peripheral = device.peripheral, peripheral.state != .disconnected {
+            if let peripheral = device.mostRecentPeripheral(), peripheral.state != CBPeripheralState.disconnected {
                 disconnect("stop", peripheral)
             }
         }
@@ -123,7 +123,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("immediateSend (targetIdentifier=\(targetIdentifier))")
         let device = database.device(targetIdentifier)
         logger.debug("immediateSend (peripheral=\(device.identifier))")
-        guard let peripheral = device.peripheral, peripheral.state == .connected else {
+        guard let peripheral = device.mostRecentPeripheral(), peripheral.state == CBPeripheralState.connected else {
             logger.fault("immediateSend denied, peripheral not connected (peripheral=\(device.identifier))")
             return false
         }
@@ -131,7 +131,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         var length = Int16(data.count)
         toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
         toSend.append(data)
-        queue.async { peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse) }
+        queue.async { peripheral.writeValue(toSend, for: device.signalCharacteristic!, type: CBCharacteristicWriteType.withResponse) }
         return true;
     }
     
@@ -141,9 +141,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         toSend.append(Data(bytes: &length, count: MemoryLayout<UInt16>.size))
         toSend.append(data)
         
-        let devicesToSendTo = database.devices().filter { $0.peripheral != nil && $0.peripheral!.state == .connected }
+//        let devicesToSendTo = database.devices().filter { $0.peripheral != nil && $0.peripheral!.state == .connected }
+        let devicesToSendTo = database.devices().filter { $0.hasConnectedPeripheral() }
         devicesToSendTo.forEach() { device in
-            queue.async { device.peripheral!.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse) }
+//            queue.async { device.peripheral!.writeValue(toSend, for: device.signalCharacteristic!, type: .withResponse) }
+            queue.async { device.connectedPeripheral()!.writeValue(toSend, for: device.signalCharacteristic!, type: CBCharacteristicWriteType.withResponse) }
         }
         return true;
     }
@@ -255,7 +257,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskScanForPeripherals() {
         // Scan for peripherals -> didDiscover
-        var scanForServices: [CBUUID] = [BLESensorConfiguration.serviceUUID]
+        var scanForServices: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+        // Optionally, include the old Herald service UUID (prior to v2.1.0)
+        if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+            scanForServices.append(BLESensorConfiguration.legacyHeraldServiceUUID)
+        }
         // Optionally include OpenTrace protocol as scan criteria
         if BLESensorConfiguration.interopOpenTraceEnabled {
             scanForServices.append(BLESensorConfiguration.interopOpenTraceServiceUUID)
@@ -266,20 +272,26 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         central.scanForPeripherals(
             withServices: scanForServices,
-            options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.serviceUUID]])
+            options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.linuxFoundationServiceUUID]])
     }
     
     /**
      Register all connected peripherals advertising the sensor service as a device.
      */
     private func taskRegisterConnectedPeripherals() {
-        central.retrieveConnectedPeripherals(withServices: [BLESensorConfiguration.serviceUUID]).forEach() { peripheral in
-            let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-            let device = database.device(targetIdentifier)
-            if device.peripheral == nil || device.peripheral != peripheral {
-                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
-                _ = database.device(peripheral, delegate: self)
-            }
+        var services: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+        // Optionally, include the old Herald service UUID (prior to v2.1.0)
+        if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+            services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
+        }
+        central.retrieveConnectedPeripherals(withServices: services).forEach() { peripheral in
+//            let targetIdentifier = TargetIdentifier(peripheral: peripheral)
+            let device = database.device(peripheral, delegate: self)
+            logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
+//            if device.peripheral == nil || device.peripheral != peripheral {
+//                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
+//                _ = database.device(peripheral, delegate: self)
+//            }
         }
     }
 
@@ -288,7 +300,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      of a potential peripheral for resolution by this central (BLEReceiver).
      */
     private func taskResolveDevicePeripherals() {
-        let devicesToResolve = database.devices().filter { $0.peripheral == nil }
+        let devicesToResolve = database.devices().filter { !$0.hasPeripheral() }
         devicesToResolve.forEach() { device in
             guard let identifier = UUID(uuidString: device.identifier) else {
                 return
@@ -309,7 +321,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         devicesToRemove.forEach() { device in
             logger.debug("taskRemoveExpiredDevices (remove=\(device))")
             database.delete(device)
-            if let peripheral = device.peripheral {
+            if let peripheral = device.connectedPeripheral() {
                 disconnect("taskRemoveExpiredDevices", peripheral)
             }
         }
@@ -320,8 +332,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskRemoveDuplicatePeripherals() {
         var index: [PayloadData:BLEDevice] = [:]
+        var hasPrinted = false
         let devices = database.devices()
         devices.forEach() { device in
+            // Now cannot happen, because identifier never assigned by payloadData
             guard let payloadData = device.payloadData else {
                 return
             }
@@ -329,20 +343,145 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 index[payloadData] = device
                 return
             }
-            var keeping = device
-            if device.peripheral != nil, duplicate.peripheral == nil {
-                keeping = device
-            } else if duplicate.peripheral != nil, device.peripheral == nil {
-                keeping = duplicate
-            } else if device.payloadDataLastUpdatedAt > duplicate.payloadDataLastUpdatedAt {
-                keeping = device
-            } else {
-                keeping = duplicate
+            if !hasPrinted {
+                // Only print a list of nearby devices if we do in fact have duplicates - reduces logging
+                hasPrinted = true
+                database.printDevices()
             }
-            let discarding = (keeping.identifier == device.identifier ? duplicate : device)
-            index[payloadData] = keeping
-            database.delete(discarding)
-            self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.shortName),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=\(keeping.identifier))")
+            // If we get this far, we somehow have a duplicate (Happens depending on detection vs payloadRead speed)
+            self.logger.debug("INFO: Two devices with the same PayloadData found for payload: \(payloadData.shortName)")
+            self.logger.debug(" - Device identifier: \(device.identifier), lastUpdated: \(device.lastUpdatedAt)")
+            for id in device.peripheralIDs {
+                self.logger.debug("  - Peripheral ID: \(id.id.uuidString), state: \(id.peripheral.state), lastSeen: \(id.lastSeen)")
+            }
+            self.logger.debug(" - Duplicate identifier: \(duplicate.identifier), lastUpdated: \(duplicate.lastUpdatedAt)")
+            for id in duplicate.peripheralIDs {
+                self.logger.debug("  - Peripheral ID: \(id.id.uuidString), state: \(id.peripheral.state), lastSeen: \(id.lastSeen)")
+            }
+            // Now merge the two devices into one by pseudoDeviceAddress - Android phones
+            if let devicePDA = device.pseudoDeviceAddress {
+                if nil == duplicate.pseudoDeviceAddress {
+                    //            if device.pseudoDeviceAddress != nil and duplicate.pseudoDeviceAddress == nil {
+                    for pid in duplicate.peripheralIDs {
+                        device.peripheralIDs.append(pid)
+                    }
+                    duplicate.peripheralIDs.removeAll()
+                    duplicate.payloadData = nil
+                    database.delete(duplicate)
+                } else {
+                    self.logger.debug("Android device has rotated Bluetooth MAC Address and pseudoDeviceAddress")
+                    // pseudoDeviceAddress has changed
+                    if device.timeIntervalSinceCreated > duplicate.timeIntervalSinceCreated {
+                        for pid in duplicate.peripheralIDs {
+                            device.peripheralIDs.append(pid)
+                        }
+                        duplicate.peripheralIDs.removeAll()
+                        duplicate.payloadData = nil
+                        database.delete(duplicate)
+                    } else {
+                        for pid in device.peripheralIDs {
+                            duplicate.peripheralIDs.append(pid)
+                        }
+                        device.peripheralIDs.removeAll()
+                        device.payloadData = nil
+                        database.delete(device)
+                    }
+                }
+            } else if let duplicatePDA = duplicate.pseudoDeviceAddress {
+                if device.pseudoDeviceAddress == nil {
+                    for pid in device.peripheralIDs {
+                        duplicate.peripheralIDs.append(pid)
+                    }
+                    device.peripheralIDs.removeAll()
+                    device.payloadData = nil
+                    database.delete(device)
+                } else {
+                    self.logger.debug("Android device has rotated Bluetooth MAC Address and pseudoDeviceAddress")
+                    // pseudoDeviceAddress has changed
+                    if device.timeIntervalSinceCreated > duplicate.timeIntervalSinceCreated {
+                        for pid in duplicate.peripheralIDs {
+                            device.peripheralIDs.append(pid)
+                        }
+                        duplicate.peripheralIDs.removeAll()
+                        duplicate.payloadData = nil
+                        database.delete(duplicate)
+                    } else {
+                        for pid in device.peripheralIDs {
+                            duplicate.peripheralIDs.append(pid)
+                        }
+                        device.peripheralIDs.removeAll()
+                        device.payloadData = nil
+                        database.delete(device)
+                    }
+                }
+            } else {
+                // Now handle the possibility they are iOS and the Bluetooth MAC address has rotated
+                if ((device.operatingSystem == .ios) && (duplicate.operatingSystem == .ios)) {
+                    self.logger.debug("iOS device has rotated Bluetooth MAC Address")
+                    if device.timeIntervalSinceCreated > duplicate.timeIntervalSinceCreated {
+                        for pid in duplicate.peripheralIDs {
+                            device.peripheralIDs.append(pid)
+                        }
+                        duplicate.peripheralIDs.removeAll()
+                        duplicate.payloadData = nil
+                        database.delete(duplicate)
+                    } else {
+                        for pid in device.peripheralIDs {
+                            duplicate.peripheralIDs.append(pid)
+                        }
+                        device.peripheralIDs.removeAll()
+                        device.payloadData = nil
+                        database.delete(device)
+                    }
+                } else {
+                    self.logger.debug("WARNING could not merge by pseudoDeviceAddress - we need to handle this possibility")
+                }
+            }
+//            var keeping = device
+//            var discarding = duplicate
+//            // First attempt to evaluate if only one has a Peripheral ID assigned
+//            if device.peripheral != nil, duplicate.peripheral == nil {
+//                keeping = device
+//                discarding = duplicate
+//            } else if duplicate.peripheral != nil, device.peripheral == nil {
+//                keeping = duplicate
+//                discarding = device
+//            // Next, check if only one has a pseudoDeviceAddress (getting here implies both have the same Physical address)
+//            } else if device.pseudoDeviceAddress != nil, duplicate.pseudoDeviceAddress == nil {
+//                keeping = device
+//                discarding = duplicate
+//            } else if duplicate.pseudoDeviceAddress != nil, device.pseudoDeviceAddress == nil {
+//                keeping = duplicate
+//                discarding = device
+//            } else if (device.payloadData == duplicate.payloadData) {
+//                // Only Android have duplicate PDA, and remaining else clauses are for non Android
+//                if let devPDA = device.pseudoDeviceAddress, let dupPDA = duplicate.pseudoDeviceAddress {
+//                    if (devPDA.data != dupPDA.data) && (device.identifier != duplicate.identifier) {
+//                        // Remote Android device has rotated it's Bluetooth ID and PseudoDeviceAddress (This is correct)
+//                        // Trust the more recent one (added to the list later)
+//                        keeping = duplicate
+//                        discarding = device
+//                    } else {
+//                        // Otherwise our android devices have the same pseudoDeviceAddress (They cannot have the same identifier due to how they are stored)
+//                        // Yes this is the same as the above, but the logic is being kept for clarity
+//                        keeping = duplicate
+//                        discarding = device
+//                    }
+//                // Next check if the payload update date is more recent (WARNING: New devices have a very OLD update date)
+//                } else if device.payloadDataLastUpdatedAt > duplicate.payloadDataLastUpdatedAt {
+//                    keeping = device
+//                    discarding = duplicate
+//                    // Finally, assume that if the entry has been added later, then it must be more up to date
+//                    // (This without the second check above (pseudoDeviceAddress) is presumed to be the cause of the iPhone being overactive in 'discovering' Android devices and reading their payload)
+//                } else {
+//                    keeping = duplicate
+//                    discarding = device
+//                }
+//            }
+////            let discarding = (keeping.identifier == device.identifier ? duplicate : device)
+//            index[payloadData] = keeping
+//            database.delete(discarding)
+//            self.logger.debug("taskRemoveDuplicatePeripherals (payload=\(payloadData.shortName),device=\(device.identifier),duplicate=\(duplicate.identifier),keeping=\(keeping.identifier))")
             // CoreBluetooth will eventually give warning and disconnect actual duplicate silently.
             // While calling disconnect here is cleaner but it will trigger didDiscover and
             // retain the duplicates. Expect to see message :
@@ -350,6 +489,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             // <CBPeripheral: XXX, identifier = XXX, name = iPhone, state = connected>.
             // Did you forget to cancel the connection?
         }
+        
+        // TODO Remove old peripheralIDs not seen in a while
     }
     
     /**
@@ -357,7 +498,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskWakeTransmitters() {
         database.devices().forEach() { device in
-            guard device.operatingSystem == .ios, let peripheral = device.peripheral, peripheral.state == .connected else {
+            guard device.operatingSystem == .ios, let peripheral = device.connectedPeripheral() else {
                 return
             }
             guard device.timeIntervalSinceLastUpdate < TimeInterval.minute else {
@@ -378,7 +519,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Identify recently discovered devices with pending tasks : connect -> nextTask
         let hasPendingTask = didDiscover.filter({ deviceHasPendingTask($0) })
         // Identify all connected (iOS) devices to trigger refresh : connect -> nextTask
-        let toBeRefreshed = database.devices().filter({ !hasPendingTask.contains($0) && $0.peripheral?.state == .connected })
+        let toBeRefreshed = database.devices().filter({ !hasPendingTask.contains($0) && $0.hasConnectedPeripheral() })
         // Identify all unconnected devices with unknown operating system, these are
         // created by ConcreteBLETransmitter on characteristic write, to ensure all
         // centrals that connect to this peripheral are recorded, to enable this central
@@ -387,24 +528,25 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // discovery of phoneB by phoneA, and a connection from A to B, will trigger
         // B to connect to A, thus assuming location permission has been enabled, it
         // will only require screen ON at either phone to trigger bi-directional connection.
-        let asymmetric = database.devices().filter({ !hasPendingTask.contains($0) && $0.operatingSystem == .unknown && $0.peripheral?.state != .connected })
+        let asymmetric = database.devices().filter({ !hasPendingTask.contains($0) && $0.operatingSystem == .unknown &&
+            $0.hasPeripheral() && !$0.hasConnectedPeripheral() })
         // Connect to recently discovered devices with pending tasks
         hasPendingTask.forEach() { device in
-            guard let peripheral = device.peripheral else {
+            guard let peripheral = device.mostRecentPeripheral() else {
                 return
             }
             connect("taskConnect|hasPending", peripheral);
         }
         // Refresh connection to existing devices to trigger next task
         toBeRefreshed.forEach() { device in
-            guard let peripheral = device.peripheral else {
+            guard let peripheral = device.mostRecentPeripheral() else {
                 return
             }
             connect("taskConnect|refresh", peripheral);
         }
         // Connect to unknown devices that have written to this peripheral
         asymmetric.forEach() { device in
-            guard let peripheral = device.peripheral else {
+            guard let peripheral = device.mostRecentPeripheral() else {
                 return
             }
             connect("taskConnect|asymmetric", peripheral);
@@ -416,7 +558,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         var set: Set<BLEDevice> = []
         var list: [BLEDevice] = []
         while let device = scanResults.popLast() {
-            if set.insert(device).inserted, let peripheral = device.peripheral, peripheral.state != .connected {
+            if set.insert(device).inserted, device.hasPeripheral() && !device.hasConnectedPeripheral() {
                 list.append(device)
                 logger.debug("taskConnectScanResults, didDiscover (device=\(device))")
             }
@@ -445,7 +587,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return true
         }
         // iOS should always be connected
-        if device.operatingSystem == .ios, let peripheral = device.peripheral, peripheral.state != .connected {
+        // TODO re-evaluate this and verify the behaviour still occurs
+        if device.operatingSystem == .ios, device.hasPeripheral() && !device.hasConnectedPeripheral() {
             return true
         }
         return false
@@ -454,11 +597,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// Check if iOS device is waiting for connection and free capacity if required
     private func taskIosMultiplex() {
         // Identify iOS devices
-        let devices = database.devices().filter({ $0.operatingSystem == .ios && $0.peripheral != nil })
+        let devices = database.devices().filter({ $0.operatingSystem == .ios && $0.hasPeripheral() })
         // Get a list of connected devices and uptime
-        let connected = devices.filter({ $0.peripheral?.state == .connected }).sorted(by: { $0.timeIntervalBetweenLastConnectedAndLastAdvert > $1.timeIntervalBetweenLastConnectedAndLastAdvert })
+        let connected = devices.filter({ $0.hasConnectedPeripheral() }).sorted(by: { $0.timeIntervalBetweenLastConnectedAndLastAdvert > $1.timeIntervalBetweenLastConnectedAndLastAdvert })
         // Get a list of connecting devices
-        let pending = devices.filter({ $0.peripheral?.state != .connected }).sorted(by: { $0.lastConnectRequestedAt < $1.lastConnectRequestedAt })
+        let pending = devices.filter({ !$0.hasConnectedPeripheral() }).sorted(by: { $0.lastConnectRequestedAt < $1.lastConnectRequestedAt })
         logger.debug("taskIosMultiplex summary (connected=\(connected.count),pending=\(pending.count))")
         connected.forEach() { device in
             logger.debug("taskIosMultiplex, connected (device=\(device.description),upTime=\(device.timeIntervalBetweenLastConnectedAndLastAdvert))")
@@ -469,20 +612,20 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         // Retry all pending connections if there is surplus capacity
         if connected.count < BLESensorConfiguration.concurrentConnectionQuota {
             pending.forEach() { device in
-                guard let toBeConnected = device.peripheral else {
+                guard let toBeConnected = device.mostRecentPeripheral() else {
                     return
                 }
                 connect("taskIosMultiplex|retry", toBeConnected);
             }
         }
         // Initiate multiplexing when capacity has been reached
-        guard connected.count > BLESensorConfiguration.concurrentConnectionQuota, pending.count > 0, let deviceToBeDisconnected = connected.first, let peripheralToBeDisconnected = deviceToBeDisconnected.peripheral, deviceToBeDisconnected.timeIntervalBetweenLastConnectedAndLastAdvert > TimeInterval.minute else {
+        guard connected.count > BLESensorConfiguration.concurrentConnectionQuota, pending.count > 0, let deviceToBeDisconnected = connected.first, let peripheralToBeDisconnected = deviceToBeDisconnected.connectedPeripheral(), deviceToBeDisconnected.timeIntervalBetweenLastConnectedAndLastAdvert > TimeInterval.minute else {
             return
         }
         logger.debug("taskIosMultiplex, multiplexing (toBeDisconnected=\(deviceToBeDisconnected.description))")
         disconnect("taskIosMultiplex", peripheralToBeDisconnected)
         pending.forEach() { device in
-            guard let toBeConnected = device.peripheral else {
+            guard let toBeConnected = device.mostRecentPeripheral() else {
                 return
             }
             connect("taskIosMultiplex|multiplex", toBeConnected);
@@ -542,6 +685,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             device.lastConnectRequestedAt = Date()
             self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
                 if $0.state != .connected {
+                    var performConnection = false
                     // Check to see if Herald has initiated a connection attempt before
                     if let lastAttempt = device.lastConnectionInitiationAttempt {
                         // Has Herald already initiated a connect attempt?
@@ -549,19 +693,62 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                             // If timeout reached, force disconnect
                             self.logger.fault("connect, timeout forcing disconnect (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             device.lastConnectionInitiationAttempt = nil
+                            device.failedConnectionAttempts += 1
+                            // determine next connection time now
+                            // Removed the following line as the other setting of this now includes the connection timeout within it, so this is superfluous
+//                            device.onlyConnectAfter = Date() + TimeInterval(1 + 2^device.failedConnectionAttempts + Int.random(in: 0...5)) // 1 second, 3, 7, 15, 31, 63 and so on, with mean 2.5 seconds jitter added
                             self.queue.async { self.central.cancelPeripheralConnection(peripheral) }
                         } else {
                             // If not timed out yet, keep trying
+//                            self.logger.debug("connect, waiting for connection or timeout... (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
                             self.logger.debug("connect, retrying (source=\(source),device=\(device),elapsed=\(-lastAttempt.timeIntervalSinceNow))")
-                            self.central.connect($0)
+//                            device.lastConnectionInitiationAttempt = Date() // Set on each distinct attempt
+//                            device.onlyConnectAfter = Date() + TimeInterval(1 + Int.random(in: 0...5)) // 1 second + mean 2.5 seconds jitter added
+                            performConnection = true
                         }
                     } else {
                         // If not, connect now
                         self.logger.debug("connect, initiation (source=\(source),device=\(device))")
-                        device.lastConnectionInitiationAttempt = Date()
-                        self.central.connect($0)
+//                        device.lastConnectionInitiationAttempt = Date() // Set on each distinct attempt
+//                        device.onlyConnectAfter = Date() + TimeInterval(1 + Int.random(in: 0...5)) // 1 second + mean 2.5 seconds jitter added
+                        performConnection = true
+                    }
+                    // Try to connect, but don't attempt if currently attempting a connection (I.e. from a recent previous call that reaches this point)
+                    // Note: iOS devices incorrectly report .connecting, so we're relying on the timeout, above, here.
+                    //       Also now checking if we're waiting for a timeout, as we didn't handle that case before. (Temporary workaround for https://github.com/theheraldproject/herald-for-ios/issues/188)
+                    if (performConnection && $0.state != .connecting && nil == device.lastConnectionInitiationAttempt) {
+                        // Allow progressive backoff
+                        if (device.onlyConnectAfter < Date()) {
+                            // Changed to 3^ in order to back off more quickly (after 6 you'll now be at 94 seconds instead of 33 seconds)
+                            // Separated into separate lines as otherwise the XCode compiler complains that it's too complicated...
+                            let prog = 3^device.failedConnectionAttempts
+                            let seconds = 1  + prog + Int.random(in: 0...5)
+                            // Added connection timeout time too as a temporary workaround for https://github.com/theheraldproject/herald-for-ios/issues/188)
+                            let delay: TimeInterval = TimeInterval(seconds) + BLESensorConfiguration.connectionAttemptTimeout
+                            
+                            self.logger.debug("connect, now requesting a central connection (source=\(source),device=\(device),failedAttempts=\(device.failedConnectionAttempts),nextOnlyConnectAfterDelay=\(seconds)")
+                            // Add in a delay immediately to prevent thrashing, but don't increase failure count unless THIS connection times out explicitly
+                            device.lastConnectionInitiationAttempt = Date() // Set on each distinct attempt
+                            
+                            // 14, 16, 22, 40, 94 and so on, with mean 2.5 seconds jitter added
+                            // Additional timeout added as otherwise the jitter mostly falls WITHIN the .connecting period
+                            device.onlyConnectAfter = Date() + delay
+                            
+                            self.central.connect($0)
+                        } else {
+                            self.logger.debug("connect, waiting for discovery or backoff delay (source=\(source),device=\(device),connectAfter=\(device.onlyConnectAfter))")
+                        }
+                    } else {
+                        self.logger.debug("connect, waiting for state to leave .connecting state (source=\(source),device=\(device),connectAfter=\(device.onlyConnectAfter),state=\($0.state.description)")
                     }
                 } else {
+                    // clear failure and progressive backoff counts for this now-connected device
+                    device.failedConnectionAttempts = 0
+                    device.lastConnectionInitiationAttempt = nil
+                    // Minimum 10 second delay (plus mean 2.5 second jitter) between SUCCESSFUL attempts
+                    // Note: In reality this will only affect us if reading a payload fails due to the connection failing
+                    device.onlyConnectAfter = Date() + TimeInterval(10 + Int.random(in: 0...5))
+                    // This ensures post-connection actions take place
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
             }
@@ -576,10 +763,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      then the peripheral is unregistered by removing it from the beacons table.
      */
     private func disconnect(_ source: String, _ peripheral: CBPeripheral) {
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("disconnect (source=\(source),peripheral=\(targetIdentifier))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("disconnect (source=\(source),peripheral=\(device.identifier))")
         guard peripheral.state == .connected || peripheral.state == .connecting else {
-            logger.fault("disconnect denied, peripheral not connected or connecting (source=\(source),peripheral=\(targetIdentifier),state=\(peripheral.state))")
+            logger.fault("disconnect denied, peripheral not connected or connecting (source=\(source),peripheral=\(device.identifier),state=\(peripheral.state))")
             return
         }
         queue.async { self.central.cancelPeripheralConnection(peripheral) }
@@ -587,10 +774,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     /// Read RSSI
     private func readRSSI(_ source: String, _ peripheral: CBPeripheral) {
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("readRSSI (source=\(source),peripheral=\(targetIdentifier))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("readRSSI (source=\(source),peripheral=\(device.identifier))")
         guard peripheral.state == .connected else {
-            logger.fault("readRSSI denied, peripheral not connected (source=\(source),peripheral=\(targetIdentifier))")
+            logger.fault("readRSSI denied, peripheral not connected (source=\(source),peripheral=\(device.identifier))")
             scheduleScan("readRSSI")
             return
         }
@@ -599,15 +786,19 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     
     /// Discover services
     private func discoverServices(_ source: String, _ peripheral: CBPeripheral) {
-        let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-        logger.debug("discoverServices (source=\(source),peripheral=\(targetIdentifier))")
+        let device = database.device(peripheral, delegate: self)
+        logger.debug("discoverServices (source=\(source),peripheral=\(device.identifier))")
         guard peripheral.state == .connected else {
-            logger.fault("discoverServices denied, peripheral not connected (source=\(source),peripheral=\(targetIdentifier))")
+            logger.fault("discoverServices denied, peripheral not connected (source=\(source),peripheral=\(device.identifier))")
             scheduleScan("discoverServices")
             return
         }
         queue.async {
-            var services: [CBUUID] = [BLESensorConfiguration.serviceUUID]
+            var services: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+            // Optionally, include the old Herald service UUID (prior to v2.1.0)
+            if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
+                services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
+            }
             // Optionally include OpenTrace protocol as discovery criteria
             if BLESensorConfiguration.interopOpenTraceEnabled {
                 services.append(BLESensorConfiguration.interopOpenTraceServiceUUID)
@@ -619,7 +810,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// Read payload data from device
     private func readPayload(_ source: String, _ device: BLEDevice) {
         logger.debug("readPayload (source=\(source),peripheral=\(device.identifier))")
-        guard let peripheral = device.peripheral, peripheral.state == .connected else {
+        guard let peripheral = device.connectedPeripheral() else {
             logger.fault("readPayload denied, peripheral not connected (source=\(source),peripheral=\(device.identifier))")
             return
         }
@@ -636,7 +827,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         // Initiate read payload
         device.lastReadPayloadRequestedAt = Date()
-        if device.operatingSystem == .android, let peripheral = device.peripheral {
+        if device.operatingSystem == .android, let peripheral = device.mostRecentPeripheral() {
             discoverServices("readPayload|android", peripheral)
         } else {
             queue.async { peripheral.readValue(for: payloadCharacteristic) }
@@ -665,7 +856,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      maximising the time interval between bluetooth calls to minimise power usage.
      */
     private func wakeTransmitter(_ source: String, _ device: BLEDevice) {
-        guard device.operatingSystem == .ios, let peripheral = device.peripheral, let characteristic = device.signalCharacteristic else {
+        guard device.operatingSystem == .ios, let peripheral = device.mostRecentPeripheral(), let characteristic = device.signalCharacteristic else {
             return
         }
         logger.debug("wakeTransmitter (source=\(source),peripheral=\(device.identifier),write=\(characteristic.properties.contains(.write))")
@@ -791,7 +982,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         logger.debug("didFailToConnect (device=\(device),error=\(String(describing: error)))")
         if String(describing: error).contains("Device is invalid") {
             logger.debug("Unregister invalid device (device=\(device))")
-            database.delete(device)
+            database.delete(device, peripheral: peripheral)
         } else {
             connect("didFailToConnect", peripheral)
         }
@@ -842,7 +1033,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         for service in services {
-            if service.uuid == BLESensorConfiguration.serviceUUID {
+            if (service.uuid == BLESensorConfiguration.linuxFoundationServiceUUID) ||
+                (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && service.uuid == BLESensorConfiguration.legacyHeraldServiceUUID) {
                 logger.debug("didDiscoverServices, found sensor service (device=\(device))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return

@@ -13,8 +13,26 @@ public protocol PseudoRandomFunction {
     func nextBytes(_ data: inout Data) -> Bool
 }
 
+public extension PseudoRandomFunction {
+
+    func nextBytes(_ count: Int) -> Data {
+        var data = Data(repeating: 0, count: max(0, count))
+        if !nextBytes(&data) {
+            let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.Security.PseudoRandomFunction")
+            logger.fault("Random function failed, reverting to UInt8 random")
+            for i in 0...data.count-1 {
+                data[i] = UInt8.random(in: UInt8.min...UInt8.max)
+            }
+        }
+        return data
+    }
+    
+    func nextInt64() -> Int64 {
+        return nextBytes(8).int64(0)!
+    }
+}
+
 public class SecureRandomFunction: PseudoRandomFunction {
-    private let logger = ConcreteSensorLogger(subsystem: "Sensor", category: "Data.Security.PseudoRandomFunction")
 
     public init() {
     }

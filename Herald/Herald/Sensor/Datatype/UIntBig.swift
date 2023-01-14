@@ -71,24 +71,20 @@ public class UIntBig: Equatable, Hashable, Comparable {
         }
     }
     
-    public convenience init?(bitLength: Int, random: PseudoRandomFunction = SecureRandomFunction()) {
+    public convenience init(bitLength: Int, random: PseudoRandomFunction = SecureRandomFunction()) {
         self.init(Array<UInt16>(repeating: 0, count: (bitLength + 15) / 16))
-        var data = Data(repeating: 0, count: magnitude.count * 2)
-        guard random.nextBytes(&data) else {
-            return nil
-        }
+        let data = random.nextBytes(magnitude.count * 2)
         var remaining = bitLength
         var i = 0
         while i < magnitude.count, remaining > 0 {
-            guard var value = data.uint16(i) else {
-                return nil
+            if var value = data.uint16(i) {
+                if remaining < 16 {
+                    value = value >> (16 - remaining)
+                } else {
+                    remaining -= 16
+                }
+                magnitude[i] = value
             }
-            if remaining < 16 {
-                value = value >> (16 - remaining)
-            } else {
-                remaining -= 16
-            }
-            magnitude[i] = value
             i += 1
         }
     }

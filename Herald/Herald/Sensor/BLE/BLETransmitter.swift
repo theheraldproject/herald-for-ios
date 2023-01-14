@@ -127,7 +127,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             } else {
                 queue.async {
                     self.peripheral.stopAdvertising()
-                    self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
+                    self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.linuxFoundationServiceUUID]])
                 }
             }
         } else {
@@ -148,7 +148,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
             legacyPayloadCharacteristic = (BLESensorConfiguration.interopOpenTraceEnabled ? CBMutableCharacteristic(type: BLESensorConfiguration.interopOpenTracePayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable]) : nil)
         }
-        let service = CBMutableService(type: BLESensorConfiguration.serviceUUID, primary: true)
+        let service = CBMutableService(type: BLESensorConfiguration.linuxFoundationServiceUUID, primary: true)
         signalCharacteristic?.value = nil
         payloadCharacteristic?.value = nil
 	if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
@@ -161,7 +161,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
             self.peripheral.add(service)
-            self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.serviceUUID]])
+            self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.linuxFoundationServiceUUID]])
         }
     }
     
