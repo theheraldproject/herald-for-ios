@@ -25,7 +25,12 @@ public class SensorArray : NSObject, Sensor {
         //   but enabling location sensor will enable direct iOS-iOS detection in background.
         // - Please note, the actual location is not used or recorded by HERALD.
         if let mobilitySensorResolution = BLESensorConfiguration.mobilitySensorEnabled {
-            sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.linuxFoundationServiceUUID.uuidString)))
+            if BLESensorConfiguration.standardHeraldServiceDetectionEnabled {
+                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.linuxFoundationServiceUUID.uuidString)))
+            }
+            if BLESensorConfiguration.customServiceDetectionEnabled && nil != BLESensorConfiguration.customServiceUUID {
+                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.customServiceUUID.uuidString)))
+            }
         }
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)
