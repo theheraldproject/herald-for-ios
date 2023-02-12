@@ -1,7 +1,7 @@
 //
 //  BLESensor.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -71,7 +71,7 @@ public struct BLESensorConfiguration {
      * @since v2.2 February 2023
      * @note Requires customHeraldServiceDetectionEnabled to be set to true to enable.
      */
-    public static var customServiceUUID: UUID = null;
+    public static var customServiceUUID: CBUUID? = nil;
     /**
      * Whether to detect a custom service UUID. Disabled by default.
      * Doesn't affect advertising.
@@ -95,7 +95,7 @@ public struct BLESensorConfiguration {
      * @since v2.2 February 2023
      * @note Requires customHeraldServiceDetectionEnabled to be set to true to enable.
      */
-    public static var customAdditionalServiceUUIDs: [UUID] = null;
+    public static var customAdditionalServiceUUIDs: [CBUUID] = [];
     /**
      * The custom manufacturer ID to use. Note this MUST be a Bluetooth SIG registered ID to
      * ensure there is no interference.
@@ -249,6 +249,11 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
         receiver = ConcreteBLEReceiver(queue: sensorQueue, delegateQueue: delegateQueue, database: database, payloadDataSupplier: payloadDataSupplier)
         super.init()
         database.add(delegate: self)
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // ConcreteBLESensor does not have a coordination provider
+        return nil
     }
     
     func start() {

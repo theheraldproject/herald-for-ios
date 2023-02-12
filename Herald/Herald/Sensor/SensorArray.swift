@@ -1,7 +1,7 @@
 //
 //  SensorArray.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -26,10 +26,10 @@ public class SensorArray : NSObject, Sensor {
         // - Please note, the actual location is not used or recorded by HERALD.
         if let mobilitySensorResolution = BLESensorConfiguration.mobilitySensorEnabled {
             if BLESensorConfiguration.standardHeraldServiceDetectionEnabled {
-                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.linuxFoundationServiceUUID.uuidString)))
+                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString: BLESensorConfiguration.linuxFoundationServiceUUID.uuidString)))
             }
-            if BLESensorConfiguration.customServiceDetectionEnabled && nil != BLESensorConfiguration.customServiceUUID {
-                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.customServiceUUID.uuidString)))
+            if let csuuid = BLESensorConfiguration.customServiceUUID, BLESensorConfiguration.customServiceDetectionEnabled {
+                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString: csuuid.uuidString)))
             }
         }
         // BLE sensor for detecting and tracking proximity
@@ -53,6 +53,11 @@ public class SensorArray : NSObject, Sensor {
         } else {
             logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
         }
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // Array does not have a coordination provider
+        return nil
     }
     
     private func deviceModel() -> String {

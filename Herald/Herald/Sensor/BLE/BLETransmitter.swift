@@ -1,7 +1,7 @@
 //
 //  BLETransmitter.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -86,6 +86,11 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         }
     }
     
+    public func coordinationProvider() -> CoordinationProvider? {
+        // BLETransmitter does not have a coordination provider
+        return nil
+    }
+    
     func add(delegate: SensorDelegate) {
         delegates.append(delegate)
     }
@@ -154,19 +159,21 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
         }
         signalCharacteristic?.value = nil
         payloadCharacteristic?.value = nil
-        if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
-            legacyPayloadCharacteristic.value = nil
-            service.characteristics = [signalCharacteristic!, payloadCharacteristic!, legacyPayloadCharacteristic]
-        } else {
-            service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
-        }
+        legacyPayloadCharacteristic?.value = nil
+        // We do characteristics via GATT only now
+//        if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
+//            legacyPayloadCharacteristic.value = nil
+//            service.characteristics = [signalCharacteristic!, payloadCharacteristic!, legacyPayloadCharacteristic]
+//        } else {
+//            service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
+//        }
         queue.async {
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
-            if BLESensorConfiguration.customServiceAdvertisingEnabled && nil != BLESensorConfiguration.customServiceUUID {
-                let service = CBMutableService(type: BLESensorConfiguration.customServiceUUID, primary: true)
+            if let csuuid = BLESensorConfiguration.customServiceUUID, BLESensorConfiguration.customServiceAdvertisingEnabled {
+                let service = CBMutableService(type: csuuid, primary: true)
                 self.peripheral.add(service)
-                self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.customServiceUUID]])
+                self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [csuuid]])
             } else if BLESensorConfiguration.standardHeraldServiceAdvertisingEnabled {
                 let service = CBMutableService(type: BLESensorConfiguration.linuxFoundationServiceUUID, primary: true)
                 self.peripheral.add(service)

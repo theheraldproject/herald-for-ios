@@ -92,6 +92,8 @@
 		B6F7460A255714C2003567B7 /* SimplePayloadDataMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */; };
 		B6F7460B255714C2003567B7 /* BloomFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74607255714C2003567B7 /* BloomFilterTests.swift */; };
 		B6F7460C255714C2003567B7 /* InteractionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F74608255714C2003567B7 /* InteractionsTests.swift */; };
+		D1FA72CF2999233C00F2F784 /* Activities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1FA72CE2999233C00F2F784 /* Activities.swift */; };
+		D1FA72D12999234800F2F784 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1FA72D02999234800F2F784 /* Coordinator.swift */; };
 		D301023D25B8DD8300598DF4 /* ExtendedDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */; };
 		D32988E425C34AE20066D9D4 /* PayloadDataFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32988E325C34AE20066D9D4 /* PayloadDataFormatter.swift */; };
 /* End PBXBuildFile section */
@@ -196,6 +198,8 @@
 		B6F74606255714C2003567B7 /* SimplePayloadDataMatcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimplePayloadDataMatcherTests.swift; sourceTree = "<group>"; };
 		B6F74607255714C2003567B7 /* BloomFilterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BloomFilterTests.swift; sourceTree = "<group>"; };
 		B6F74608255714C2003567B7 /* InteractionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractionsTests.swift; sourceTree = "<group>"; };
+		D1FA72CE2999233C00F2F784 /* Activities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Activities.swift; path = herald/Sensor/Engine/Activities.swift; sourceTree = SOURCE_ROOT; };
+		D1FA72D02999234800F2F784 /* Coordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Coordinator.swift; path = herald/Sensor/Engine/Coordinator.swift; sourceTree = SOURCE_ROOT; };
 		D301023C25B8DD8300598DF4 /* ExtendedDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedDataTests.swift; sourceTree = "<group>"; };
 		D32988E325C34AE20066D9D4 /* PayloadDataFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PayloadDataFormatter.swift; path = herald/Sensor/Data/PayloadDataFormatter.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -267,6 +271,7 @@
 		B637EF5C251E56320072D238 /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				D13665722992EA8A00F2B4FC /* Engine */,
 				B6EEC24425B5BC2B00D1CDF9 /* Extensions */,
 				B6599D0125A4EAE600AC306D /* Motion */,
 				B6F745EE255713C2003567B7 /* Analysis */,
@@ -484,6 +489,15 @@
 			path = Analysis;
 			sourceTree = "<group>";
 		};
+		D13665722992EA8A00F2B4FC /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				D1FA72CE2999233C00F2F784 /* Activities.swift */,
+				D1FA72D02999234800F2F784 /* Coordinator.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -633,6 +647,7 @@
 				B6F40DC52658FAD40088B098 /* Encryption.swift in Sources */,
 				B6DA10B325A78AF50071C08E /* CalibrationLog.swift in Sources */,
 				B637EF8E251E56320072D238 /* SensorDelegate.swift in Sources */,
+				D1FA72CF2999233C00F2F784 /* Activities.swift in Sources */,
 				B637EF86251E56320072D238 /* SensorArray.swift in Sources */,
 				B637EF8D251E56320072D238 /* StatisticsLog.swift in Sources */,
 				6FE142FB2565C39A0084A59C /* Device.swift in Sources */,
@@ -653,6 +668,7 @@
 				B637EF87251E56320072D238 /* PayloadDataSupplier.swift in Sources */,
 				B65235BB26308DF6007321B8 /* Sample.swift in Sources */,
 				B6EEC24625B5BC4400D1CDF9 /* DataExtensions.swift in Sources */,
+				D1FA72D12999234800F2F784 /* Coordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

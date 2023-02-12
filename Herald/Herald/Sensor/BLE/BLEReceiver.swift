@@ -1,7 +1,7 @@
 //
 //  BLEReceiver.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -117,6 +117,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 disconnect("stop", peripheral)
             }
         }
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // TODO implement BLE Coordination Provider
+        return nil
     }
     
     func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {
@@ -268,10 +273,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 scanForServices.append(csuuid)
                 solicitedKeys.append(csuuid)
             }
-            if let casuuids = BLESensorConfiguration.customAdditionalServiceUUIDs {
-                for suuid in BLESensorConfiguration.customServiceUUID {
-                    scanForServices.append(suuid)
-                }
+            for suuid in BLESensorConfiguration.customAdditionalServiceUUIDs {
+                scanForServices.append(suuid)
             }
         }
         // Optionally, include the old Herald service UUID (prior to v2.1.0)
@@ -303,10 +306,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let csuuid = BLESensorConfiguration.customServiceUUID {
                 services.append(csuuid)
             }
-            if let casuuids = BLESensorConfiguration.customAdditionalServiceUUIDs {
-                for suuid in BLESensorConfiguration.customServiceUUID {
-                    services.append(suuid)
-                }
+            for suuid in BLESensorConfiguration.customAdditionalServiceUUIDs {
+                services.append(suuid)
             }
         }
         // Optionally, include the old Herald service UUID (prior to v2.1.0)
@@ -833,10 +834,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 if let csuuid = BLESensorConfiguration.customServiceUUID {
                     services.append(csuuid)
                 }
-                if let casuuids = BLESensorConfiguration.customAdditionalServiceUUIDs {
-                    for suuid in BLESensorConfiguration.customServiceUUID {
-                        services.append(suuid)
-                    }
+                for suuid in BLESensorConfiguration.customAdditionalServiceUUIDs {
+                    services.append(suuid)
                 }
             }
             // Optionally, include the old Herald service UUID (prior to v2.1.0)
@@ -1078,11 +1077,12 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         for service in services {
             if (BLESensorConfiguration.standardHeraldServiceDetectionEnabled && service.uuid == BLESensorConfiguration.linuxFoundationServiceUUID) ||
-               (BLESensorConfiguration.customServiceDetectionEnabled && (
-                    (nil != BLESensorConfiguration.customServiceUUID && service.uuid == BLESensorConfiguration.customServiceUUID) ||
-                    (nil != BLESensorConfiguration.customAdditionalServiceUUIDs && BLESensorConfiguration.customAdditionalServiceUUIDs.contains(service.uuid))
-                ) ||
-               (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && service.uuid == BLESensorConfiguration.legacyHeraldServiceUUID) {
+               (BLESensorConfiguration.customServiceDetectionEnabled && ((
+                (((nil != BLESensorConfiguration.customServiceUUID) && (service.uuid == BLESensorConfiguration.customServiceUUID!)) ||
+                (BLESensorConfiguration.customAdditionalServiceUUIDs.contains(service.uuid))
+                )))) ||
+               (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && (service.uuid == BLESensorConfiguration.legacyHeraldServiceUUID)
+               ) {
                    logger.debug("didDiscoverServices, found sensor service (device=\(device),service=\(service.uuid.uuidString))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return
