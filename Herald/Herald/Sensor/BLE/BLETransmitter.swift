@@ -157,25 +157,30 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
             payloadCharacteristic = CBMutableCharacteristic(type: BLESensorConfiguration.payloadCharacteristicUUID, properties: [.read], value: nil, permissions: [.readable])
             legacyPayloadCharacteristic = (BLESensorConfiguration.interopOpenTraceEnabled ? CBMutableCharacteristic(type: BLESensorConfiguration.interopOpenTracePayloadCharacteristicUUID, properties: [.read, .write, .writeWithoutResponse], value: nil, permissions: [.readable, .writeable]) : nil)
         }
-        signalCharacteristic?.value = nil
-        payloadCharacteristic?.value = nil
-        legacyPayloadCharacteristic?.value = nil
-        // We do characteristics via GATT only now
-//        if let legacyPayloadCharacteristic = legacyPayloadCharacteristic {
-//            legacyPayloadCharacteristic.value = nil
-//            service.characteristics = [signalCharacteristic!, payloadCharacteristic!, legacyPayloadCharacteristic]
-//        } else {
-//            service.characteristics = [signalCharacteristic!, payloadCharacteristic!]
-//        }
         queue.async {
             self.peripheral.stopAdvertising()
             self.peripheral.removeAllServices()
+            self.signalCharacteristic?.value = nil
+            self.payloadCharacteristic?.value = nil
             if let csuuid = BLESensorConfiguration.customServiceUUID, BLESensorConfiguration.customServiceAdvertisingEnabled {
                 let service = CBMutableService(type: csuuid, primary: true)
+                service.characteristics = [self.signalCharacteristic!, self.payloadCharacteristic!]
+                if let legacyPayloadCharacteristic = self.legacyPayloadCharacteristic {
+                    legacyPayloadCharacteristic.value = nil
+                    service.characteristics = [self.signalCharacteristic!, self.payloadCharacteristic!, legacyPayloadCharacteristic]
+                } else {
+                    service.characteristics = [self.signalCharacteristic!, self.payloadCharacteristic!]
+                }
                 self.peripheral.add(service)
                 self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [csuuid]])
             } else if BLESensorConfiguration.standardHeraldServiceAdvertisingEnabled {
                 let service = CBMutableService(type: BLESensorConfiguration.linuxFoundationServiceUUID, primary: true)
+                if let legacyPayloadCharacteristic = self.legacyPayloadCharacteristic {
+                    legacyPayloadCharacteristic.value = nil
+                    service.characteristics = [self.signalCharacteristic!, self.payloadCharacteristic!, legacyPayloadCharacteristic]
+                } else {
+                    service.characteristics = [self.signalCharacteristic!, self.payloadCharacteristic!]
+                }
                 self.peripheral.add(service)
                 self.peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [BLESensorConfiguration.linuxFoundationServiceUUID]])
             }

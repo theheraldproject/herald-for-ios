@@ -319,6 +319,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     //            let targetIdentifier = TargetIdentifier(peripheral: peripheral)
                 let device = database.device(peripheral, delegate: self)
                 logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
+//                self.central.connect(peripheral, options: nil)
     //            if device.peripheral == nil || device.peripheral != peripheral {
     //                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
     //                _ = database.device(peripheral, delegate: self)
@@ -715,7 +716,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         queue.async {
             device.lastConnectRequestedAt = Date()
-            self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
+            let peripherals = self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier])
+            peripherals.forEach {
+                self.logger.debug("connect, found peripheral (source=\(source),device=\(device),state=\($0.state)")
                 if $0.state != .connected {
                     var performConnection = false
                     // Check to see if Herald has initiated a connection attempt before
@@ -783,6 +786,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                     // This ensures post-connection actions take place
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
+            }
+            if peripherals.count == 0 {
+                self.logger.debug("WARNING: connect, could not find peripheral. Not populated until connected? (source=\(source),device=\(device))")
+//                self.central.connect(peripheral)
             }
         }
         scheduleScan("connect")
@@ -997,8 +1004,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             device.payloadData = legacyAdvertOnlyProtocolData.payloadData
             logger.debug("didDiscover, legacy payload (device=\(device),service=\(legacyAdvertOnlyProtocolData.service.description),payload=\(legacyAdvertOnlyProtocolData.payloadData.hexEncodedString))")
         }
+        // Removed since V2.2 as it always connects to 'unknown' devices that may be unknown because they're Android and not advertising the Herald service
+        // - i.e. we were always trying to connect to unknown devices even if their next connect time was way in the future
         if (legacyAdvertOnlyProtocolData == nil || legacyAdvertOnlyProtocolData!.connectable), deviceHasPendingTask(device) {
-            connect("didDiscover", peripheral);
+//            connect("didDiscover", peripheral);
         } else {
             scanResults.append(device)
         }
@@ -1027,7 +1036,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.debug("Unregister invalid device (device=\(device))")
             database.delete(device, peripheral: peripheral)
         } else {
-            connect("didFailToConnect", peripheral)
+            // Removed since V2.2 as connecting now handled by a lifecycle process, not during the central process
+//            connect("didFailToConnect", peripheral)
         }
     }
     
@@ -1090,7 +1100,14 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 logger.debug("didDiscoverServices, found legacy service (device=\(device),service=\(service.uuid.uuidString))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return
+            } else {
+                logger.debug("didDiscoverServices, found unhandled service (device=\(device),hasServiceUUID:\(service.uuid.uuidString))")
             }
+        }
+        if services.count == 0 {
+            logger.debug("didDiscoverServices, WARNING: device is not advertising any services. Ignoring. Advertising broken or a non-Herald device (device=\(device))")
+            // V2.2 Add to ignore list (TODO only if this keeps happening repeatedly) as it's a non-Herald device, or broken and not advertising
+            device.onlyConnectAfter = Date.distantFuture
         }
         disconnect("didDiscoverServices|serviceNotFound", peripheral)
         // The disconnect calls here shall be handled by didDisconnect which determines whether to retry for iOS or stop for Android
@@ -1100,9 +1117,15 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         // Discover characteristics -> Notify delegates -> Disconnect | Wake transmitter -> Scan again
         let device = database.device(peripheral, delegate: self)
-        logger.debug("didDiscoverCharacteristicsFor (device=\(device),error=\(String(describing: error)))")
+        logger.debug("didDiscoverCharacteristicsFor (device=\(device),service=\(service.uuid.uuidString),error=\(String(describing: error)))")
         guard let characteristics = service.characteristics else {
-            disconnect("didDiscoverCharacteristicsFor|characteristicEmpty", peripheral)
+            // Don't disconnect as there may be other services this callback is activated for
+//            disconnect("didDiscoverCharacteristicsFor|characteristicNil", peripheral)
+            return
+        }
+        if (characteristics.count == 0) {
+            // Don't disconnect as there may be other services this callback is activated for
+//            disconnect("didDiscoverCharacteristicsFor|characteristicEmpty", peripheral)
             return
         }
         for characteristic in characteristics {
@@ -1185,6 +1208,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if peripheral.state == .connected {
             discoverServices("didModifyServices", peripheral)
         } else if peripheral.state != .connecting {
+            // Note: This is good as if an Android device 'fixes' itself and starts advertising, this causes it to be read
             connect("didModifyServices", peripheral)
         }
     }
