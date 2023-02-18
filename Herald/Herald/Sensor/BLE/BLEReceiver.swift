@@ -315,15 +315,24 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
         }
         if !services.isEmpty {
-            central.retrieveConnectedPeripherals(withServices: services).forEach() { peripheral in
+            let connected = central.retrieveConnectedPeripherals(withServices: services)
+            // Evaluate those that are still connected
+            connected.forEach() { peripheral in
     //            let targetIdentifier = TargetIdentifier(peripheral: peripheral)
                 let device = database.device(peripheral, delegate: self)
                 logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
+                taskInitiateNextAction("taskRegisterConnectedPeripherals", peripheral: peripheral)
+                // Immediately connect back, which also causes taskInitiateNextAction to occur
 //                self.central.connect(peripheral, options: nil)
     //            if device.peripheral == nil || device.peripheral != peripheral {
     //                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
     //                _ = database.device(peripheral, delegate: self)
     //            }
+            }
+            // Also fetch those we're no longer connected to who have recently connected to us and may have tasks pending
+            let peris = database.devices().filter {$0.hasPeripheral() && !connected.contains($0.mostRecentPeripheral()!)}
+            for peri in peris {
+                taskInitiateNextAction("taskRegisterConnectedPeripherals|peripheral", peripheral: peri.mostRecentPeripheral()!)
             }
         }
     }
@@ -342,6 +351,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let peripheral = peripherals.last {
                 logger.debug("taskResolveDevicePeripherals (resolved=\(device))")
                 _ = database.device(peripheral, delegate: self)
+                // Since v2.2: If OS == unknown, connect to it (which in turn resolves their characteristics)
+                if device.operatingSystem == .unknown {
+                    central.connect(peripheral)
+                }
             }
         }
     }
@@ -584,6 +597,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
             connect("taskConnect|asymmetric", peripheral);
         }
+        
+        // Also now register remotely connection initiated peripherals
+//        taskRegisterConnectedPeripherals()
     }
 
     /// Empty scan results to produce a list of recently discovered devices for connection and processing
@@ -670,27 +686,45 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// code maintenance. An alternative implementation will be introduced in the future.
     private func taskInitiateNextAction(_ source: String, peripheral: CBPeripheral) {
         let device = database.device(peripheral, delegate: self)
+        // Note since v2.2 we've added logic to connect first because this method is called when the remote Android device connects to iOS even if iOS hasn't seen the device before
+        // TODO replace this with device state maintenance based on device.peripheral() state
         if device.rssi == nil {
             // 1. RSSI
             logger.debug("taskInitiateNextAction (goal=rssi,device=\(device))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
         } else if !(device.protocolIsHerald || device.protocolIsOpenTrace) {
             // 2. Characteristics
-            logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
-            discoverServices("taskInitiateNextAction|" + source, peripheral)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
+                discoverServices("taskInitiateNextAction|" + source, peripheral)
+            }
         } else if device.payloadData == nil {
             // 3. Payload
-            logger.debug("taskInitiateNextAction (goal=payload,device=\(device))")
-            readPayload("taskInitiateNextAction|" + source, device)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=payload,device=\(device))")
+                readPayload("taskInitiateNextAction|" + source, device)
+            }
         } else if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
             // 4. Payload update
-            logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
-            readPayload("taskInitiateNextAction|" + source, device)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+                readPayload("taskInitiateNextAction|" + source, device)
+            }
         } else if BLESensorConfiguration.interopOpenTraceEnabled, device.protocolIsOpenTrace,
                device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
             // 5. Payload update for OpenTrace
-            logger.debug("taskInitiateNextAction (goal=payloadUpdate|OpenTrace,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
-            readPayload("taskInitiateNextAction|" + source, device)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=payloadUpdate|OpenTrace,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+                readPayload("taskInitiateNextAction|" + source, device)
+            }
         } else if device.operatingSystem != .ios {
             // 6. Disconnect Android
             logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),device=\(device))")

@@ -358,7 +358,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
                                 logger.debug("didReceiveWrite -> didRead=\(payloadData.shortName),fromTarget=\(targetIdentifier)")
                                 queue.async { peripheral.respond(to: request, withResult: .success) }
                                 targetDevice.operatingSystem = .android
-                                targetDevice.receiveOnly = true
+//                                targetDevice.receiveOnly = true // Not true since v2.2 where all android devices write their payload
                                 targetDevice.payloadData = payloadData
                             } else {
                                 logger.fault("didReceiveWrite, invalid payload (central=\(targetIdentifier),action=writePayload)")
@@ -456,6 +456,7 @@ class ConcreteBLETransmitter : NSObject, BLETransmitter, CBPeripheralManagerDele
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
         // Read -> Notify subscribers
         let central = database.device(TargetIdentifier(request.central.identifier.uuidString))
+        
         switch request.characteristic.uuid {
         case BLESensorConfiguration.payloadCharacteristicUUID:
             logger.debug("Read (central=\(central.description),characteristic=payload,offset=\(request.offset))")

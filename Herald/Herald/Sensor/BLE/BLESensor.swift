@@ -214,7 +214,8 @@ public struct BLESensorConfiguration {
     /// - Upper bound : Set this value to iOS Bluetooth address rotation period (roughly 15 minutes) to maximise continuity when devices go out of range, then return back in range (connection resume period = 15 mins max).
     /// - Lower bound : Set this value to Android scan-process period (roughly 2 minutes) to minimise workload, but iOS connection resume will be more reliant on re-discovery (connection resume period = 2 mins or more dependent on external factors).
     /// - iOS-iOS connections may resume beyond the set interval value if the addresses have not changed, due to other mechanisms in Herald.
-    public static var peripheralCleanInterval: TimeInterval = TimeInterval.minute * 2
+    /// - Default changed to 30 minutes in V2.2 to reflect better Android lifecycle management
+    public static var peripheralCleanInterval: TimeInterval = TimeInterval.minute * 30
     
     /// Enable inertia sensor
     /// - Inertia sensor (accelerometer) measures acceleration in meters per second (m/s) along device X, Y and Z axis
