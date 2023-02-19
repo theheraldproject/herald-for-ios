@@ -1,8 +1,8 @@
 //
 //  EventLog.swift
 //
-//  Copyright 2021 Herald Project Contributors
-//  SPDX-License-Identifier: MIT
+//  Copyright 2021-2023 Herald Project Contributors
+//  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation

@@ -1,7 +1,7 @@
 //
 //  MobilitySensor.swift
 //
-//  Copyright 2021 Herald Project Contributors
+//  Copyright 2021-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -55,6 +55,11 @@ class ConcreteMobilitySensor : NSObject, MobilitySensor, CLLocationManagerDelega
         } else {
             logger.debug("init(ios<11.0)")
         }
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // Class does not have a coordination provider
+        return nil
     }
     
     /// Establish location accuracy required based on distance resolution required

@@ -1,7 +1,7 @@
 //
 //  BLEReceiver.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -117,6 +117,11 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                 disconnect("stop", peripheral)
             }
         }
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // TODO implement BLE Coordination Provider
+        return nil
     }
     
     func immediateSend(data: Data, _ targetIdentifier: TargetIdentifier) -> Bool {
@@ -257,7 +262,21 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
      */
     private func taskScanForPeripherals() {
         // Scan for peripherals -> didDiscover
-        var scanForServices: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+        var scanForServices: [CBUUID] = []
+        var solicitedKeys: [CBUUID] = []
+        if BLESensorConfiguration.standardHeraldServiceDetectionEnabled {
+            scanForServices.append(BLESensorConfiguration.linuxFoundationServiceUUID)
+            solicitedKeys.append(BLESensorConfiguration.linuxFoundationServiceUUID)
+        }
+        if BLESensorConfiguration.customServiceDetectionEnabled {
+            if let csuuid = BLESensorConfiguration.customServiceUUID {
+                scanForServices.append(csuuid)
+                solicitedKeys.append(csuuid)
+            }
+            for suuid in BLESensorConfiguration.customAdditionalServiceUUIDs {
+                scanForServices.append(suuid)
+            }
+        }
         // Optionally, include the old Herald service UUID (prior to v2.1.0)
         if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
             scanForServices.append(BLESensorConfiguration.legacyHeraldServiceUUID)
@@ -272,26 +291,49 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         central.scanForPeripherals(
             withServices: scanForServices,
-            options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: [BLESensorConfiguration.linuxFoundationServiceUUID]])
+            options: [CBCentralManagerScanOptionSolicitedServiceUUIDsKey: solicitedKeys])
     }
     
     /**
      Register all connected peripherals advertising the sensor service as a device.
      */
     private func taskRegisterConnectedPeripherals() {
-        var services: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+        var services: [CBUUID] = []
+        if BLESensorConfiguration.standardHeraldServiceDetectionEnabled {
+            services.append(BLESensorConfiguration.linuxFoundationServiceUUID)
+        }
+        if BLESensorConfiguration.customServiceDetectionEnabled {
+            if let csuuid = BLESensorConfiguration.customServiceUUID {
+                services.append(csuuid)
+            }
+            for suuid in BLESensorConfiguration.customAdditionalServiceUUIDs {
+                services.append(suuid)
+            }
+        }
         // Optionally, include the old Herald service UUID (prior to v2.1.0)
         if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
             services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
         }
-        central.retrieveConnectedPeripherals(withServices: services).forEach() { peripheral in
-//            let targetIdentifier = TargetIdentifier(peripheral: peripheral)
-            let device = database.device(peripheral, delegate: self)
-            logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
-//            if device.peripheral == nil || device.peripheral != peripheral {
-//                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
-//                _ = database.device(peripheral, delegate: self)
-//            }
+        if !services.isEmpty {
+            let connected = central.retrieveConnectedPeripherals(withServices: services)
+            // Evaluate those that are still connected
+            connected.forEach() { peripheral in
+    //            let targetIdentifier = TargetIdentifier(peripheral: peripheral)
+                let device = database.device(peripheral, delegate: self)
+                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
+                taskInitiateNextAction("taskRegisterConnectedPeripherals", peripheral: peripheral)
+                // Immediately connect back, which also causes taskInitiateNextAction to occur
+//                self.central.connect(peripheral, options: nil)
+    //            if device.peripheral == nil || device.peripheral != peripheral {
+    //                logger.debug("taskRegisterConnectedPeripherals (device=\(device))")
+    //                _ = database.device(peripheral, delegate: self)
+    //            }
+            }
+            // Also fetch those we're no longer connected to who have recently connected to us and may have tasks pending
+            let peris = database.devices().filter {$0.hasPeripheral() && !connected.contains($0.mostRecentPeripheral()!)}
+            for peri in peris {
+                taskInitiateNextAction("taskRegisterConnectedPeripherals|peripheral", peripheral: peri.mostRecentPeripheral()!)
+            }
         }
     }
 
@@ -309,6 +351,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             if let peripheral = peripherals.last {
                 logger.debug("taskResolveDevicePeripherals (resolved=\(device))")
                 _ = database.device(peripheral, delegate: self)
+                // Since v2.2: If OS == unknown, connect to it (which in turn resolves their characteristics)
+                if device.operatingSystem == .unknown {
+                    central.connect(peripheral)
+                }
             }
         }
     }
@@ -551,6 +597,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             }
             connect("taskConnect|asymmetric", peripheral);
         }
+        
+        // Also now register remotely connection initiated peripherals
+//        taskRegisterConnectedPeripherals()
     }
 
     /// Empty scan results to produce a list of recently discovered devices for connection and processing
@@ -637,27 +686,45 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     /// code maintenance. An alternative implementation will be introduced in the future.
     private func taskInitiateNextAction(_ source: String, peripheral: CBPeripheral) {
         let device = database.device(peripheral, delegate: self)
+        // Note since v2.2 we've added logic to connect first because this method is called when the remote Android device connects to iOS even if iOS hasn't seen the device before
+        // TODO replace this with device state maintenance based on device.peripheral() state
         if device.rssi == nil {
             // 1. RSSI
             logger.debug("taskInitiateNextAction (goal=rssi,device=\(device))")
             readRSSI("taskInitiateNextAction|" + source, peripheral)
         } else if !(device.protocolIsHerald || device.protocolIsOpenTrace) {
             // 2. Characteristics
-            logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
-            discoverServices("taskInitiateNextAction|" + source, peripheral)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=characteristics,device=\(device))")
+                discoverServices("taskInitiateNextAction|" + source, peripheral)
+            }
         } else if device.payloadData == nil {
             // 3. Payload
-            logger.debug("taskInitiateNextAction (goal=payload,device=\(device))")
-            readPayload("taskInitiateNextAction|" + source, device)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=payload,device=\(device))")
+                readPayload("taskInitiateNextAction|" + source, device)
+            }
         } else if device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.payloadDataUpdateTimeInterval {
             // 4. Payload update
-            logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
-            readPayload("taskInitiateNextAction|" + source, device)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=payloadUpdate,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+                readPayload("taskInitiateNextAction|" + source, device)
+            }
         } else if BLESensorConfiguration.interopOpenTraceEnabled, device.protocolIsOpenTrace,
                device.timeIntervalSinceLastPayloadDataUpdate > BLESensorConfiguration.interopOpenTracePayloadDataUpdateTimeInterval {
             // 5. Payload update for OpenTrace
-            logger.debug("taskInitiateNextAction (goal=payloadUpdate|OpenTrace,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
-            readPayload("taskInitiateNextAction|" + source, device)
+            if peripheral.state == .disconnected {
+                connect("taskInitiateNextAction|" + source, peripheral)
+            } else {
+                logger.debug("taskInitiateNextAction (goal=payloadUpdate|OpenTrace,device=\(device),elapsed=\(device.timeIntervalSinceLastPayloadDataUpdate))")
+                readPayload("taskInitiateNextAction|" + source, device)
+            }
         } else if device.operatingSystem != .ios {
             // 6. Disconnect Android
             logger.debug("taskInitiateNextAction (goal=disconnect|\(device.operatingSystem.rawValue),device=\(device))")
@@ -683,7 +750,9 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         }
         queue.async {
             device.lastConnectRequestedAt = Date()
-            self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier]).forEach {
+            let peripherals = self.central.retrievePeripherals(withIdentifiers: [peripheral.identifier])
+            peripherals.forEach {
+                self.logger.debug("connect, found peripheral (source=\(source),device=\(device),state=\($0.state)")
                 if $0.state != .connected {
                     var performConnection = false
                     // Check to see if Herald has initiated a connection attempt before
@@ -752,6 +821,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
                     self.taskInitiateNextAction("connect|" + source, peripheral: $0)
                 }
             }
+            if peripherals.count == 0 {
+                self.logger.debug("WARNING: connect, could not find peripheral. Not populated until connected? (source=\(source),device=\(device))")
+//                self.central.connect(peripheral)
+            }
         }
         scheduleScan("connect")
     }
@@ -794,7 +867,18 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         queue.async {
-            var services: [CBUUID] = [BLESensorConfiguration.linuxFoundationServiceUUID]
+            var services: [CBUUID] = []
+            if BLESensorConfiguration.standardHeraldServiceDetectionEnabled {
+                services.append(BLESensorConfiguration.linuxFoundationServiceUUID)
+            }
+            if BLESensorConfiguration.customServiceDetectionEnabled {
+                if let csuuid = BLESensorConfiguration.customServiceUUID {
+                    services.append(csuuid)
+                }
+                for suuid in BLESensorConfiguration.customAdditionalServiceUUIDs {
+                    services.append(suuid)
+                }
+            }
             // Optionally, include the old Herald service UUID (prior to v2.1.0)
             if BLESensorConfiguration.legacyHeraldServiceDetectionEnabled {
                 services.append(BLESensorConfiguration.legacyHeraldServiceUUID)
@@ -954,8 +1038,10 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             device.payloadData = legacyAdvertOnlyProtocolData.payloadData
             logger.debug("didDiscover, legacy payload (device=\(device),service=\(legacyAdvertOnlyProtocolData.service.description),payload=\(legacyAdvertOnlyProtocolData.payloadData.hexEncodedString))")
         }
+        // Removed since V2.2 as it always connects to 'unknown' devices that may be unknown because they're Android and not advertising the Herald service
+        // - i.e. we were always trying to connect to unknown devices even if their next connect time was way in the future
         if (legacyAdvertOnlyProtocolData == nil || legacyAdvertOnlyProtocolData!.connectable), deviceHasPendingTask(device) {
-            connect("didDiscover", peripheral);
+//            connect("didDiscover", peripheral);
         } else {
             scanResults.append(device)
         }
@@ -984,7 +1070,8 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             logger.debug("Unregister invalid device (device=\(device))")
             database.delete(device, peripheral: peripheral)
         } else {
-            connect("didFailToConnect", peripheral)
+            // Removed since V2.2 as connecting now handled by a lifecycle process, not during the central process
+//            connect("didFailToConnect", peripheral)
         }
     }
     
@@ -1033,16 +1120,28 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
             return
         }
         for service in services {
-            if (service.uuid == BLESensorConfiguration.linuxFoundationServiceUUID) ||
-                (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && service.uuid == BLESensorConfiguration.legacyHeraldServiceUUID) {
-                logger.debug("didDiscoverServices, found sensor service (device=\(device))")
+            if (BLESensorConfiguration.standardHeraldServiceDetectionEnabled && service.uuid == BLESensorConfiguration.linuxFoundationServiceUUID) ||
+               (BLESensorConfiguration.customServiceDetectionEnabled && ((
+                (((nil != BLESensorConfiguration.customServiceUUID) && (service.uuid == BLESensorConfiguration.customServiceUUID!)) ||
+                (BLESensorConfiguration.customAdditionalServiceUUIDs.contains(service.uuid))
+                )))) ||
+               (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && (service.uuid == BLESensorConfiguration.legacyHeraldServiceUUID)
+               ) {
+                   logger.debug("didDiscoverServices, found sensor service (device=\(device),service=\(service.uuid.uuidString))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return
             } else if BLESensorConfiguration.interopOpenTraceEnabled, service.uuid == BLESensorConfiguration.interopOpenTraceServiceUUID {
-                logger.debug("didDiscoverServices, found legacy service (device=\(device))")
+                logger.debug("didDiscoverServices, found legacy service (device=\(device),service=\(service.uuid.uuidString))")
                 queue.async { peripheral.discoverCharacteristics(nil, for: service) }
                 return
+            } else {
+                logger.debug("didDiscoverServices, found unhandled service (device=\(device),hasServiceUUID:\(service.uuid.uuidString))")
             }
+        }
+        if services.count == 0 {
+            logger.debug("didDiscoverServices, WARNING: device is not advertising any services. Ignoring. Advertising broken or a non-Herald device (device=\(device))")
+            // V2.2 Add to ignore list (TODO only if this keeps happening repeatedly) as it's a non-Herald device, or broken and not advertising
+            device.onlyConnectAfter = Date.distantFuture
         }
         disconnect("didDiscoverServices|serviceNotFound", peripheral)
         // The disconnect calls here shall be handled by didDisconnect which determines whether to retry for iOS or stop for Android
@@ -1052,9 +1151,15 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         // Discover characteristics -> Notify delegates -> Disconnect | Wake transmitter -> Scan again
         let device = database.device(peripheral, delegate: self)
-        logger.debug("didDiscoverCharacteristicsFor (device=\(device),error=\(String(describing: error)))")
+        logger.debug("didDiscoverCharacteristicsFor (device=\(device),service=\(service.uuid.uuidString),error=\(String(describing: error)))")
         guard let characteristics = service.characteristics else {
-            disconnect("didDiscoverCharacteristicsFor|characteristicEmpty", peripheral)
+            // Don't disconnect as there may be other services this callback is activated for
+//            disconnect("didDiscoverCharacteristicsFor|characteristicNil", peripheral)
+            return
+        }
+        if (characteristics.count == 0) {
+            // Don't disconnect as there may be other services this callback is activated for
+//            disconnect("didDiscoverCharacteristicsFor|characteristicEmpty", peripheral)
             return
         }
         for characteristic in characteristics {
@@ -1137,6 +1242,7 @@ class ConcreteBLEReceiver: NSObject, BLEReceiver, BLEDatabaseDelegate, CBCentral
         if peripheral.state == .connected {
             discoverServices("didModifyServices", peripheral)
         } else if peripheral.state != .connecting {
+            // Note: This is good as if an Android device 'fixes' itself and starts advertising, this causes it to be read
             connect("didModifyServices", peripheral)
         }
     }
