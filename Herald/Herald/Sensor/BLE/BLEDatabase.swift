@@ -579,9 +579,10 @@ class BLEPseudoDeviceAddress {
             return nil
         }
         // HERALD pseudo device address
-        if (manufacturerId == BLESensorConfiguration.linuxFoundationManufacturerIdForSensor ||
+        if ( (BLESensorConfiguration.standardHeraldServiceDetectionEnabled && manufacturerId == BLESensorConfiguration.linuxFoundationManufacturerIdForSensor) ||
+             (BLESensorConfiguration.customServiceDetectionEnabled && 0 != BLESensorConfiguration.customManufacturerIdForSensor && manufacturerId == BLESensorConfiguration.customManufacturerIdForSensor) ||
              (BLESensorConfiguration.legacyHeraldServiceDetectionEnabled && manufacturerId == BLESensorConfiguration.legacyHeraldManufacturerIdForSensor)
-           ) && manufacturerData.count == 8 {
+           ) && manufacturerData.count >= 8 {
             self.init(data: Data(manufacturerData.subdata(in: 2..<8)))
         }
         // Legacy pseudo device address

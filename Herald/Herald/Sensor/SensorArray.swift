@@ -1,7 +1,7 @@
 //
 //  SensorArray.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
@@ -25,7 +25,12 @@ public class SensorArray : NSObject, Sensor {
         //   but enabling location sensor will enable direct iOS-iOS detection in background.
         // - Please note, the actual location is not used or recorded by HERALD.
         if let mobilitySensorResolution = BLESensorConfiguration.mobilitySensorEnabled {
-            sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString:  BLESensorConfiguration.linuxFoundationServiceUUID.uuidString)))
+            if BLESensorConfiguration.standardHeraldServiceDetectionEnabled {
+                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString: BLESensorConfiguration.linuxFoundationServiceUUID.uuidString)))
+            }
+            if let csuuid = BLESensorConfiguration.customServiceUUID, BLESensorConfiguration.customServiceDetectionEnabled {
+                sensorArray.append(ConcreteMobilitySensor(resolution: mobilitySensorResolution, rangeForBeacon: UUID(uuidString: csuuid.uuidString)))
+            }
         }
         // BLE sensor for detecting and tracking proximity
         concreteBle = ConcreteBLESensor(payloadDataSupplier)
@@ -48,6 +53,11 @@ public class SensorArray : NSObject, Sensor {
         } else {
             logger.info("DEVICE (payloadPrefix=EMPTY,description=\(SensorArray.deviceDescription))")
         }
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // Array does not have a coordination provider
+        return nil
     }
     
     private func deviceModel() -> String {

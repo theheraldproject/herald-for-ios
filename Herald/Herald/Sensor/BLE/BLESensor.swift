@@ -1,12 +1,13 @@
 //
 //  BLESensor.swift
 //
-//  Copyright 2020-2021 Herald Project Contributors
+//  Copyright 2020-2023 Herald Project Contributors
 //  SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
 import CoreBluetooth
+import CoreFoundation
 
 protocol BLESensor : Sensor {
 }
@@ -20,9 +21,9 @@ public struct BLESensorConfiguration {
     /// then discover services to identify actual beacons.
     /// - Service and characteristic UUIDs are V4 UUIDs that have been randomly generated and tested
     /// for uniqueness by conducting web searches to ensure it returns no results.
-    public static var legacyHeraldServiceUUID: CBUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
+    public static let legacyHeraldServiceUUID: CBUUID = CBUUID(string: "428132af-4746-42d3-801e-4572d65bfd9b")
     /// The legacy unregistered manufacturer ID that was used by Herald until Oct 2022
-    public static var legacyHeraldManufacturerIdForSensor: UInt16 = UInt16(65530)
+    public static let legacyHeraldManufacturerIdForSensor: UInt16 = UInt16(65530)
     /// Detect the old legacy (unregistered) 128 bit Herald service ID
     /// Since v2.1.0 (Oct 2022)
     /// Deprecated. Support will be removed by Oct 2023. May be changed to false by default before then.
@@ -30,25 +31,82 @@ public struct BLESensorConfiguration {
     
     /// The Service UUID (Short) used by Herald since v2.1.0 (Oct 2022)
     /// See legacyHeraldServiceDetectionEnabled and legacyHeraldServiceUUID for the prior service support
-    public static var linuxFoundationServiceUUID: CBUUID = CBUUID(string: "0000FCF6-0000-1000-8000-00805F9B34FB")
+    public static let linuxFoundationServiceUUID: CBUUID = CBUUID(string: "0000FCF6-0000-1000-8000-00805F9B34FB")
     /// Manufacturer data is being used on Android to store pseudo device address
     /// - This is now the dedicated Linux Foundation manufacturer ID (decimal 1521, hex 0x05F1)
     /// See legacyHeraldManufacturerIdForSensor for previous version
-    public static var linuxFoundationManufacturerIdForSensor: UInt16 = UInt16(1521) // aka 0x05F1
+    public static let linuxFoundationManufacturerIdForSensor: UInt16 = UInt16(1521) // aka 0x05F1
+    
+    /**
+     * Enables detection of the current standard Herald service UUID.
+     * Enabled by default
+     * @since v2.2 February 2023
+     */
+    public static var standardHeraldServiceDetectionEnabled: Bool = true;
+    
+    /**
+     * Enables advertising of the current standard Herald service UUID.
+     * Enabled by default
+     * @since v2.2 February 2023
+     */
+    public static var standardHeraldServiceAdvertisingEnabled: Bool = true;
     
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
-    public static var androidSignalCharacteristicUUID: CBUUID = CBUUID(string: "f617b813-092e-437a-8324-e09a80821a11")
+    public static let androidSignalCharacteristicUUID: CBUUID = CBUUID(string: "f617b813-092e-437a-8324-e09a80821a11")
     /// Signaling characteristic for controlling connection between peripheral and central, e.g. keep each other from suspend state
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
-    public static var iosSignalCharacteristicUUID: CBUUID = CBUUID(string: "0eb0d5f2-eae4-4a9a-8af3-a4adb02d4363")
+    public static let iosSignalCharacteristicUUID: CBUUID = CBUUID(string: "0eb0d5f2-eae4-4a9a-8af3-a4adb02d4363")
     /// Primary payload characteristic (read) for distributing payload data from peripheral to central, e.g. identity data
     /// - Characteristic UUID is randomly generated V4 UUIDs that has been tested for uniqueness by conducting web searches to ensure it returns no results.
-    public static var payloadCharacteristicUUID: CBUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
+    public static let payloadCharacteristicUUID: CBUUID = CBUUID(string: "3e98c0f8-8f05-4829-a121-43e38f8933e7")
     /// Secured Payload exchange registered UUID
     /// Since v2.1.0 (Not used until a future version TBD)
-    public static var securedPayloadCharacteristicUUID: CBUUID = CBUUID(string: "ae9f88ca-6ea6-494d-bd3f-09ffa3380340")
+    public static let securedPayloadCharacteristicUUID: CBUUID = CBUUID(string: "ae9f88ca-6ea6-494d-bd3f-09ffa3380340")
 
+    // MARK:- Custom Service UUID interoperability - Since v2.2
+    /**
+     * A custom service UUID to use for a Herald service. Required for custom apps (without Herald interop).
+     *
+     * @since v2.2 February 2023
+     * @note Requires customHeraldServiceDetectionEnabled to be set to true to enable.
+     */
+    public static var customServiceUUID: CBUUID? = nil;
+    /**
+     * Whether to detect a custom service UUID. Disabled by default.
+     * Doesn't affect advertising.
+     * in preference to the default Linux Foundation Herald UUID if specified.
+     * Only takes effect if customServiceUUID is set to a valid non-null UUID.
+     *
+     * @since v2.2 February 2023
+     */
+    public static var customServiceDetectionEnabled: Bool = false;
+    /**
+     * Whether to advertise using the main customServiceUUID instead of the standard Herald
+     * Service UUID.
+     *
+     * @since v2.2 February 2023
+     */
+    public static var customServiceAdvertisingEnabled: Bool = false;
+    /**
+     * Additional UUIDs beyond just customServiceUUID to detect. Useful for 'legacy' custom
+     * application detections. You do not have to include customServiceUUID in this list.
+     *
+     * @since v2.2 February 2023
+     * @note Requires customHeraldServiceDetectionEnabled to be set to true to enable.
+     */
+    public static var customAdditionalServiceUUIDs: [CBUUID] = [];
+    /**
+     * The custom manufacturer ID to use. Note this MUST be a Bluetooth SIG registered ID to
+     * ensure there is no interference.
+     * Note that if this is not specified, then the default Linux Foundation Herald service
+     * manufacturer ID will be used.
+     *
+     * @since v2.2 February 2023
+     * @note Requires customHeraldServiceDetectionEnabled to be set to true to enable.
+     * @note Requires pseudoDeviceAddress to be enabled.
+     */
+    static var customManufacturerIdForSensor: Int = 0;
     
     // MARK:- Interoperability with OpenTrace
 
@@ -89,13 +147,13 @@ public struct BLESensorConfiguration {
     // MARK:- BLE signal characteristic action codes
     
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload data length, then payload data
-    public static var signalCharacteristicActionWritePayload: UInt8 = UInt8(1)
+    public static let signalCharacteristicActionWritePayload: UInt8 = UInt8(1)
     /// Signal characteristic action code for write RSSI, expect 1 byte action code followed by 4 byte little-endian Int32 integer value for RSSI value
-    public static var signalCharacteristicActionWriteRSSI: UInt8 = UInt8(2)
+    public static let signalCharacteristicActionWriteRSSI: UInt8 = UInt8(2)
     /// Signal characteristic action code for write payload, expect 1 byte action code followed by 2 byte little-endian Int16 integer value for payload sharing data length, then payload sharing data
-    public static var signalCharacteristicActionWritePayloadSharing: UInt8 = UInt8(3)
+    public static let signalCharacteristicActionWritePayloadSharing: UInt8 = UInt8(3)
     /// Signal characteristic action code for arbitrary immediate write
-    public static var signalCharacteristicActionWriteImmediate: UInt8 = UInt8(4)
+    public static let signalCharacteristicActionWriteImmediate: UInt8 = UInt8(4)
 
     // MARK:- BLE event timing
     
@@ -156,7 +214,8 @@ public struct BLESensorConfiguration {
     /// - Upper bound : Set this value to iOS Bluetooth address rotation period (roughly 15 minutes) to maximise continuity when devices go out of range, then return back in range (connection resume period = 15 mins max).
     /// - Lower bound : Set this value to Android scan-process period (roughly 2 minutes) to minimise workload, but iOS connection resume will be more reliant on re-discovery (connection resume period = 2 mins or more dependent on external factors).
     /// - iOS-iOS connections may resume beyond the set interval value if the addresses have not changed, due to other mechanisms in Herald.
-    public static var peripheralCleanInterval: TimeInterval = TimeInterval.minute * 2
+    /// - Default changed to 30 minutes in V2.2 to reflect better Android lifecycle management
+    public static var peripheralCleanInterval: TimeInterval = TimeInterval.minute * 30
     
     /// Enable inertia sensor
     /// - Inertia sensor (accelerometer) measures acceleration in meters per second (m/s) along device X, Y and Z axis
@@ -191,6 +250,11 @@ class ConcreteBLESensor : NSObject, BLESensor, BLEDatabaseDelegate {
         receiver = ConcreteBLEReceiver(queue: sensorQueue, delegateQueue: delegateQueue, database: database, payloadDataSupplier: payloadDataSupplier)
         super.init()
         database.add(delegate: self)
+    }
+    
+    public func coordinationProvider() -> CoordinationProvider? {
+        // ConcreteBLESensor does not have a coordination provider
+        return nil
     }
     
     func start() {
